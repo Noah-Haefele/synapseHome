@@ -4,7 +4,7 @@ import QtQuick.Controls 2.15
 ApplicationWindow {
     id: mainWindow
 
-    width: 640
+    width: 800
     height: 480
     visible: true
     title: "Nexus UI"
