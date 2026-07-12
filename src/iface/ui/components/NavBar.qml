@@ -7,7 +7,7 @@ Item {
 
     property real preferredWidth: 280
 
-    signal backClicked
+    signal backClicked()
 
     Layout.preferredWidth: preferredWidth
     Layout.fillHeight: true
@@ -31,29 +31,14 @@ Item {
                 height: 45
 
                 // Back button
-                Button {
-                    id: backButton
-
+                SimpleButton {
                     anchors.left: parent.left
                     anchors.verticalCenter: parent.verticalCenter
 
                     height: parent.height * 0.8
                     width: height
                     
-                    background: Rectangle {
-                        radius: 10
-                        color: backButton.down ? "#e8e8e8" : "transparent"
-                    }
-
-                    contentItem: Text {
-                        text: "H"
-
-                        color: "#222"
-                        font.pixelSize: 12
-
-                        horizontalAlignment: Text.AlignHCenter
-                        verticalAlignment: Text.AlignVCenter
-                    }
+                    text: "h"
 
                     onClicked: root.backClicked()
                 }
