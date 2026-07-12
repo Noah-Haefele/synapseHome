@@ -7,7 +7,7 @@ ApplicationWindow {
     width: 800
     height: 480
     visible: true
-    title: "Nexus UI"
+    title: "Synapse UI"
 
     // Navigation between different views
     StackView {
