@@ -1,7 +1,6 @@
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
-import QtQuick.Effects
 
 Item {
     id: root
@@ -10,73 +9,84 @@ Item {
         anchors.fill: parent
         spacing: 0
 
-        // navbar
+        // Navigation panel
         Rectangle {
-            Layout.preferredWidth: parent.width * 0.2
+            Layout.preferredWidth: parent.width * 0.25
             Layout.fillHeight: true
             color: "#f2f2f4"
-            // back button
-            Button {
-                id: backButton
 
+            Column {
                 anchors {
-                    left: parent.left
-                    right: parent.right
                     top: parent.top
-                    margins: 5
+                    horizontalCenter: parent.horizontalCenter
+                    topMargin: 5
                 }
 
-                height: 45
-                
-                background: Item {
-                    Rectangle {
-                        id: bg
-                        anchors.fill: parent
-                        radius: 10
-                        color: backButton.down ? "#e8e8e8" : "#f2f2f4"
+                width: parent.width * 0.93
+
+                Item {
+                    width: parent.width
+                    height: 45
+
+                    // Back button
+                    Button {
+                        id: backButton
+
+                        anchors.left: parent.left
+                        anchors.verticalCenter: parent.verticalCenter
+
+                        height: parent.height * 0.8
+                        width: height
+                        
+                        background: Rectangle {
+                            radius: 10
+                            color: backButton.down ? "#e8e8e8" : "transparent"
+                        }
+
+                        contentItem: Text {
+                            text: "H"
+
+                            color: "#222"
+                            font.pixelSize: 12
+
+                            horizontalAlignment: Text.AlignHCenter
+                            verticalAlignment: Text.AlignVCenter
+                        }
+
+                        onClicked: stackView.pop()
+                    }
+
+                    // Page title
+                    Label {
+                        anchors.centerIn: parent
+
+                        text: "Settings"
+
+                        font {
+                            pixelSize: 15
+                            weight: Font.DemiBold
+                        }
                     }
                 }
+                
 
-                contentItem: Text {
-                    text: "Home"
-                    color: "#222"
-                    font.pixelSize: 17
-                    horizontalAlignment: Text.AlignHCenter
-                    verticalAlignment: Text.AlignVCenter
-                }
-            }
-
-            // list of settings groups
-            ListView {
-                anchors {
-                    left: parent.left
-                    right: parent.right
-                    top: backButton.bottom
-                    bottom: parent.bottom
-
-                    leftMargin: 7
-                    rightMargin: 7
-                    topMargin: 15
-                    bottomMargin: 7
-                }
-
-                spacing: 10
-
-                model: ["Option 1", "Option 2", "Option 3", "Option 4"]
-
-                delegate: Column {
-                    width: ListView.view.width
+                // List of settings groups
+                ListView {
                     spacing: 10
 
-                    ItemDelegate {
-                        id: delegate
+                    width: parent.width
+                    height: 300
 
-                        width: parent.width
+                    model: ["Option 1", "Option 2", "Option 3", "Option 4"]
+
+                    delegate: ItemDelegate {
+                        width: ListView.view.width
+                        height: 45
 
                         hoverEnabled: true
 
                         background: Rectangle {
-                            color: delegate.hovered ? "#e6e6e6" : "transparent"
+                            color: hovered ? "#e6e6e6" : "transparent"
                             radius: 6
                         }
 
@@ -91,7 +101,7 @@ Item {
             }
         }
 
-        // content area
+        // Content area
         Rectangle {
             Layout.fillHeight: true
             Layout.fillWidth: true
