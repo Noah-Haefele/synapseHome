@@ -54,10 +54,10 @@ Item {
                     top: backButton.bottom
                     bottom: parent.bottom
 
-                    leftMargin: 5
-                    rightMargin: 5
+                    leftMargin: 7
+                    rightMargin: 7
                     topMargin: 15
-                    bottomMargin: 5
+                    bottomMargin: 7
                 }
 
                 spacing: 10
@@ -77,6 +77,7 @@ Item {
 
                         background: Rectangle {
                             color: delegate.hovered ? "#e6e6e6" : "transparent"
+                            radius: 6
                         }
 
                         contentItem: Label {
@@ -85,14 +86,6 @@ Item {
                             horizontalAlignment: Text.AlignHCenter
                             verticalAlignment: Text.AlignVCenter
                         }
-                    }
-
-                    Rectangle {
-                        visible: index === 1
-                        width: parent.width
-                        height: 1
-                        color: "#c0c0c0"
-                        anchors.horizontalCenter: parent.horizontalCenter
                     }
                 }
             }
