@@ -13,8 +13,16 @@ Item {
         // Navigation panel
         NavBar {
             preferredWidth: parent.width * 0.25
-            
+
             onBackClicked: stackView.pop()
+        }
+
+        // Border between navigation panel and content area
+        Rectangle {
+            height: parent.height
+            width: 1
+
+            color: '#ebebeb'
         }
 
         // Content area
