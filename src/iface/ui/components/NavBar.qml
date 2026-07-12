@@ -26,6 +26,7 @@ Item {
 
             width: parent.width * 0.93
 
+            // Header
             Item {
                 width: parent.width
                 height: 45
@@ -54,9 +55,19 @@ Item {
                         weight: Font.DemiBold
                     }
                 }
+
+                // System action button
+                SimpleButton {
+                    anchors.right: parent.right
+                    anchors.verticalCenter: parent.verticalCenter
+
+                    height: parent.height * 0.8
+                    width: height
+                    
+                    text: "a"
+                }
             }
             
-
             // List of settings groups
             ListView {
                 spacing: 10
