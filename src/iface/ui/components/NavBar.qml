@@ -67,13 +67,15 @@ Item {
                     text: "a"
                 }
             }
-            
+
             // List of settings groups
             ListView {
                 spacing: 10
 
                 width: parent.width
                 height: 300
+
+                topMargin: 5
 
                 model: ["Option 1", "Option 2", "Option 3", "Option 4"]
 
