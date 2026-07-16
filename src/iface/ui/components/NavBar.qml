@@ -43,8 +43,8 @@ Item {
                     height: parent.height * 0.8
                     width: height
 
-                    backgroundColor: '#79baff'
-                    textColor: "white"
+                    backgroundColor: root.backgroundColor
+                    textColor: "black"
                     
                     text: "\u2190"
 
@@ -71,8 +71,8 @@ Item {
                     height: parent.height * 0.8
                     width: height
 
-                    backgroundColor: "#e74c3c"
-                    textColor: "white"
+                    backgroundColor: root.backgroundColor
+                    textColor: "black"
                     
                     text: "\u23FB"
                 }
