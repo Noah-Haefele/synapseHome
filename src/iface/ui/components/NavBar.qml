@@ -81,7 +81,7 @@ Item {
 
                 spacing: 10
 
-                topMargin: 5
+                topMargin: 10
 
                 model: Floor {}
 
