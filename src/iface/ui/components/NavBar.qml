@@ -20,9 +20,10 @@ Item {
         
         color: root.backgroundColor
 
-        Column {
+        ColumnLayout {
             anchors {
                 top: parent.top
+                bottom: parent.bottom
                 horizontalCenter: parent.horizontalCenter
                 topMargin: 5
             }
@@ -31,8 +32,8 @@ Item {
 
             // Header
             Item {
-                width: parent.width
-                height: 45
+                Layout.fillWidth: true
+                Layout.preferredHeight: 45
 
                 // Back button
                 SimpleButton {
@@ -75,10 +76,10 @@ Item {
             ListView {
                 id: floorList
 
-                spacing: 10
+                Layout.fillWidth: true
+                Layout.fillHeight: true
 
-                width: parent.width
-                height: 300
+                spacing: 10
 
                 topMargin: 5
 
