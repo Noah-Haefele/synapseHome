@@ -9,10 +9,7 @@ Button {
     
     background: Rectangle {
         radius: 8
-        opacity: button.down ? 0.3 : 1
-        color: button.backgroundColor
-        border.color: Qt.darker(button.backgroundColor, 1.2)
-        border.width: 1
+        color: button.hovered ? Qt.darker(button.backgroundColor, 1.2) : button.backgroundColor
     }
 
     contentItem: Text {
