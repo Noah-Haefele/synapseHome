@@ -1,11 +1,14 @@
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
+import "../models"
 
 Item {
     id: root
 
     property real preferredWidth: 280
+
+    property color backgroundColor: "#f2f2f4"
 
     signal backClicked()
 
@@ -15,7 +18,7 @@ Item {
     Rectangle {
         anchors.fill: parent
         
-        color: "#f2f2f4"
+        color: root.backgroundColor
 
         Column {
             anchors {
@@ -70,6 +73,8 @@ Item {
 
             // List of settings groups
             ListView {
+                id: floorList
+
                 spacing: 10
 
                 width: parent.width
@@ -77,24 +82,46 @@ Item {
 
                 topMargin: 5
 
-                model: ["Option 1", "Option 2", "Option 3", "Option 4"]
+                model: Floor {}
 
-                delegate: ItemDelegate {
+                delegate: Rectangle {
+                    id: wrapper
+
                     width: ListView.view.width
                     height: 45
 
-                    hoverEnabled: true
+                    readonly property bool isCurrent: ListView.isCurrentItem
 
-                    background: Rectangle {
-                        color: hovered ? "#e6e6e6" : "transparent"
+                    Rectangle {
+                        id: background
+
+                        anchors.fill: parent
+
                         radius: 6
+                        color: wrapper.isCurrent ? "#79baff" : root.backgroundColor
+                        opacity: hoverArea.containsMouse ? 0.3 : 1
+
+                        Behavior on opacity {
+                            NumberAnimation { duration: 150 }
+                        }
                     }
 
-                    contentItem: Label {
-                        text: modelData
+                    Text {
+                        anchors.centerIn: parent
+
+                        text: name
+
+                        color: "black"
+                    }
+
+                    MouseArea {
+                        id: hoverArea
+
                         anchors.fill: parent
-                        horizontalAlignment: Text.AlignHCenter
-                        verticalAlignment: Text.AlignVCenter
+
+                        hoverEnabled: true
+
+                        onClicked: floorList.currentIndex = index
                     }
                 }
             }
