@@ -84,6 +84,9 @@ Item {
 
                 model: Floor {}
 
+                // Disable user scrolling
+                interactive: false
+
                 delegate: Rectangle {
                     id: wrapper
 
