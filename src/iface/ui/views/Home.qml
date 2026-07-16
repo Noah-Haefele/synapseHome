@@ -28,6 +28,14 @@ Item {
         ControlGrid {
             Layout.fillHeight: true
             Layout.fillWidth: true
+
+            onSingleClicked:  (name) => {
+                switch (name) {
+                    case "settings":
+                        stackView.push("Settings.qml")
+                        break
+                }
+            }
         }
     }
 }
