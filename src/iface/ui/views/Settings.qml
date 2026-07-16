@@ -22,7 +22,7 @@ Item {
             height: parent.height
             width: 1
 
-            color: '#ebebeb'
+            color: '#dbdbdd'
         }
 
         // Content area
