@@ -108,15 +108,12 @@ Item {
                         anchors.fill: parent
 
                         radius: 6
-                        color: wrapper.isCurrent ? "#79baff" : root.backgroundColor
-                        border.color: Qt.darker(background.color, 1.2)
+                        color: wrapper.isCurrent
+                            ? (hoverArea.containsMouse ? Qt.darker("#79baff", 1.2) : "#79baff")
+                            : (hoverArea.containsMouse ? Qt.darker(root.backgroundColor, 1.2) : root.backgroundColor)
+                        border.color: Qt.darker(background.color, 1.4)
                         // display border only if the option is highlighted
                         border.width: wrapper.isCurrent ? 1 : 0
-                        opacity: hoverArea.containsMouse ? 0.3 : 1
-
-                        Behavior on opacity {
-                            NumberAnimation { duration: 150 }
-                        }
                     }
 
                     Text {
