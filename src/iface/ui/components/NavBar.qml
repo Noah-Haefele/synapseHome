@@ -109,6 +109,9 @@ Item {
 
                         radius: 6
                         color: wrapper.isCurrent ? "#79baff" : root.backgroundColor
+                        border.color: Qt.darker(background.color, 1.2)
+                        // display border only if the option is highlighted
+                        border.width: wrapper.isCurrent ? 1 : 0
                         opacity: hoverArea.containsMouse ? 0.3 : 1
 
                         Behavior on opacity {
