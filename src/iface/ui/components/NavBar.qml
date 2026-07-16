@@ -42,8 +42,11 @@ Item {
 
                     height: parent.height * 0.8
                     width: height
+
+                    backgroundColor: '#79baff'
+                    textColor: "white"
                     
-                    text: "h"
+                    text: "\u2190"
 
                     onClicked: root.backClicked()
                 }
@@ -67,8 +70,11 @@ Item {
 
                     height: parent.height * 0.8
                     width: height
+
+                    backgroundColor: "#e74c3c"
+                    textColor: "white"
                     
-                    text: "a"
+                    text: "\u23FB"
                 }
             }
 

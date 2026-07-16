@@ -3,16 +3,22 @@ import QtQuick.Controls
 
 Button {
     id: button
+
+    property color backgroundColor: "transparent"
+    property color textColor: "black"
     
     background: Rectangle {
-        radius: 10
-        color: button.down ? "#e8e8e8" : "transparent"
+        radius: 8
+        opacity: button.down ? 0.3 : 1
+        color: button.backgroundColor
+        border.color: Qt.darker(button.backgroundColor, 1.2)
+        border.width: 1
     }
 
     contentItem: Text {
         text: button.text
 
-        color: "#222"
+        color: button.textColor
         font.pixelSize: 12
 
         horizontalAlignment: Text.AlignHCenter
