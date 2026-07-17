@@ -10,8 +10,13 @@ ComboBox {
     font.pixelSize: 24
     font.family: "DejaVu Sans, sans-serif"
 
-    property alias items: root.model
-    model: []
+    // Ensure a default selection is made when the model is loaded 
+    // dynamically, preventing the ComboBox from getting stuck on index -1
+    onCountChanged: {
+        if (count > 0 && currentIndex === -1) {
+            currentIndex = 0
+        }
+    }
 
     // arrow
     indicator: Text {
@@ -33,7 +38,7 @@ ComboBox {
 
     // content
     contentItem: Text {
-        text: root.displayText || "Choose..."
+        text: root.displayText
         
         color: "#333333"
         font: root.font
@@ -63,7 +68,7 @@ ComboBox {
 
         // available options
         contentItem: ListView {
-            model: root.popup.visible ? root.delegateModel : null
+            model: root.delegateModel
 
             clip: true
             spacing: 0
