@@ -89,7 +89,7 @@ Item {
 
                 topMargin: 10
 
-                model: Floor {}
+                model: SettingsOptions {}
 
                 // Disable user scrolling
                 interactive: false
