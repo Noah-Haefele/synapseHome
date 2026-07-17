@@ -28,6 +28,14 @@ Rectangle {
             
             model: Floors {}
             textRole: "name"
+
+            currentIndex: uiHandler.floorIdx
+
+            onCurrentIndexChanged: {
+                if (uiHandler.floorIdx !== currentIndex) {
+                    uiHandler.floorIdx = currentIndex
+                }
+            }
         }
     }
 }
