@@ -74,7 +74,7 @@ ComboBox {
                 width: root.width
                 height: 70
 
-                text: modelData
+                text: root.textRole !== "" ? model[root.textRole] : modelData
 
                 contentItem: Text {
                     text: parent.text

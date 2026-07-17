@@ -2,9 +2,19 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 import "../components"
+import "../subviews/settings"
 
 Item {
     id: root
+
+    // For right subviews:
+    // 0 = display
+    // 1 = audio
+    // 2 = ring-tone
+    // 3 = system
+    // 4 = outdoor-station
+    // 5 = utility-server
+    property int leftViewState: 0
 
     RowLayout {
         anchors.fill: parent
@@ -15,6 +25,9 @@ Item {
             preferredWidth: parent.width * 0.25
 
             onBackClicked: stackView.pop()
+            onOptionClicked: (index, name) => {
+                root.leftViewState = index
+            }
         }
 
         // Border between navigation panel and content area
@@ -26,14 +39,27 @@ Item {
         }
 
         // Content area
-        Rectangle {
-            Layout.fillHeight: true
+        ColumnLayout {
             Layout.fillWidth: true
-            color: "white"
+            Layout.fillHeight: true
+            spacing: 0
 
-            Label {
-                anchors.centerIn: parent
-                text: "Settings Content"
+            System {
+                visible: leftViewState === 3
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+            }
+
+            Rectangle {
+                visible: leftViewState !== 3
+                Layout.fillHeight: true
+                Layout.fillWidth: true
+                color: "white"
+
+                Label {
+                    anchors.centerIn: parent
+                    text: "Settings Content"
+                }
             }
         }
     }
