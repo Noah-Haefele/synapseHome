@@ -79,10 +79,8 @@ Column {
         }
 
         popup: Popup {
-            y: combo.height + 15
+            y: combo.height + 10
             width: combo.width
-
-            padding: 0
 
             background: Rectangle {
                 color: "#ffffff"
