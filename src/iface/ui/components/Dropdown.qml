@@ -79,8 +79,33 @@ Column {
         }
 
         popup: Popup {
-            y: combo.height + 10
+            id: popup
+
+            // 70 is the delegate height, 400 is the maximum height cap.
+            property real expectedHeight: Math.min(combo.count * 70, 400)
+
+            // set height so qt knows the bounds
+            height: expectedHeight
             width: combo.width
+
+            // calculates if popup has to be opend upwards
+            property bool opensUpwards: {
+                if (!combo.Window.window) return false;
+
+                // calculates lower edge of popup
+                let globalBottom = combo.mapToItem(null, 0, combo.height).y;
+                let spaceBelow = combo.Window.window.height - globalBottom;
+
+                // if lower edge of popup smaller than actual popup height
+                return spaceBelow < expectedHeight + 10;
+            }
+            
+            // upwards: -height of popup - 10
+            // downwards: height of popup + 10
+            y: opensUpwards ? -expectedHeight - 15 : combo.height + 15
+
+            // flip animation from right direction
+            transformOrigin: opensUpwards ? Popup.Bottom : Popup.Top
 
             background: Rectangle {
                 color: "#ffffff"
