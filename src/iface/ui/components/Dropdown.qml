@@ -1,99 +1,126 @@
 import QtQuick 2.15
 import QtQuick.Controls 2.15
 
-ComboBox {
+Column {
     id: root
 
-    height: 60
-    width: 300
+    property alias model: combo.model
+    property alias currentIndex: combo.currentIndex
+    property alias textRole: combo.textRole
+    property alias count: combo.count
 
-    font.pixelSize: 24
-    font.family: "DejaVu Sans, sans-serif"
+    property alias label: label.text
 
-    // Ensure a default selection is made when the model is loaded 
-    // dynamically, preventing the ComboBox from getting stuck on index -1
-    onCountChanged: {
-        if (count > 0 && currentIndex === -1) {
-            currentIndex = 0
-        }
+    // Default width
+    width: 350
+
+    spacing: 1
+
+    Text {
+        id: label
+
+        visible: text.length > 0
+        text: ""
+
+        font.pixelSize: 11
+
+        color: "#6b7280"
     }
 
-    // arrow
-    indicator: Text {
-        x: root.width - width - 20
-        anchors.verticalCenter: parent.verticalCenter
-        text: root.popup.visible ? "▲" : "▼"
-        color: "#999999"
-        font.pixelSize: 18
-        horizontalAlignment: Text.AlignHCenter
-        verticalAlignment: Text.AlignVCenter
-    }
+    ComboBox {
+        id: combo
 
-    background: Rectangle {
-        color: "#ffffff"
-        radius: 12
-        border.color: "#e0e0e0"
-        border.width: 1
-    }
-
-    // content
-    contentItem: Text {
-        text: root.displayText
-        
-        color: "#333333"
-        font: root.font
-
-        verticalAlignment: Text.AlignVCenter
-
-        leftPadding: 20
-        // prevents overlapping with arrow
-        rightPadding: root.indicator ? root.indicator.width + 30 : 20
-
-        elide: Text.ElideRight
-    }
-
-    popup: Popup {
-        y: root.height + 8
+        height: 60
         width: root.width
 
-        padding: 0
+        font.pixelSize: 24
+        font.family: "DejaVu Sans, sans-serif"
+
+        // Ensure a default selection is made when the model is loaded 
+        // dynamically, preventing the ComboBox from getting stuck on index -1
+        onCountChanged: {
+            if (count > 0 && currentIndex === -1) {
+                currentIndex = 0
+            }
+        }
+
+        // Dropdown arrow indicator
+        indicator: Text {
+            x: combo.width - width - 20
+            anchors.verticalCenter: parent.verticalCenter
+            text: combo.popup.visible ? "▲" : "▼"
+            color: "#999999"
+            font.pixelSize: 18
+            horizontalAlignment: Text.AlignHCenter
+            verticalAlignment: Text.AlignVCenter
+        }
 
         background: Rectangle {
             color: "#ffffff"
             radius: 12
-
             border.color: "#e0e0e0"
             border.width: 1
         }
 
-        // available options
-        contentItem: ListView {
-            model: root.delegateModel
-
-            clip: true
-            spacing: 0
+        // content
+        contentItem: Text {
+            text: combo.displayText
             
-            implicitHeight: Math.min(contentHeight, 400)
+            color: "#333333"
+            font: combo.font
 
-            delegate: ItemDelegate {
-                width: root.width
-                height: 70
+            verticalAlignment: Text.AlignVCenter
 
-                text: root.textRole !== "" ? model[root.textRole] : modelData
+            leftPadding: 20
+            // prevents overlapping with arrow
+            rightPadding: combo.indicator ? combo.indicator.width + 30 : 20
 
-                contentItem: Text {
-                    text: parent.text
+            elide: Text.ElideRight
+        }
 
-                    color: highlighted ? "#2F4C6B" : "#333333"
-                    font.pixelSize: 22
+        popup: Popup {
+            y: combo.height + 15
+            width: combo.width
 
-                    verticalAlignment: Text.AlignVCenter
+            padding: 0
 
-                    leftPadding: 20
-                }
+            background: Rectangle {
+                color: "#ffffff"
+                radius: 12
 
-                background: Rectangle {
-                    color: highlighted ? "#f0f0f0" : "#ffffff"
+                border.color: "#e0e0e0"
+                border.width: 1
+            }
+
+            // available options
+            contentItem: ListView {
+                model: combo.delegateModel
+
+                clip: true
+                spacing: 0
+                
+                implicitHeight: Math.min(contentHeight, 400)
+
+                delegate: ItemDelegate {
+                    width: combo.width
+                    height: 70
+
+                    text: combo.textRole !== "" ? model[combo.textRole] : modelData
+
+                    contentItem: Text {
+                        text: parent.text
+
+                        color: highlighted ? "#2F4C6B" : "#333333"
+                        font.pixelSize: 22
+
+                        verticalAlignment: Text.AlignVCenter
+
+                        leftPadding: 20
+                    }
+
+                    background: Rectangle {
+                        color: highlighted ? "#f0f0f0" : "#ffffff"
+                    }
                 }
             }
         }

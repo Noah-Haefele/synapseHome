@@ -13,25 +13,26 @@ Rectangle {
         anchors {
             top: parent.top
             horizontalCenter: parent.horizontalCenter
-            topMargin: 80
+            topMargin: 30
         }
 
         width: parent.width * 0.8
 
-        spacing: 55
+        spacing: 45
 
         // Selection of floors
         Column {
             id: floorSelections
 
+            width: parent.width
+
             anchors.horizontalCenter: parent.horizontalCenter
             
-            spacing: 15
+            spacing: 16
 
             // In which floor the device is
             Dropdown {
-                width: 400
-                height: 56
+                width: parent.width
 
                 anchors.horizontalCenter: parent.horizontalCenter
                 
@@ -45,39 +46,44 @@ Rectangle {
                         uiHandler.floorIdx = currentIndex
                     }
                 }
+
+                label: "Floor"
             }
 
             // Floor call shortcut 1 in control grid
             Dropdown {
-                width: 400
-                height: 56
+                width: parent.width
 
                 anchors.horizontalCenter: parent.horizontalCenter
                 
                 model: Floors {}
                 textRole: "name"
+
+                label: "Pref 1"
             }
 
             // Floor call shortcut 2 in control grid
             Dropdown {
-                width: 400
-                height: 56
+                width: parent.width
 
                 anchors.horizontalCenter: parent.horizontalCenter
                 
                 model: Floors {}
                 textRole: "name"
+
+                label: "Pref 1"
             }
 
             // Floor call shortcut 3 in control grid
             Dropdown {
-                width: 400
-                height: 56
+                width: parent.width
 
                 anchors.horizontalCenter: parent.horizontalCenter
                 
                 model: Floors {}
                 textRole: "name"
+
+                label: "Pref 1"
             }
         }
 
