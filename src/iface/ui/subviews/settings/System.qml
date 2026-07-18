@@ -13,29 +13,71 @@ Rectangle {
         anchors {
             top: parent.top
             horizontalCenter: parent.horizontalCenter
-            topMargin: 90
+            topMargin: 80
         }
 
         width: parent.width * 0.8
 
-        spacing: 40
+        spacing: 55
 
         // Selection of floors
-        Dropdown {
-            width: 400
-            height: 56
+        Column {
+            id: floorSelections
 
             anchors.horizontalCenter: parent.horizontalCenter
             
-            model: Floors {}
-            textRole: "name"
+            spacing: 15
 
-            currentIndex: uiHandler.floorIdx
+            // In which floor the device is
+            Dropdown {
+                width: 400
+                height: 56
 
-            onCurrentIndexChanged: {
-                if (uiHandler.floorIdx !== currentIndex) {
-                    uiHandler.floorIdx = currentIndex
+                anchors.horizontalCenter: parent.horizontalCenter
+                
+                model: Floors {}
+                textRole: "name"
+
+                currentIndex: uiHandler.floorIdx
+
+                onCurrentIndexChanged: {
+                    if (uiHandler.floorIdx !== currentIndex) {
+                        uiHandler.floorIdx = currentIndex
+                    }
                 }
+            }
+
+            // Floor call shortcut 1 in control grid
+            Dropdown {
+                width: 400
+                height: 56
+
+                anchors.horizontalCenter: parent.horizontalCenter
+                
+                model: Floors {}
+                textRole: "name"
+            }
+
+            // Floor call shortcut 2 in control grid
+            Dropdown {
+                width: 400
+                height: 56
+
+                anchors.horizontalCenter: parent.horizontalCenter
+                
+                model: Floors {}
+                textRole: "name"
+            }
+
+            // Floor call shortcut 3 in control grid
+            Dropdown {
+                width: 400
+                height: 56
+
+                anchors.horizontalCenter: parent.horizontalCenter
+                
+                model: Floors {}
+                textRole: "name"
             }
         }
 
