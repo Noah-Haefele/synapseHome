@@ -6,9 +6,10 @@ Button {
 
     property color backgroundColor: "transparent"
     property color textColor: "black"
+    property int radius: 0
     
     background: Rectangle {
-        radius: 8
+        radius: button.radius
         color: button.hovered ? Qt.darker(button.backgroundColor, 1.2) : button.backgroundColor
     }
 

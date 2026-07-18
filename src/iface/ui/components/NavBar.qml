@@ -7,10 +7,10 @@ Item {
     id: root
 
     property real preferredWidth: 280
-
     property color backgroundColor: "#f2f2f4"
 
     signal backClicked()
+    signal optionClicked(int index, string name)
 
     Layout.preferredWidth: preferredWidth
     Layout.fillHeight: true
@@ -45,6 +45,7 @@ Item {
 
                     backgroundColor: root.backgroundColor
                     textColor: "black"
+                    radius: 8
                     
                     text: "\u2190"
 
@@ -73,6 +74,7 @@ Item {
 
                     backgroundColor: root.backgroundColor
                     textColor: "black"
+                    radius: 8
                     
                     text: "\u23FB"
                 }
@@ -131,7 +133,10 @@ Item {
 
                         hoverEnabled: true
 
-                        onClicked: floorList.currentIndex = index
+                        onClicked: {
+                            floorList.currentIndex = index
+                            root.optionClicked(index, name)
+                        }
                     }
                 }
             }
