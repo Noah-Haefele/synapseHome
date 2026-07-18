@@ -17,7 +17,10 @@ class SettingsManager(QObject):
 
         # defaults
         self._data = {
-            "floorIdx": 1
+            "floorIdx": 0,          # In which floor is the device
+            "fastCallIdx1": 1,      # Floor call shortcut 1 in control grid
+            "fastCallIdx2": 2,      # Floor call shortcut 2 in control grid
+            "fastCallIdx3": 3       # Floor call shortcut 3 in control grid
         }
 
         self._save_timer = QTimer()
@@ -60,8 +63,23 @@ class SettingsManager(QObject):
         except Exception as e:
             logger.error(f"Could not save settings: {e}")
 
-    
+    # In which floor this device is
     @Property(int, notify=settingsChanged)
     def floorIdx(self): return self._data.get("floorIdx", 0)
     @floorIdx.setter
     def floorIdx(self, val): self._update("floorIdx", int(val))
+    # Floor-Preference 1
+    @Property(int, notify=settingsChanged)
+    def fastCallIdx1(self): return self._data.get("fastCallIdx1", 0)
+    @fastCallIdx1.setter
+    def fastCallIdx1(self, val): self._update("fastCallIdx1", int(val))
+    # Floor-Preference 2
+    @Property(int, notify=settingsChanged)
+    def fastCallIdx2(self): return self._data.get("fastCallIdx2", 0)
+    @fastCallIdx2.setter
+    def fastCallIdx2(self, val): self._update("fastCallIdx2", int(val))
+    # Floor-Preference 3
+    @Property(int, notify=settingsChanged)
+    def fastCallIdx3(self): return self._data.get("fastCallIdx3", 0)
+    @fastCallIdx3.setter
+    def fastCallIdx3(self, val): self._update("fastCallIdx3", int(val))
