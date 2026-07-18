@@ -45,6 +45,7 @@ Item {
 
                     backgroundColor: root.backgroundColor
                     textColor: "black"
+                    radius: 8
                     
                     text: "\u2190"
 
@@ -73,6 +74,7 @@ Item {
 
                     backgroundColor: root.backgroundColor
                     textColor: "black"
+                    radius: 8
                     
                     text: "\u23FB"
                 }
