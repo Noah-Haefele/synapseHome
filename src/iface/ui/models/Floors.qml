@@ -1,24 +1,24 @@
 import QtQuick
 
-// List of available floors
 ListModel {
     ListElement {
         name: "Basement"
-        idx: 0
+        floorId: 0
+        iconPath: "../../../../assets/icons/button/callD.svg"
+        type: "floor"
     }
 
     ListElement {
         name: "1st Floor"
-        idx: 1
+        floorId: 1
+        iconPath: "../../../../assets/icons/button/call1.svg"
+        type: "floor"
     }
 
     ListElement {
         name: "2nd Floor"
-        idx: 2
-    }
-
-    ListElement {
-        name: "3rd Floor"
-        idx: 3
+        floorId: 2
+        iconPath: "../../../../assets/icons/button/callE.svg"
+        type: "floor"
     }
 }
