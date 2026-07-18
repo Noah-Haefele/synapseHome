@@ -27,7 +27,7 @@ Rectangle {
 
     When adding a new floor:
     1. Add the floor data to Floors.qml.
-    2. Add a button entry here with type "floor" and the matching floorId.
+    2. Add a button entry here with type "floor" and the matching floorIdx.
     */
     ListModel {
         id: buttonData
@@ -35,7 +35,7 @@ Rectangle {
         ListElement {
             name: "floorD"
             type: "floor"
-            idx: 3
+            floorIdx: 0
         }
 
         ListElement {
@@ -47,7 +47,7 @@ Rectangle {
         ListElement {
             name: "floor1"
             type: "floor"
-            idx: 2
+            floorIdx: 1
         }
 
         ListElement {
@@ -59,7 +59,7 @@ Rectangle {
         ListElement {
             name: "floorE"
             type: "floor"
-            idx: 1
+            floorIdx: 2
         }
 
         ListElement {
