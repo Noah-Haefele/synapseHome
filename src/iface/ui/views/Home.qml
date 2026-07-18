@@ -29,8 +29,8 @@ Item {
             Layout.fillHeight: true
             Layout.fillWidth: true
 
-            onSingleClicked:  (name) => {
-                switch (name) {
+            onSingleClicked:  (type, value) => {
+                switch (value) {
                     case "settings":
                         stackView.push("Settings.qml")
                         break

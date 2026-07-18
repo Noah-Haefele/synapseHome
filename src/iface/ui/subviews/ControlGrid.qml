@@ -9,7 +9,7 @@ Rectangle {
     
     color: "black"
 
-    signal singleClicked(string name)
+    signal singleClicked(string type, var value)
 
     // Create instance of Floors model
     Floors {
@@ -33,7 +33,6 @@ Rectangle {
         id: buttonData
 
         ListElement {
-            name: "floorD"
             type: "floor"
             floorIdx: 0
         }
@@ -45,7 +44,6 @@ Rectangle {
         }
 
         ListElement {
-            name: "floor1"
             type: "floor"
             floorIdx: 1
         }
@@ -57,7 +55,6 @@ Rectangle {
         }
 
         ListElement {
-            name: "floorE"
             type: "floor"
             floorIdx: 2
         }
@@ -105,7 +102,12 @@ Rectangle {
 
                 clr: "white"
 
-                onClicked: root.singleClicked(model.name)
+                onClicked: {
+                    root.singleClicked(
+                        model.type,
+                        model.type === "floor" ? model.floorIdx : model.name
+                    )
+                }
             }
         }
     }
