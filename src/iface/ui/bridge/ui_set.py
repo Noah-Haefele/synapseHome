@@ -13,7 +13,7 @@ class SettingsManager(QObject):
         super().__init__()
 
         BASE_DIR = Path(__file__).resolve().parents[4]
-        self._config_file = os.path.join(BASE_DIR, "data", "settings.json")
+        self._settings_file = os.path.join(BASE_DIR, "data", "settings.json")
 
         # defaults
         self._data = {
@@ -29,12 +29,12 @@ class SettingsManager(QObject):
         self._save_timer.timeout.connect(self._do_save_to_disk)
 
         self._options = []
-        self.load_config()
+        self.load_settings()
 
-    def load_config(self):
-        if os.path.exists(self._config_file):
+    def load_settings(self):
+        if os.path.exists(self._settings_file):
             try:
-                with open(self._config_file, "r") as f:
+                with open(self._settings_file, "r") as f:
                     new_data = json.load(f)
                 self._data.update({k: v for k, v in new_data.items() if k in self._data})
                 self.settingsChanged.emit()
@@ -52,14 +52,14 @@ class SettingsManager(QObject):
 
     def _do_save_to_disk(self):
         # atomic save: first write in tmp file, then replace original
-        temp_file = self._config_file + ".tmp"
+        temp_file = self._settings_file + ".tmp"
         try:
             with open(temp_file, "w") as f:
                 json.dump(self._data, f, indent= 4)
                 f.flush()
                 os.fsync(f.fileno())
 
-            os.replace(temp_file, self._config_file)
+            os.replace(temp_file, self._settings_file)
         except Exception as e:
             logger.error(f"Could not save settings: {e}")
 
