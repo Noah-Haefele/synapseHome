@@ -3,7 +3,8 @@ from PySide6.QtGui import QGuiApplication
 from PySide6.QtQml import QQmlApplicationEngine
 from pathlib import Path
 
-from src.iface.ui.bridge.ui_set import SettingsManager
+from src.iface.ui.bridge.ui_set import UiSet
+from src.core.set.floor_manager import FloorManager
 # Networking
 from src.core.net.utils import NetworkInterface
 from src.iface.ui.bridge.ui_net import UINetwork
@@ -11,10 +12,12 @@ from src.iface.ui.bridge.ui_net import UINetwork
 def main():
     app = QGuiApplication(sys.argv)
 
-    ui_handler = SettingsManager()
+    floor_manager = FloorManager()
+    ui_handler = UiSet(floor_manager=floor_manager)
     # Networking
     core_network = NetworkInterface()
     ui_network_bridge = UINetwork(net_interface=core_network)
+
 
     engine = QQmlApplicationEngine()
     engine.rootContext().setContextProperty("uiHandler", ui_handler)
