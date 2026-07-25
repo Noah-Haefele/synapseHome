@@ -3,6 +3,12 @@ import QtQuick.Controls 2.15
 import "../../components"
 import "../../models"
 
+/**
+ * System-Settings Screen View
+ * 
+ * Provides UI controls for configuring the device floor location, 
+ * shortcut call preferences, and device network status.
+ */
 Rectangle {
     id: configRoot
 
@@ -20,7 +26,7 @@ Rectangle {
 
         spacing: 45
 
-        // Selection of floors
+        // Floor Configuration Section
         Column {
             id: floorSelections
 
@@ -32,58 +38,54 @@ Rectangle {
 
             // In which floor the device is
             Dropdown {
-                width: parent.width
-
                 anchors.horizontalCenter: parent.horizontalCenter
-                
-                model: Floors {}
-                textRole: "name"
-
-                currentIndex: uiHandler.floorIdx
-
-                onCurrentIndexChanged: {
-                    if (uiHandler.floorIdx !== currentIndex) {
-                        uiHandler.floorIdx = currentIndex
-                    }
-                }
-
                 label: "Floor"
+                
+                model: uiHandler.allFloors
+                textRole: "name"
+                valueRole: "floorId"
+                selectedValue: uiHandler.floorIdx
+                
+                onUserSelected: (val) => uiHandler.setMainFloor(val)
             }
 
-            // Floor call shortcut 1 in control grid
+            // Pref 1
             Dropdown {
-                width: parent.width
-
                 anchors.horizontalCenter: parent.horizontalCenter
-                
-                model: Floors {}
-                textRole: "name"
-
                 label: "Pref 1"
+                
+                model: uiHandler.pref1Model
+                textRole: "name"
+                valueRole: "floorId"
+                selectedValue: uiHandler.fastCallIdx1
+                
+                onUserSelected: (val) => uiHandler.setPrefFloor(1, val)
             }
 
-            // Floor call shortcut 2 in control grid
+            // Pref 2
             Dropdown {
-                width: parent.width
-
                 anchors.horizontalCenter: parent.horizontalCenter
+                label: "Pref 2"
                 
-                model: Floors {}
+                model: uiHandler.pref2Model
                 textRole: "name"
-
-                label: "Pref 1"
+                valueRole: "floorId"
+                selectedValue: uiHandler.fastCallIdx2
+                
+                onUserSelected: (val) => uiHandler.setPrefFloor(2, val)
             }
 
-            // Floor call shortcut 3 in control grid
+            // Pref 3
             Dropdown {
-                width: parent.width
-
                 anchors.horizontalCenter: parent.horizontalCenter
+                label: "Pref 3"
                 
-                model: Floors {}
+                model: uiHandler.pref3Model
                 textRole: "name"
-
-                label: "Pref 1"
+                valueRole: "floorId"
+                selectedValue: uiHandler.fastCallIdx3
+                
+                onUserSelected: (val) => uiHandler.setPrefFloor(3, val)
             }
         }
 

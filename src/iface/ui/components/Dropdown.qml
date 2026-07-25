@@ -1,20 +1,51 @@
 import QtQuick 2.15
 import QtQuick.Controls 2.15
 
+/**
+ * Custom Dropdown / ComboBox Component
+ * 
+ * Wraps QtQuick ComboBox with automatic index synchronization 
+ * based on backend model keys (valueRole) and dynamic popup positioning.
+ */
+
 Column {
     id: root
 
     property alias model: combo.model
-    property alias currentIndex: combo.currentIndex
     property alias textRole: combo.textRole
     property alias count: combo.count
-
     property alias label: label.text
 
-    // Default width
-    width: 350
+    // Model key used to extract the option's unique identifier/ID
+    property alias valueRole: combo.valueRole
+    
+    // Active selection ID provided by backend state
+    property int selectedValue: -1
+    
+    // Emitted only on explicit user interaction
+    signal userSelected(int value)
 
+    width: 350
     spacing: 1
+
+    /**
+     * Synchronizes the internal ComboBox currentIndex with `selectedValue`.
+     * Guards against uninitialized properties or empty models.
+     */
+    function syncIndex() {
+        if (!combo || combo.count === 0 || combo.valueRole === "" || selectedValue === undefined) {
+            return
+        }
+        var idx = combo.indexOfValue(selectedValue)
+        if (idx !== -1) {
+            combo.currentIndex = idx
+        }
+    }
+
+    // Defer sync execution to avoid initial property binding race conditions
+    onSelectedValueChanged: Qt.callLater(syncIndex)
+    onValueRoleChanged: Qt.callLater(syncIndex)
+    Component.onCompleted: Qt.callLater(syncIndex)
 
     Text {
         id: label
@@ -36,11 +67,41 @@ Column {
         font.pixelSize: 24
         font.family: "DejaVu Sans, sans-serif"
 
-        // Ensure a default selection is made when the model is loaded 
-        // dynamically, preventing the ComboBox from getting stuck on index -1
-        onCountChanged: {
-            if (count > 0 && currentIndex === -1) {
-                currentIndex = 0
+        // Re-synchronize when model items update dynamically
+        onModelChanged: Qt.callLater(root.syncIndex)
+        onCountChanged: Qt.callLater(root.syncIndex)
+
+        onActivated: function(index) {
+            var val = combo.valueAt(index)
+            if (val !== undefined) {
+                root.userSelected(val)
+            }
+        }
+
+        delegate: ItemDelegate {
+            width: combo.width
+            height: 70
+
+            // Safely resolve display text from Python dictionaries or primitive values
+            text: {
+                if (typeof modelData === "object" && modelData !== null) {
+                    return combo.textRole !== "" && modelData[combo.textRole] !== undefined 
+                           ? modelData[combo.textRole] 
+                           : ""
+                }
+                return modelData !== undefined ? modelData : ""
+            }
+
+            contentItem: Text {
+                text: parent.text
+                color: highlighted ? "#2F4C6B" : "#333333"
+                font.pixelSize: 22
+                verticalAlignment: Text.AlignVCenter
+                leftPadding: 20
+            }
+
+            background: Rectangle {
+                color: highlighted ? "#f0f0f0" : "#ffffff"
             }
         }
 
@@ -81,7 +142,7 @@ Column {
         popup: Popup {
             id: popup
 
-            // 70 is the delegate height, 400 is the maximum height cap.
+            // Item height is 70px; maximum popup height cap is 400px
             property real expectedHeight: Math.min(combo.count * 70, 400)
 
             // set height so qt knows the bounds
@@ -123,28 +184,6 @@ Column {
                 spacing: 0
                 
                 implicitHeight: Math.min(contentHeight, 400)
-
-                delegate: ItemDelegate {
-                    width: combo.width
-                    height: 70
-
-                    text: combo.textRole !== "" ? model[combo.textRole] : modelData
-
-                    contentItem: Text {
-                        text: parent.text
-
-                        color: highlighted ? "#2F4C6B" : "#333333"
-                        font.pixelSize: 22
-
-                        verticalAlignment: Text.AlignVCenter
-
-                        leftPadding: 20
-                    }
-
-                    background: Rectangle {
-                        color: highlighted ? "#f0f0f0" : "#ffffff"
-                    }
-                }
             }
         }
     }
