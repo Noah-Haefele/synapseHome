@@ -52,7 +52,7 @@ class FloorManager(QObject):
         self._floors_by_id = {}
 
         # Debounce timer for non-blocking disk persistence (1s delay)
-        self._save_timer = QTimer()
+        self._save_timer = QTimer(self)
         self._save_timer.setSingleShot(True)
         self._save_timer.setInterval(1000)
         self._save_timer.timeout.connect(self._save_settings)
