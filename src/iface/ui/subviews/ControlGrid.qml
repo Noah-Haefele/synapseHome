@@ -9,12 +9,7 @@ Rectangle {
     
     color: "black"
 
-    signal singleClicked(string name)
-
-    // Create instance of Floors model
-    Floors {
-        id: floors
-    }
+    signal singleClicked(string type, var value)
 
     /*
     Button layout configuration.
@@ -33,9 +28,8 @@ Rectangle {
         id: buttonData
 
         ListElement {
-            name: "floorD"
             type: "floor"
-            floorIdx: 0
+            prefNum: 1
         }
 
         ListElement {
@@ -45,9 +39,8 @@ Rectangle {
         }
 
         ListElement {
-            name: "floor1"
             type: "floor"
-            floorIdx: 1
+            prefNum: 2
         }
 
         ListElement {
@@ -57,9 +50,8 @@ Rectangle {
         }
 
         ListElement {
-            name: "floorE"
             type: "floor"
-            floorIdx: 2
+            prefNum: 3
         }
 
         ListElement {
@@ -97,15 +89,28 @@ Rectangle {
 
                 icon: {
                     if (model.type === "floor") {
-                        return floors.get(model.floorIdx).iconPath
+                        switch (model.prefNum) {
+                        case 1:
+                            return uiHandler.pref1IconPath
+                        case 2:
+                            return uiHandler.pref2IconPath
+                        case 3:
+                            return uiHandler.pref3IconPath
+                        default:
+                            return ""
+                        }
                     }
-
                     return model.iconPath
                 }
 
                 clr: "white"
 
-                onClicked: root.singleClicked(model.name)
+                onClicked: {
+                    root.singleClicked(
+                        model.type,
+                        model.type === "floor" ? model.prefNum : model.name
+                    )
+                }
             }
         }
     }

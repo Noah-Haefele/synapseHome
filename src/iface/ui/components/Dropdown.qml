@@ -1,100 +1,189 @@
 import QtQuick 2.15
 import QtQuick.Controls 2.15
 
-ComboBox {
+/**
+ * Custom Dropdown / ComboBox Component
+ * 
+ * Wraps QtQuick ComboBox with automatic index synchronization 
+ * based on backend model keys (valueRole) and dynamic popup positioning.
+ */
+
+Column {
     id: root
 
-    height: 60
-    width: 300
+    property alias model: combo.model
+    property alias textRole: combo.textRole
+    property alias count: combo.count
+    property alias label: label.text
 
-    font.pixelSize: 24
-    font.family: "DejaVu Sans, sans-serif"
+    // Model key used to extract the option's unique identifier/ID
+    property alias valueRole: combo.valueRole
+    
+    // Active selection ID provided by backend state
+    property int selectedValue: -1
+    
+    // Emitted only on explicit user interaction
+    signal userSelected(int value)
 
-    // Ensure a default selection is made when the model is loaded 
-    // dynamically, preventing the ComboBox from getting stuck on index -1
-    onCountChanged: {
-        if (count > 0 && currentIndex === -1) {
-            currentIndex = 0
+    width: 350
+    spacing: 1
+
+    /**
+     * Synchronizes the internal ComboBox currentIndex with `selectedValue`.
+     * Guards against uninitialized properties or empty models.
+     */
+    function syncIndex() {
+        if (!combo || combo.count === 0 || combo.valueRole === "" || selectedValue === undefined) {
+            return
+        }
+        var idx = combo.indexOfValue(selectedValue)
+        if (idx !== -1) {
+            combo.currentIndex = idx
         }
     }
 
-    // arrow
-    indicator: Text {
-        x: root.width - width - 20
-        anchors.verticalCenter: parent.verticalCenter
-        text: root.popup.visible ? "▲" : "▼"
-        color: "#999999"
-        font.pixelSize: 18
-        horizontalAlignment: Text.AlignHCenter
-        verticalAlignment: Text.AlignVCenter
+    // Defer sync execution to avoid initial property binding race conditions
+    onSelectedValueChanged: Qt.callLater(syncIndex)
+    onValueRoleChanged: Qt.callLater(syncIndex)
+    Component.onCompleted: Qt.callLater(syncIndex)
+
+    Text {
+        id: label
+
+        visible: text.length > 0
+        text: ""
+
+        font.pixelSize: 11
+
+        color: "#6b7280"
     }
 
-    background: Rectangle {
-        color: "#ffffff"
-        radius: 12
-        border.color: "#e0e0e0"
-        border.width: 1
-    }
+    ComboBox {
+        id: combo
 
-    // content
-    contentItem: Text {
-        text: root.displayText
-        
-        color: "#333333"
-        font: root.font
-
-        verticalAlignment: Text.AlignVCenter
-
-        leftPadding: 20
-        // prevents overlapping with arrow
-        rightPadding: root.indicator ? root.indicator.width + 30 : 20
-
-        elide: Text.ElideRight
-    }
-
-    popup: Popup {
-        y: root.height + 8
+        height: 60
         width: root.width
 
-        padding: 0
+        font.pixelSize: 24
+        font.family: "DejaVu Sans, sans-serif"
+
+        // Re-synchronize when model items update dynamically
+        onModelChanged: Qt.callLater(root.syncIndex)
+        onCountChanged: Qt.callLater(root.syncIndex)
+
+        onActivated: function(index) {
+            var val = combo.valueAt(index)
+            if (val !== undefined) {
+                root.userSelected(val)
+            }
+        }
+
+        delegate: ItemDelegate {
+            width: combo.width
+            height: 70
+
+            // Safely resolve display text from Python dictionaries or primitive values
+            text: {
+                if (typeof modelData === "object" && modelData !== null) {
+                    return combo.textRole !== "" && modelData[combo.textRole] !== undefined 
+                           ? modelData[combo.textRole] 
+                           : ""
+                }
+                return modelData !== undefined ? modelData : ""
+            }
+
+            contentItem: Text {
+                text: parent.text
+                color: highlighted ? "#2F4C6B" : "#333333"
+                font.pixelSize: 22
+                verticalAlignment: Text.AlignVCenter
+                leftPadding: 20
+            }
+
+            background: Rectangle {
+                color: highlighted ? "#f0f0f0" : "#ffffff"
+            }
+        }
+
+        // Dropdown arrow indicator
+        indicator: Text {
+            x: combo.width - width - 20
+            anchors.verticalCenter: parent.verticalCenter
+            text: combo.popup.visible ? "▲" : "▼"
+            color: "#999999"
+            font.pixelSize: 18
+            horizontalAlignment: Text.AlignHCenter
+            verticalAlignment: Text.AlignVCenter
+        }
 
         background: Rectangle {
             color: "#ffffff"
             radius: 12
-
             border.color: "#e0e0e0"
             border.width: 1
         }
 
-        // available options
-        contentItem: ListView {
-            model: root.delegateModel
-
-            clip: true
-            spacing: 0
+        // content
+        contentItem: Text {
+            text: combo.displayText
             
-            implicitHeight: Math.min(contentHeight, 400)
+            color: "#333333"
+            font: combo.font
 
-            delegate: ItemDelegate {
-                width: root.width
-                height: 70
+            verticalAlignment: Text.AlignVCenter
 
-                text: root.textRole !== "" ? model[root.textRole] : modelData
+            leftPadding: 20
+            // prevents overlapping with arrow
+            rightPadding: combo.indicator ? combo.indicator.width + 30 : 20
 
-                contentItem: Text {
-                    text: parent.text
+            elide: Text.ElideRight
+        }
 
-                    color: highlighted ? "#2F4C6B" : "#333333"
-                    font.pixelSize: 22
+        popup: Popup {
+            id: popup
 
-                    verticalAlignment: Text.AlignVCenter
+            // Item height is 70px; maximum popup height cap is 400px
+            property real expectedHeight: Math.min(combo.count * 70, 400)
 
-                    leftPadding: 20
-                }
+            // set height so qt knows the bounds
+            height: expectedHeight
+            width: combo.width
 
-                background: Rectangle {
-                    color: highlighted ? "#f0f0f0" : "#ffffff"
-                }
+            // calculates if popup has to be opend upwards
+            property bool opensUpwards: {
+                if (!combo.Window.window) return false;
+
+                // calculates lower edge of popup
+                let globalBottom = combo.mapToItem(null, 0, combo.height).y;
+                let spaceBelow = combo.Window.window.height - globalBottom;
+
+                // if lower edge of popup smaller than actual popup height
+                return spaceBelow < expectedHeight + 10;
+            }
+            
+            // upwards: -height of popup - 10
+            // downwards: height of popup + 10
+            y: opensUpwards ? -expectedHeight - 15 : combo.height + 15
+
+            // flip animation from right direction
+            transformOrigin: opensUpwards ? Popup.Bottom : Popup.Top
+
+            background: Rectangle {
+                color: "#ffffff"
+                radius: 12
+
+                border.color: "#e0e0e0"
+                border.width: 1
+            }
+
+            // available options
+            contentItem: ListView {
+                model: combo.delegateModel
+
+                clip: true
+                spacing: 0
+                
+                implicitHeight: Math.min(contentHeight, 400)
             }
         }
     }

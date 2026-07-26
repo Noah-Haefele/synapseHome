@@ -1,1 +1,1 @@
-from .ui_set import SettingsManager
+from .ui_set import UiSet
