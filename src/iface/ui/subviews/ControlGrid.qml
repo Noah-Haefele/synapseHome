@@ -108,7 +108,7 @@ Rectangle {
                 onClicked: {
                     root.singleClicked(
                         model.type,
-                        model.type === "floor" ? model.floorIdx : model.name
+                        model.type === "floor" ? model.prefNum : model.name
                     )
                 }
             }
