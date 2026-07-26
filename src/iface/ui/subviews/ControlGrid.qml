@@ -34,7 +34,7 @@ Rectangle {
 
         ListElement {
             type: "floor"
-            floorIdx: 0
+            floorIdx: 1
         }
 
         ListElement {
@@ -45,7 +45,7 @@ Rectangle {
 
         ListElement {
             type: "floor"
-            floorIdx: 1
+            floorIdx: 2
         }
 
         ListElement {
@@ -56,7 +56,7 @@ Rectangle {
 
         ListElement {
             type: "floor"
-            floorIdx: 2
+            floorIdx: 3
         }
 
         ListElement {
@@ -94,9 +94,8 @@ Rectangle {
 
                 icon: {
                     if (model.type === "floor") {
-                        return floors.get(model.floorIdx).iconPath
+                        return uiHandler.get_pref_icon_path(model.floorIdx)
                     }
-
                     return model.iconPath
                 }
 

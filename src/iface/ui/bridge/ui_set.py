@@ -51,6 +51,10 @@ class UiSet(QObject):
     def fastCallIdx3(self):
         return self._floor_manager.get_pref(3)
 
+    @Slot(int, result=str)
+    def get_pref_icon_path(self, pref_num: int):
+        return self._floor_manager.get_pref_icon_path(pref_num)
+
     @Slot(int)
     def setMainFloor(self, floor_id: int) -> None:
         self._floor_manager.set_main_floor(floor_id)

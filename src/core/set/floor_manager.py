@@ -49,6 +49,8 @@ class FloorManager(QObject):
             }
         ]
 
+        self._floors_by_id = {}
+
         # Debounce timer for non-blocking disk persistence (1s delay)
         self._save_timer = QTimer()
         self._save_timer.setSingleShot(True)
@@ -76,12 +78,20 @@ class FloorManager(QObject):
         if self._config_file.exists():
             try:
                 with open(self._config_file, "r", encoding="utf-8") as f:
-                    self._config = json.load(f)
-                self.stateChanged.emit()
+                    self._config = json.load(f)        
             except Exception as e:
                 logger.error(f"Configs could not be loaded: {e}")
         else:
             self._save_config()
+
+        self._rebuild_floor_map()
+        self.stateChanged.emit()
+
+    def _rebuild_floor_map(self):
+        self._floors_by_id = {
+            floor["floorId"]: floor
+            for floor in self._config
+        }
 
     def _save_settings(self) -> None:
         self._do_save_to_disk(self._settings, self._settings_file)
@@ -121,6 +131,19 @@ class FloorManager(QObject):
                 continue
             model.append(floor)
         return model
+
+    def get_pref_icon_path(self, pref_num: int) -> str:
+        floor_id = self.get_pref(pref_num)
+
+        if floor_id == -1:
+            return ""
+        
+        floor = self._floors_by_id.get(floor_id)
+
+        if floor is None:
+            return ""
+
+        return floor["iconPath"]
 
     def set_main_floor(self, floor_id: int) -> None:
         if self._settings.get("floorIdx") != floor_id:
