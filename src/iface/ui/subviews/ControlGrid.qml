@@ -34,7 +34,7 @@ Rectangle {
 
         ListElement {
             type: "floor"
-            floorIdx: 1
+            prefNum: 1
         }
 
         ListElement {
@@ -45,7 +45,7 @@ Rectangle {
 
         ListElement {
             type: "floor"
-            floorIdx: 2
+            prefNum: 2
         }
 
         ListElement {
@@ -56,7 +56,7 @@ Rectangle {
 
         ListElement {
             type: "floor"
-            floorIdx: 3
+            prefNum: 3
         }
 
         ListElement {
@@ -94,7 +94,7 @@ Rectangle {
 
                 icon: {
                     if (model.type === "floor") {
-                        switch (model.floorIdx) {
+                        switch (model.prefNum) {
                         case 1:
                             return uiHandler.pref1IconPath
                         case 2:
