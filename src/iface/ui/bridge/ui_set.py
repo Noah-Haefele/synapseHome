@@ -67,3 +67,7 @@ class UiSet(QObject):
     @Slot(int, int)
     def setPrefFloor(self, pref_num: int, floor_id: int) -> None:
         self._floor_manager.set_pref_floor(pref_num, floor_id)
+
+    @Slot(int, result=int)
+    def getPrefFloor(self, pref_num: int):
+        return self._floor_manager.get_pref(pref_num)
