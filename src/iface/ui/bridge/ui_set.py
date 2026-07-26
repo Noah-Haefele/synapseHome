@@ -19,17 +19,9 @@ class UiSet(QObject):
     def allFloors(self):
         return self._floor_manager.all_floors
 
-    # all posible options for each pref dropdown
+    # all posible options for pref dropdown
     @Property("QVariantList", notify=settingsChanged)
-    def pref1Model(self):
-        return self._floor_manager.get_pref_model()
-
-    @Property("QVariantList", notify=settingsChanged)
-    def pref2Model(self):
-        return self._floor_manager.get_pref_model()
-
-    @Property("QVariantList", notify=settingsChanged)
-    def pref3Model(self):
+    def prefModel(self):
         return self._floor_manager.get_pref_model()
 
 

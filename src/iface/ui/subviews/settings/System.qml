@@ -58,7 +58,7 @@ Rectangle {
 
                 width: parent.width * 0.8
                 
-                model: uiHandler.pref1Model
+                model: uiHandler.prefModel
                 textRole: "name"
                 valueRole: "floorId"
                 selectedValue: uiHandler.fastCallIdx1
@@ -73,7 +73,7 @@ Rectangle {
 
                 width: parent.width * 0.8
                 
-                model: uiHandler.pref2Model
+                model: uiHandler.prefModel
                 textRole: "name"
                 valueRole: "floorId"
                 selectedValue: uiHandler.fastCallIdx2
@@ -88,7 +88,7 @@ Rectangle {
 
                 width: parent.width * 0.8
                 
-                model: uiHandler.pref3Model
+                model: uiHandler.prefModel
                 textRole: "name"
                 valueRole: "floorId"
                 selectedValue: uiHandler.fastCallIdx3
