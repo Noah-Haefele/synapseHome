@@ -40,6 +40,8 @@ Rectangle {
             Dropdown {
                 anchors.horizontalCenter: parent.horizontalCenter
                 label: "Floor"
+
+                width: parent.width * 0.8
                 
                 model: uiHandler.allFloors
                 textRole: "name"
@@ -53,6 +55,8 @@ Rectangle {
             Dropdown {
                 anchors.horizontalCenter: parent.horizontalCenter
                 label: "Pref 1"
+
+                width: parent.width * 0.8
                 
                 model: uiHandler.pref1Model
                 textRole: "name"
@@ -66,6 +70,8 @@ Rectangle {
             Dropdown {
                 anchors.horizontalCenter: parent.horizontalCenter
                 label: "Pref 2"
+
+                width: parent.width * 0.8
                 
                 model: uiHandler.pref2Model
                 textRole: "name"
@@ -79,6 +85,8 @@ Rectangle {
             Dropdown {
                 anchors.horizontalCenter: parent.horizontalCenter
                 label: "Pref 3"
+
+                width: parent.width * 0.8
                 
                 model: uiHandler.pref3Model
                 textRole: "name"
