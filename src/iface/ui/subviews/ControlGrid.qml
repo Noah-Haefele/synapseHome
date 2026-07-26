@@ -11,11 +11,6 @@ Rectangle {
 
     signal singleClicked(string type, var value)
 
-    // Create instance of Floors model
-    Floors {
-        id: floors
-    }
-
     /*
     Button layout configuration.
 
