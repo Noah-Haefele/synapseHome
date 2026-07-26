@@ -19,6 +19,7 @@ class UiSet(QObject):
     def allFloors(self):
         return self._floor_manager.all_floors
 
+    # all posible options for each pref dropdown
     @Property("QVariantList", notify=settingsChanged)
     def pref1Model(self):
         return self._floor_manager.get_pref_model()
@@ -31,6 +32,7 @@ class UiSet(QObject):
     def pref3Model(self):
         return self._floor_manager.get_pref_model()
 
+
     @Property(int, notify=settingsChanged)
     def floorIdx(self):
         return self._floor_manager.floor_idx
@@ -39,6 +41,7 @@ class UiSet(QObject):
     def floorIdx(self, val: int):
         self._floor_manager.set_main_floor(int(val))
 
+    # actual value of each dropdown
     @Property(int, notify=settingsChanged)
     def fastCallIdx1(self):
         return self._floor_manager.get_pref(1)
@@ -51,9 +54,19 @@ class UiSet(QObject):
     def fastCallIdx3(self):
         return self._floor_manager.get_pref(3)
 
-    @Slot(int, result=str)
-    def get_pref_icon_path(self, pref_num: int):
-        return self._floor_manager.get_pref_icon_path(pref_num)
+    # icon path for each icon in ControlGrid based on setting of dropdown
+    @Property(str, notify=settingsChanged)
+    def pref1IconPath(self):
+        return self._floor_manager.get_pref_icon_path(1)
+
+    @Property(str, notify=settingsChanged)
+    def pref2IconPath(self):
+        return self._floor_manager.get_pref_icon_path(2)
+
+    @Property(str, notify=settingsChanged)
+    def pref3IconPath(self):
+        return self._floor_manager.get_pref_icon_path(3)
+
 
     @Slot(int)
     def setMainFloor(self, floor_id: int) -> None:

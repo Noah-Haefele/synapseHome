@@ -94,7 +94,16 @@ Rectangle {
 
                 icon: {
                     if (model.type === "floor") {
-                        return uiHandler.get_pref_icon_path(model.floorIdx)
+                        switch (model.floorIdx) {
+                        case 1:
+                            return uiHandler.pref1IconPath
+                        case 2:
+                            return uiHandler.pref2IconPath
+                        case 3:
+                            return uiHandler.pref3IconPath
+                        default:
+                            return ""
+                        }
                     }
                     return model.iconPath
                 }
