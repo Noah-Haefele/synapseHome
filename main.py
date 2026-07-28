@@ -15,7 +15,7 @@ def main():
 
     floor_manager = FloorManager()
     ui_handler = UiSet(floor_manager=floor_manager)
-    call_handler = UICall()
+    call_handler = UICall(floor_manager=floor_manager)
     # Networking
     core_network = NetworkInterface()
     ui_network_bridge = UINetwork(net_interface=core_network)

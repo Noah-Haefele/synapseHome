@@ -9,18 +9,16 @@ Rectangle {
 
     color: "white"
 
-    property string destinationLabel: "Unknown..."
-
     Label {
         anchors {
             horizontalCenter: parent.horizontalCenter
             top: parent.top
             topMargin: 25
         }
-        
+
         font.pixelSize: 30
 
-        text: root.destinationLabel
+        text: callHandler.destinationLabel
     }
 
     Row {

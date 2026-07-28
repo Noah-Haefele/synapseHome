@@ -120,6 +120,15 @@ class FloorManager(QObject):
     def floor_idx(self):
         return self._settings.get("floorIdx", -1)
 
+    def get_floor(self, floor_id: int):
+        return self._floors_by_id.get(floor_id)
+
+    def get_floor_name(self, floor_id: int, fallback: str = "Unknown...") -> str:
+        floor = self.get_floor(floor_id)
+        if floor is None:
+            return fallback
+        return floor.get("name", fallback)
+
     def get_pref(self, num: int) -> int:
         return self._settings.get(f"fastCallIdx{num}", -1)
 
