@@ -1,12 +1,56 @@
 import QtQuick 2.15
 import QtQuick.Controls 2.15
+import "../components"
 
 Rectangle {
+    id: root
+
     anchors.fill: parent
+
     color: "white"
 
+    property string destinationLabel: "Unknown..."
+
     Label {
-        anchors.centerIn: parent
-        text: "Calling...."
+        anchors {
+            horizontalCenter: parent.horizontalCenter
+            top: parent.top
+            topMargin: 25
+        }
+        
+        font.pixelSize: 30
+
+        text: root.destinationLabel
+    }
+
+    Row {
+        anchors {
+            horizontalCenter: parent.horizontalCenter
+            bottom: parent.bottom
+            bottomMargin: 10
+        }
+
+        spacing: 16
+
+        ButtonIcon {
+            height: 120
+            width: height
+            
+            icon: "../../../../assets/icons/call/muteMic_on.svg"
+        }
+
+        ButtonIcon {
+            height: 120
+            width: height
+
+            icon: "../../../../assets/icons/call/call_off.svg"
+        }
+
+        ButtonIcon {
+            height: 120
+            width: height
+            
+            icon: "../../../../assets/icons/call/muteMic_off.svg"
+        }
     }
 }
