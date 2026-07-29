@@ -25,11 +25,17 @@ class UICall(QObject):
 
     @Property(str, notify=destinationLabelChanged)
     def destinationLabel(self) -> str:
+        """Returns label to indicate which floor is being called"""
         if self._target_floor_id == -1:
-            return "Unknown..."
+            return "Unknown…"
 
-        return self._floor_manager.get_floor_name(self._target_floor_id)
+        label = self._floor_manager.get_floor_name(self._target_floor_id)
+        # show ellipsis while waiting for call acceptance
+        if self._call_state == "CALLING":
+            label += " ..."
 
+        return label
+    
     @Slot(int)
     def startCall(self, floorId: int):
         """QML triggers call"""
