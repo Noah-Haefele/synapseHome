@@ -42,6 +42,8 @@ Rectangle {
             width: height
 
             icon: "../../../../assets/icons/call/call_off.svg"
+
+            onClicked: callHandler.endCall()
         }
 
         ButtonIcon {
