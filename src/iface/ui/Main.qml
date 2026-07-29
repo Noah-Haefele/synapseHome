@@ -16,4 +16,22 @@ ApplicationWindow {
         anchors.fill: parent
         initialItem: "views/Home.qml"
     }
+
+    // Call overlay
+    Loader {
+        id: callOverlay
+        anchors.fill: parent
+        source: "views/Call.qml"
+        active: false
+        z: 1000
+    }
+
+    Connections {
+        target: callHandler
+
+        function onCallStateChanged(state) {
+            callOverlay.active =
+                (state === "CALLING")
+        }
+    }
 }

@@ -30,10 +30,18 @@ Item {
             Layout.fillWidth: true
 
             onSingleClicked:  (type, value) => {
-                switch (value) {
-                    case "settings":
-                        stackView.push("Settings.qml")
-                        break
+                if (type === "floor") {
+                    const floor = uiHandler.getPrefFloor(value)
+
+                    if (floor >= 0) {
+                        callHandler.startCall(floor)
+                    }
+                } else{ 
+                    switch (value) {
+                        case "settings":
+                            stackView.push("Settings.qml")
+                            break
+                    }
                 }
             }
         }
