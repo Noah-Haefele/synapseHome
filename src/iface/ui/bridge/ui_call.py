@@ -13,7 +13,7 @@ class UICall(QObject):
 
         self._floor_manager = floor_manager
         self._call_state = "IDLE"
-        self._target_floor_id = None
+        self._target_floor_id = -1
 
     @Property(str, notify=callStateChanged)
     def callState(self) -> str:
@@ -21,11 +21,11 @@ class UICall(QObject):
 
     @Property(int, notify=targetFloorChanged)
     def targetFloor(self) -> int:
-        return self._target_floor_id
+        return self._target_floor_id if self._target_floor_id != -1 else -1
 
     @Property(str, notify=destinationLabelChanged)
     def destinationLabel(self) -> str:
-        if self._target_floor_id is None:
+        if self._target_floor_id == -1:
             return "Unknown..."
 
         return self._floor_manager.get_floor_name(self._target_floor_id)
@@ -44,7 +44,7 @@ class UICall(QObject):
     def endCall(self):
         """Ends call / hand up"""
         self._call_state = "IDLE"
-        self._target_floor_id = None
+        self._target_floor_id = -1
 
         self.targetFloorChanged.emit(self._target_floor_id)
         self.destinationLabelChanged.emit()
