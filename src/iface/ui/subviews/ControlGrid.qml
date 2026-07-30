@@ -89,21 +89,31 @@ Rectangle {
 
                 icon: {
                     if (model.type === "floor") {
-                        switch (model.prefNum) {
-                        case 1:
-                            return uiHandler.pref1IconPath
-                        case 2:
-                            return uiHandler.pref2IconPath
-                        case 3:
-                            return uiHandler.pref3IconPath
-                        default:
-                            return ""
+                        if (uiHandler.getPrefFloor(model.prefNum) !== -1) {
+                            return "../../../../assets/icons/button/call.svg"
                         }
+                        return ""
                     }
                     return model.iconPath
                 }
 
                 clr: "white"
+
+                label: {
+                    if (model.type === "floor") {
+                        switch (model.prefNum) {
+                        case 1:
+                            return uiHandler.pref1ShortName
+                        case 2:
+                            return uiHandler.pref2ShortName
+                        case 3:
+                            return uiHandler.pref3ShortName
+                        default:
+                            return ""
+                        }
+                    }
+                    return ""
+                }
 
                 onClicked: {
                     root.singleClicked(
