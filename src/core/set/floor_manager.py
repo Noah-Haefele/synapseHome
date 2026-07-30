@@ -155,13 +155,7 @@ class FloorManager(QObject):
 
         if floor_id == -1:
             return ""
-        
-        floor = self._floors_by_id.get(floor_id)
-
-        if floor is None:
-            return ""
-
-        return floor["iconPath"]
+        return "../../../../assets/icons/button/call.svg"
 
     def set_main_floor(self, floor_id: int) -> None:
         if self._settings.get("floorIdx") != floor_id:

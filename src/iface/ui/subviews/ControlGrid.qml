@@ -89,10 +89,16 @@ Rectangle {
 
                 icon: {
                     if (model.type === "floor") {
-                        if (uiHandler.getPrefFloor(model.prefNum) !== -1) {
-                            return "../../../../assets/icons/button/call.svg"
+                        switch (model.prefNum) {
+                        case 1:
+                            return uiHandler.pref1IconPath
+                        case 2:
+                            return uiHandler.pref2IconPath
+                        case 3:
+                            return uiHandler.pref3IconPath
+                        default:
+                            return ""
                         }
-                        return ""
                     }
                     return model.iconPath
                 }
