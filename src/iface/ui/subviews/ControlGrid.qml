@@ -99,6 +99,8 @@ Rectangle {
                         default:
                             return ""
                         }
+                    } else if (model.name === "floorA") {
+                        return "../../../../assets/icons/button/call.svg"
                     }
                     return model.iconPath
                 }
@@ -117,6 +119,8 @@ Rectangle {
                         default:
                             return ""
                         }
+                    } else if (model.name === "floorA") {
+                        return "A"
                     }
                     return ""
                 }
