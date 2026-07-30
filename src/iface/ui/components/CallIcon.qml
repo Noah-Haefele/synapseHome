@@ -17,13 +17,30 @@ Item {
     }
 
     Text {
-        text: root.label
+        // Warning if Number to large
+        text: root.label.length > 2 ? "!!" : root.label
 
-        font.pixelSize: parent.width * 0.1
+        font.pixelSize: {
+            switch (root.label.length) {
+            case 2:
+                return parent.width * 0.08
+            // Number to large
+            default:
+                return parent.width * 0.1
+            }
+        }
         
-        color: root.labelColor
+        // Paint double exclamaiton mark in red
+        color: root.label.length > 2 ? '#ff0000' : root.labelColor
 
-        x: parent.width * 0.56
-        y: parent.height * 0.22
+        x: {
+            switch (root.label.length) {
+            case 2:
+                return parent.width * 0.54
+            default:
+                return parent.width * 0.56
+            }
+        }
+        y: parent.height * 0.23
     }
 }
