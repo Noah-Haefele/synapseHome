@@ -99,11 +99,31 @@ Rectangle {
                         default:
                             return ""
                         }
+                    } else if (model.name === "floorA") {
+                        return "../../../../assets/icons/button/call.svg"
                     }
                     return model.iconPath
                 }
 
                 clr: "white"
+
+                label: {
+                    if (model.type === "floor") {
+                        switch (model.prefNum) {
+                        case 1:
+                            return uiHandler.pref1ShortName
+                        case 2:
+                            return uiHandler.pref2ShortName
+                        case 3:
+                            return uiHandler.pref3ShortName
+                        default:
+                            return ""
+                        }
+                    } else if (model.name === "floorA") {
+                        return "A"
+                    }
+                    return ""
+                }
 
                 onClicked: {
                     root.singleClicked(

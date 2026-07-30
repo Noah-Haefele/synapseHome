@@ -6,8 +6,8 @@
    viewBox="0 0 256 256"
    xml:space="preserve"
    id="svg5"
-   sodipodi:docname="notification-bell-13097_A.svg"
-   inkscape:version="1.4.2 (ebf0e940d0, 2025-05-08)"
+   sodipodi:docname="call.svg"
+   inkscape:version="1.4.3 (0d15f75042, 2025-12-25)"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns="http://www.w3.org/2000/svg"
@@ -59,13 +59,4 @@
    style="fill:#000000;fill-rule:nonzero;stroke:none;stroke-width:1.82;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:10;stroke-dasharray:none"
    stroke-linecap="round"
    id="path4" />
-<text
-   xml:space="preserve"
-   style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:53.3333px;font-family:'Liberation Mono';-inkscape-font-specification:'Liberation Mono, Bold';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:start;writing-mode:lr-tb;direction:ltr;text-anchor:start;fill:#ff0000"
-   x="151.17242"
-   y="98.206894"
-   id="text5"><tspan
-     sodipodi:role="line"
-     id="tspan5"
-     x="151.17242"
-     y="98.206894">A</tspan></text></svg>
+</svg>

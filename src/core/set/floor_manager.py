@@ -31,20 +31,20 @@ class FloorManager(QObject):
         self._config = [
             {
                 "name": "1st Floor",
+                "shortName": "1",
                 "floorId": 1,
-                "iconPath": "../../../../assets/icons/button/callE.svg",
                 "type": "floor"
             },
             {
                 "name": "2nd Floor",
+                "shortName": "2",
                 "floorId": 2,
-                "iconPath": "../../../../assets/icons/button/call1.svg",
                 "type": "floor"
             },
             {
                 "name": "3rd Floor",
+                "shortName": "3",
                 "floorId": 3,
-                "iconPath": "../../../../assets/icons/button/callD.svg",
                 "type": "floor"
             }
         ]
@@ -129,11 +129,20 @@ class FloorManager(QObject):
             return fallback
         return floor.get("name", fallback)
 
+    def get_floor_short_name(self, floor_id:int, fallback: str = "?") -> str:
+        if floor_id == -1:
+            return ""
+        
+        floor = self.get_floor(floor_id)
+        if floor is None:
+            return fallback
+        return floor.get("shortName", fallback)
+
     def get_pref(self, num: int) -> int:
         return self._settings.get(f"fastCallIdx{num}", -1)
 
     def get_pref_model(self) -> list:
-        model = [{"name": "Unassigned", "floorId": -1, "iconPath": "", "type": "empty"}]
+        model = [{"name": "Unassigned","shortName": "", "floorId": -1, "type": "empty"}]
         main_floor = self.floor_idx
         for floor in self._config:
             if floor.get("floorId") == main_floor:
@@ -146,13 +155,7 @@ class FloorManager(QObject):
 
         if floor_id == -1:
             return ""
-        
-        floor = self._floors_by_id.get(floor_id)
-
-        if floor is None:
-            return ""
-
-        return floor["iconPath"]
+        return "../../../../assets/icons/button/call.svg"
 
     def set_main_floor(self, floor_id: int) -> None:
         if self._settings.get("floorIdx") != floor_id:

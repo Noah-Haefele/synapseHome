@@ -58,7 +58,25 @@ class UiSet(QObject):
     @Property(str, notify=settingsChanged)
     def pref3IconPath(self):
         return self._floor_manager.get_pref_icon_path(3)
+    
+    # short name for each call icon in ControlGrid
+    @Property(str, notify=settingsChanged)
+    def pref1ShortName(self):
+        return self._floor_manager.get_floor_short_name(
+            self._floor_manager.get_pref(1)
+        )
 
+    @Property(str, notify=settingsChanged)
+    def pref2ShortName(self):
+        return self._floor_manager.get_floor_short_name(
+            self._floor_manager.get_pref(2)
+        )
+
+    @Property(str, notify=settingsChanged)
+    def pref3ShortName(self):
+        return self._floor_manager.get_floor_short_name(
+            self._floor_manager.get_pref(3)
+        )
 
     @Slot(int)
     def setMainFloor(self, floor_id: int) -> None:

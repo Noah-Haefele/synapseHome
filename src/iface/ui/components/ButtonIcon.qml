@@ -4,8 +4,12 @@ import QtQuick.Controls 2.15
 Control {
     id: root
 
-    property url icon: ""
     property color clr: "transparent"
+
+    // CallIcon relevant stuff
+    property url icon: ""
+    property string label: ""
+    property color labelColor: "black"
 
     signal clicked()
     signal pressedAndHold()
@@ -14,12 +18,15 @@ Control {
         color: root.clr
     }
 
-    Image {
+    CallIcon {
         anchors.centerIn: parent
+
         width: parent.width * 0.6
         height: parent.height * 0.6
-        fillMode: Image.PreserveAspectFit
-        source: Qt.resolvedUrl(root.icon)
+
+        icon: root.icon
+        label: root.label
+        labelColor: root.labelColor
     }
 
     MouseArea {
