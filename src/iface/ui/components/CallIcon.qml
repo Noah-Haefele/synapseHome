@@ -9,6 +9,8 @@ Item {
 
     Item {
         id: iconBox
+        // Keep the visible icon area square and centered so the label stays
+        // anchored to the same visual region when the button is resized.
         anchors.centerIn: parent
         width: Math.min(parent.width, parent.height)
         height: width
@@ -21,7 +23,7 @@ Item {
         }
 
         Text {
-            // Warning if Number to large
+            // Show a fallback marker for labels that are too long to fit nicely.
             text: root.label.length > 2 ? "!!" : root.label
 
             font.pixelSize: {
@@ -33,9 +35,11 @@ Item {
                 }
             }
 
-            // Paint double exclamaiton mark in red
+            // Paint oversized labels in red to make overflow obvious.
             color: root.label.length > 2 ? '#ff0000' : root.labelColor
 
+            // Position the label relative to the fitted icon box so it stays
+            // visually attached to the icon when the control scales.
             anchors.left: parent.left
             anchors.top: parent.top
             anchors.leftMargin: parent.width * 0.59
