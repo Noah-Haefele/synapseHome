@@ -31,20 +31,20 @@ class FloorManager(QObject):
         self._config = [
             {
                 "name": "1st Floor",
+                "shortName": "1",
                 "floorId": 1,
-                "iconPath": "../../../../assets/icons/button/callE.svg",
                 "type": "floor"
             },
             {
                 "name": "2nd Floor",
+                "shortName": "2",
                 "floorId": 2,
-                "iconPath": "../../../../assets/icons/button/call1.svg",
                 "type": "floor"
             },
             {
                 "name": "3rd Floor",
+                "shortName": "3",
                 "floorId": 3,
-                "iconPath": "../../../../assets/icons/button/callD.svg",
                 "type": "floor"
             }
         ]
@@ -142,7 +142,7 @@ class FloorManager(QObject):
         return self._settings.get(f"fastCallIdx{num}", -1)
 
     def get_pref_model(self) -> list:
-        model = [{"name": "Unassigned", "floorId": -1, "iconPath": "", "type": "empty"}]
+        model = [{"name": "Unassigned","shortName": "", "floorId": -1, "type": "empty"}]
         main_floor = self.floor_idx
         for floor in self._config:
             if floor.get("floorId") == main_floor:

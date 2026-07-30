@@ -3,21 +3,18 @@
         "name": "1st Floor",
         "shortName": "1",
         "floorId": 1,
-        "iconPath": "../../../../assets/icons/button/callE.svg",
         "type": "floor"
     },
     {
         "name": "2nd Floor",
         "shortName": "2",
         "floorId": 2,
-        "iconPath": "../../../../assets/icons/button/call1.svg",
         "type": "floor"
     },
     {
         "name": "3rd Floor",
         "shortName": "3",
         "floorId": 3,
-        "iconPath": "../../../../assets/icons/button/callD.svg",
         "type": "floor"
     }
 ]
