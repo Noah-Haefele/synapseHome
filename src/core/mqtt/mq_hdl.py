@@ -29,6 +29,7 @@ class MQTTHandler:
         self._running = False
 
     def start(self):
+        """Starts the MQTT client, connects to the broker, and starts the network loop."""
         if self._running:
             return  # Already running
         
@@ -46,6 +47,7 @@ class MQTTHandler:
             logger.exception("MQTT connection failed")
 
     def stop(self):
+        """Stops the MQTT network loop and disconnects from the broker."""
         if not self._running:
             return  # Not running
 
@@ -56,6 +58,10 @@ class MQTTHandler:
         self._running = False
 
     def subscribe(self, topic: str, callback: Callable[[str], None]):
+        """
+        Subscribes to a topic and registers a callback for incoming messages.
+        The configured topic prefix is automatically added to the given topic.
+        """
         full_topic = f"{self._mqtt_config.topic_prefix}/{topic}"
 
         with self._subscription_lock:
@@ -70,6 +76,10 @@ class MQTTHandler:
                 logger.info("Subscribed to topic: %s", full_topic)
 
     def unsubscribe(self, topic: str):
+        """
+        Removes a subscription and unregisters its callback.
+        The configured topic prefix is automatically added to the given topic.
+        """
         full_topic = f"{self._mqtt_config.topic_prefix}/{topic}"
 
         with self._subscription_lock:
