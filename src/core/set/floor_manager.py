@@ -16,7 +16,7 @@ class FloorManager(QObject):
         super().__init__()
 
         base_dir = Path(__file__).resolve().parents[3]
-        self._settings_file = base_dir / "data" / "settings.json"
+        self._settings_file = base_dir / "internal" / "settings.json"
         self._config_file = base_dir / "config" / "floors.json"
 
         # Default user settings
