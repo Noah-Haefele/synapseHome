@@ -12,6 +12,7 @@ logger = logging.getLogger(__name__)
 class MQTTConfig:
     host: str = "127.0.0.1"
     port: int = 1883
+    keepalive: int = 60
     username: str = ""
     password: str = ""
     # on every new instance
