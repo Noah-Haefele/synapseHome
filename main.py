@@ -7,6 +7,8 @@ from PySide6.QtQml import QQmlApplicationEngine
 
 from src.core.net.utils import NetworkInterface
 from src.core.set.floor_manager import FloorManager
+from src.core.mqtt.mq_conf import MQTTConfig
+from src.core.mqtt.mq_hdl import MQTTHandler
 from src.iface.ui.bridge.ui_call import UICall
 from src.iface.ui.bridge.ui_net import UINetwork
 from src.iface.ui.bridge.ui_set import UiSet
@@ -17,8 +19,10 @@ logger = logging.getLogger("Main")
 def main():
     app = QGuiApplication(sys.argv)
 
-    floor_manager = FloorManager()
     core_network = NetworkInterface()
+    floor_manager = FloorManager()
+    mqtt_config = MQTTConfig()
+    mqtt_handler = MQTTHandler(mqtt_config=mqtt_config)
 
     # UI Bridges
     ui_handler = UiSet(floor_manager=floor_manager)
