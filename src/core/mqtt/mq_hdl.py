@@ -57,12 +57,12 @@ class MQTTHandler:
 
         self._running = False
 
-    def subscribe(self, topic: str, callback: Callable[[str], None]):
+    def subscribe(self, subtopic: str, callback: Callable[[str], None]):
         """
-        Subscribes to a topic and registers a callback for incoming messages.
-        The configured topic prefix is automatically added to the given topic.
+        Subscribes to a subtopic and registers a callback for incoming messages.
+        The configured topic prefix is automatically added to the given subtopic.
         """
-        full_topic = f"{self._mqtt_config.topic_prefix}/{topic}"
+        full_topic = f"{self._mqtt_config.topic_prefix}/{subtopic}"
 
         with self._subscription_lock:
             self._subscriptions[full_topic] = callback
@@ -75,12 +75,12 @@ class MQTTHandler:
             else:
                 logger.info("Subscribed to topic: %s", full_topic)
 
-    def unsubscribe(self, topic: str):
+    def unsubscribe(self, subtopic: str):
         """
         Removes a subscription and unregisters its callback.
-        The configured topic prefix is automatically added to the given topic.
+        The configured topic prefix is automatically added to the given subtopic.
         """
-        full_topic = f"{self._mqtt_config.topic_prefix}/{topic}"
+        full_topic = f"{self._mqtt_config.topic_prefix}/{subtopic}"
 
         with self._subscription_lock:
             self._subscriptions.pop(full_topic, None)
@@ -95,6 +95,14 @@ class MQTTHandler:
                 )
             else:
                 logger.info(f"Unsubscribed from topic: {full_topic}")
+
+    def publish(self, subtopic: str, payload: str, qos: int = 1, retain: bool = False) -> None:
+        """Publishes a payload to the broker under the configured topic prefix."""
+        full_topic = f"{self._mqtt_config.topic_prefix}/{subtopic}"
+        result = self._mqttc.publish(full_topic, payload, qos=qos, retain=retain)
+        
+        if result.rc != mqtt.MQTT_ERR_SUCCESS:
+            logger.warning("Failed to queue message for topic %s (rc: %d)", full_topic, result.rc)
 
     # --- Callbacks --- 
     
