@@ -54,7 +54,7 @@ class CallNode():
 
             # Notify the UI bridge about incoming call if the callback is set
             if self.on_incoming_call:
-                self.on_incoming_call(caller_floor_id, caller_ip)
+                self.on_incoming_call(caller_floor_id)
 
         except ValueError:
             logger.error("Failed to parse incoming call payload: %s", payload)

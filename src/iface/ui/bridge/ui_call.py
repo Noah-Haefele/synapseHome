@@ -17,6 +17,8 @@ class UICall(QObject):
         self._call_state = "IDLE"
         self._target_floor_id = -1
 
+        self._call_node.on_incoming_call = self._on_incoming_call
+
     @Property(str, notify=callStateChanged)
     def callState(self) -> str:
         return self._call_state
@@ -35,7 +37,9 @@ class UICall(QObject):
         # show ellipsis while waiting for call acceptance
         if self._call_state == "CALLING":
             label += " ..."
-
+        elif self._call_state == "RINGING":
+            label += " is calling..."
+            
         return label
     
     @Slot(int)
@@ -55,6 +59,19 @@ class UICall(QObject):
         """Ends call / hand up"""
         self._call_state = "IDLE"
         self._target_floor_id = -1
+
+        self.targetFloorChanged.emit(self._target_floor_id)
+        self.destinationLabelChanged.emit()
+        self.callStateChanged.emit(self._call_state)
+
+    def _on_incoming_call(self, call_floor_id: int) -> None:
+        """Callback handler invoked by CallNode when an inbound call arrives."""
+        # Just take up the call if line is idle
+        if self._call_state != "IDLE":
+            return
+
+        self._target_floor_id = call_floor_id
+        self._call_state = "RINGING"
 
         self.targetFloorChanged.emit(self._target_floor_id)
         self.destinationLabelChanged.emit()
