@@ -17,11 +17,20 @@ ApplicationWindow {
         initialItem: "views/Home.qml"
     }
 
-    // Call overlay
+    // OutgoingCallOverlay overlay
     Loader {
-        id: callOverlay
+        id: outgoingCallOverlay
         anchors.fill: parent
         source: "views/call/Outgoing.qml"
+        active: false
+        z: 1000
+    }
+
+    // IncomingCallOverlay overlay
+    Loader {
+        id: incomingCallOverlay
+        anchors.fill: parent
+        source: "views/call/Incoming.qml"
         active: false
         z: 1000
     }
@@ -30,8 +39,11 @@ ApplicationWindow {
         target: callHandler
 
         function onCallStateChanged(state) {
-            callOverlay.active =
+            outgoingCallOverlay.active =
                 (state === "CALLING")
+            
+            incomingCallOverlay.active =
+                (state === "RINGING")
         }
     }
 }
