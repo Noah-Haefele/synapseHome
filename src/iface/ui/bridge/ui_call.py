@@ -21,6 +21,8 @@ class UICall(QObject):
         self._call_node.on_incoming_call = self._on_incoming_call
         # Register the callback for accepted calls
         self._call_node.on_call_accepted = self._on_call_accepted
+        # Register the callback for stopped calls
+        self._call_node.on_call_stopped = self._on_call_stopped
 
     @Property(str, notify=callStateChanged)
     def callState(self) -> str:
@@ -72,6 +74,8 @@ class UICall(QObject):
         self._call_state = "IDLE"
         self._target_floor_id = -1
 
+        self._call_node.stop_call()
+
         self.targetFloorChanged.emit(self._target_floor_id)
         self.destinationLabelChanged.emit()
         self.callStateChanged.emit(self._call_state)
@@ -89,7 +93,18 @@ class UICall(QObject):
         self.destinationLabelChanged.emit()
         self.callStateChanged.emit(self._call_state)
 
-    def _on_call_accepted(self, call_floor_id: int) -> None:
+    def _on_call_accepted(self) -> None:
         """Callback handler invoked by CallNode when the call is accepted by the other device."""
         self._call_state = "CONNECTED"
+
+        self.destinationLabelChanged.emit()
+        self.callStateChanged.emit(self._call_state)
+
+    def _on_call_stopped(self) -> None:
+        """Callback handler invoked by CallNode when the call is stopped by the other device by either rejecting or ending the call."""
+        self._call_state = "IDLE"
+        self._target_floor_id = -1
+
+        self.targetFloorChanged.emit(self._target_floor_id)
+        self.destinationLabelChanged.emit()
         self.callStateChanged.emit(self._call_state)
