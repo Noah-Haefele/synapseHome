@@ -1,6 +1,7 @@
 from PySide6.QtCore import QObject, Property, Signal, Slot
 
 from src.core.set.floor_manager import FloorManager
+from src.core.net.node import CallNode
 
 
 class UICall(QObject):
@@ -8,10 +9,11 @@ class UICall(QObject):
     targetFloorChanged = Signal(int)
     destinationLabelChanged = Signal()
 
-    def __init__(self, floor_manager: FloorManager):
+    def __init__(self, floor_manager: FloorManager, call_node: CallNode):
         super().__init__()
 
         self._floor_manager = floor_manager
+        self._call_node = call_node
         self._call_state = "IDLE"
         self._target_floor_id = -1
 
@@ -41,6 +43,8 @@ class UICall(QObject):
         """QML triggers call"""
         self._target_floor_id = floorId
         self._call_state = "CALLING"
+
+        self._call_node.dial(self._target_floor_id)
 
         self.targetFloorChanged.emit(self._target_floor_id)
         self.destinationLabelChanged.emit()
