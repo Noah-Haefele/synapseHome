@@ -46,7 +46,7 @@ class UICall(QObject):
         return label
     
     @Slot(int)
-    def startCall(self, floorId: int):
+    def initiateCall(self, floorId: int):
         """QML triggers call"""
         self._target_floor_id = floorId
         self._call_state = "CALLING"
@@ -68,7 +68,7 @@ class UICall(QObject):
 
     @Slot()
     def endCall(self):
-        """Ends call / hand up"""
+        """Ends call / rejects incoming call"""
         self._call_state = "IDLE"
         self._target_floor_id = -1
 
