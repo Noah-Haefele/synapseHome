@@ -34,7 +34,7 @@ Item {
                     const floor = uiHandler.getPrefFloor(value)
 
                     if (floor >= 0) {
-                        callHandler.startCall(floor)
+                        callHandler.initiateCall(floor)
                     }
                 } else{ 
                     switch (value) {

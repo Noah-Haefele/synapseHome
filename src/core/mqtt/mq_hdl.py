@@ -35,7 +35,7 @@ class MQTTHandler:
         
         try:
             self._mqttc.connect(
-                self._mqtt_config.broker, 
+                self._mqtt_config.host, 
                 self._mqtt_config.port, 
                 self._mqtt_config.keepalive
             )
@@ -57,12 +57,12 @@ class MQTTHandler:
 
         self._running = False
 
-    def subscribe(self, topic: str, callback: Callable[[str], None]):
+    def subscribe(self, subtopic: str, callback: Callable[[str], None]):
         """
-        Subscribes to a topic and registers a callback for incoming messages.
-        The configured topic prefix is automatically added to the given topic.
+        Subscribes to a subtopic and registers a callback for incoming messages.
+        The configured topic prefix is automatically added to the given subtopic.
         """
-        full_topic = f"{self._mqtt_config.topic_prefix}/{topic}"
+        full_topic = f"{self._mqtt_config.topic_prefix}/{subtopic}"
 
         with self._subscription_lock:
             self._subscriptions[full_topic] = callback
@@ -73,14 +73,14 @@ class MQTTHandler:
             if result != mqtt.MQTT_ERR_SUCCESS:
                 logger.error("Failed to subscribe to topic: %s", full_topic)
             else:
-                logger.info("Subscribed to topic: %s", full_topic)
+                logger.debug("Subscribed to topic: %s", full_topic)
 
-    def unsubscribe(self, topic: str):
+    def unsubscribe(self, subtopic: str):
         """
         Removes a subscription and unregisters its callback.
-        The configured topic prefix is automatically added to the given topic.
+        The configured topic prefix is automatically added to the given subtopic.
         """
-        full_topic = f"{self._mqtt_config.topic_prefix}/{topic}"
+        full_topic = f"{self._mqtt_config.topic_prefix}/{subtopic}"
 
         with self._subscription_lock:
             self._subscriptions.pop(full_topic, None)
@@ -94,7 +94,15 @@ class MQTTHandler:
                     full_topic
                 )
             else:
-                logger.info(f"Unsubscribed from topic: {full_topic}")
+                logger.debug(f"Unsubscribed from topic: {full_topic}")
+
+    def publish(self, subtopic: str, payload: str, qos: int = 1, retain: bool = False) -> None:
+        """Publishes a payload to the broker under the configured topic prefix."""
+        full_topic = f"{self._mqtt_config.topic_prefix}/{subtopic}"
+        result = self._mqttc.publish(full_topic, payload, qos=qos, retain=retain)
+        
+        if result.rc != mqtt.MQTT_ERR_SUCCESS:
+            logger.warning("Failed to queue message for topic %s (rc: %d)", full_topic, result.rc)
 
     # --- Callbacks --- 
     
@@ -122,7 +130,7 @@ class MQTTHandler:
 
     def _on_connect(self, client, userdata, flags, rc) -> None:
         if rc == 0:
-            logger.info("Connected to MQTT broker as '%s'", self._mqtt_config.client_id)
+            logger.debug("Connected to MQTT broker as '%s'", self._mqtt_config.client_id)
 
             with self._subscription_lock:
                 topics = list(self._subscriptions.keys())

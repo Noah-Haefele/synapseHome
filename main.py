@@ -6,6 +6,7 @@ from PySide6.QtGui import QGuiApplication
 from PySide6.QtQml import QQmlApplicationEngine
 
 from src.core.net.utils import NetworkInterface
+from src.core.net.node import CallNode
 from src.core.set.floor_manager import FloorManager
 from src.core.mqtt.mq_conf import MQTTConfig
 from src.core.mqtt.mq_hdl import MQTTHandler
@@ -23,11 +24,12 @@ def main():
     floor_manager = FloorManager()
     mqtt_config = MQTTConfig()
     mqtt_handler = MQTTHandler(mqtt_config=mqtt_config)
+    call_node = CallNode(net_interface=core_network, floor_manager=floor_manager, mqtt_handler=mqtt_handler)
 
     # UI Bridges
     ui_handler = UiSet(floor_manager=floor_manager)
     ui_network_bridge = UINetwork(net_interface=core_network)
-    call_handler = UICall(floor_manager=floor_manager)
+    call_handler = UICall(floor_manager=floor_manager, call_node=call_node)
 
 
     # QML Engine

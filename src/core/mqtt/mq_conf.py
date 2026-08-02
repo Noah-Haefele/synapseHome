@@ -10,7 +10,8 @@ logger = logging.getLogger(__name__)
 
 @dataclass
 class MQTTConfig:
-    host: str = "127.0.0.1"
+    # Ip address to the MQTT broker in network
+    host: str = "192.168.1.10"
     port: int = 1883
     keepalive: int = 60
     username: str = ""
