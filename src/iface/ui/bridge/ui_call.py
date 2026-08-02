@@ -17,7 +17,10 @@ class UICall(QObject):
         self._call_state = "IDLE"
         self._target_floor_id = -1
 
+        # Register the callback for incoming calls
         self._call_node.on_incoming_call = self._on_incoming_call
+        # Register the callback for accepted calls
+        self._call_node.on_call_accepted = self._on_call_accepted
 
     @Property(str, notify=callStateChanged)
     def callState(self) -> str:
@@ -39,7 +42,7 @@ class UICall(QObject):
             label += " ..."
         elif self._call_state == "RINGING":
             label += " is calling..."
-            
+
         return label
     
     @Slot(int)
@@ -52,6 +55,15 @@ class UICall(QObject):
 
         self.targetFloorChanged.emit(self._target_floor_id)
         self.destinationLabelChanged.emit()
+        self.callStateChanged.emit(self._call_state)
+
+    @Slot()
+    def acceptCall(self):
+        """Accepts incoming call"""
+        self._call_state = "CONNECTED"
+
+        self._call_node.accept_call()
+
         self.callStateChanged.emit(self._call_state)
 
     @Slot()
@@ -75,4 +87,9 @@ class UICall(QObject):
 
         self.targetFloorChanged.emit(self._target_floor_id)
         self.destinationLabelChanged.emit()
+        self.callStateChanged.emit(self._call_state)
+
+    def _on_call_accepted(self, call_floor_id: int) -> None:
+        """Callback handler invoked by CallNode when the call is accepted by the other device."""
+        self._call_state = "CONNECTED"
         self.callStateChanged.emit(self._call_state)

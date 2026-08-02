@@ -35,6 +35,15 @@ ApplicationWindow {
         z: 1000
     }
 
+    // AcceptedCallOverlay overlay
+    Loader {
+        id: acceptedCallOverlay
+        anchors.fill: parent
+        source: "views/call/Accepted.qml"
+        active: false
+        z: 1000
+    }
+
     Connections {
         target: callHandler
 
@@ -44,6 +53,9 @@ ApplicationWindow {
             
             incomingCallOverlay.active =
                 (state === "RINGING")
+
+            acceptedCallOverlay.active =
+                (state === "CONNECTED")
         }
     }
 }

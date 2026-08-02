@@ -34,9 +34,7 @@ Rectangle {
             height: 120
             width: height
             
-            icon: "../../../../assets/icons/call/call_on.svg"
-
-            onClicked: callHandler.acceptCall()
+            icon: "../../../../assets/icons/call/muteMic_on.svg"
         }
 
         ButtonIcon {
@@ -46,6 +44,13 @@ Rectangle {
             icon: "../../../../assets/icons/call/call_off.svg"
 
             onClicked: callHandler.endCall()
+        }
+
+        ButtonIcon {
+            height: 120
+            width: height
+            
+            icon: "../../../../assets/icons/call/muteMic_off.svg"
         }
     }
 }
