@@ -21,7 +21,7 @@ ApplicationWindow {
     Loader {
         id: callOverlay
         anchors.fill: parent
-        source: "views/Call.qml"
+        source: "views/call/Outgoing.qml"
         active: false
         z: 1000
     }
