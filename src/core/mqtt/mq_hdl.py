@@ -35,7 +35,7 @@ class MQTTHandler:
         
         try:
             self._mqttc.connect(
-                self._mqtt_config.broker, 
+                self._mqtt_config.host, 
                 self._mqtt_config.port, 
                 self._mqtt_config.keepalive
             )
