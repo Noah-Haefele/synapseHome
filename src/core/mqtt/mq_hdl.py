@@ -73,7 +73,7 @@ class MQTTHandler:
             if result != mqtt.MQTT_ERR_SUCCESS:
                 logger.error("Failed to subscribe to topic: %s", full_topic)
             else:
-                logger.info("Subscribed to topic: %s", full_topic)
+                logger.debug("Subscribed to topic: %s", full_topic)
 
     def unsubscribe(self, subtopic: str):
         """
@@ -94,7 +94,7 @@ class MQTTHandler:
                     full_topic
                 )
             else:
-                logger.info(f"Unsubscribed from topic: {full_topic}")
+                logger.debug(f"Unsubscribed from topic: {full_topic}")
 
     def publish(self, subtopic: str, payload: str, qos: int = 1, retain: bool = False) -> None:
         """Publishes a payload to the broker under the configured topic prefix."""
@@ -130,7 +130,7 @@ class MQTTHandler:
 
     def _on_connect(self, client, userdata, flags, rc) -> None:
         if rc == 0:
-            logger.info("Connected to MQTT broker as '%s'", self._mqtt_config.client_id)
+            logger.debug("Connected to MQTT broker as '%s'", self._mqtt_config.client_id)
 
             with self._subscription_lock:
                 topics = list(self._subscriptions.keys())
