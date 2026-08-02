@@ -21,36 +21,18 @@ Rectangle {
         text: callHandler.destinationLabel
     }
 
-    Row {
+    ButtonIcon {
         anchors {
             horizontalCenter: parent.horizontalCenter
             bottom: parent.bottom
             bottomMargin: 10
         }
 
-        spacing: 16
+        height: 120
+        width: height
 
-        ButtonIcon {
-            height: 120
-            width: height
-            
-            icon: "../../../../assets/icons/call/muteMic_on.svg"
-        }
+        icon: "../../../../assets/icons/call/call_off.svg"
 
-        ButtonIcon {
-            height: 120
-            width: height
-
-            icon: "../../../../assets/icons/call/call_off.svg"
-
-            onClicked: callHandler.endCall()
-        }
-
-        ButtonIcon {
-            height: 120
-            width: height
-            
-            icon: "../../../../assets/icons/call/muteMic_off.svg"
-        }
+        onClicked: callHandler.endCall()
     }
 }
