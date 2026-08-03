@@ -1,6 +1,7 @@
 import logging
 from PySide6.QtCore import QObject, Property, Signal, Slot
 from src.core.set.floor_manager import FloorManager
+from src.core.set.general import SettingsManager
 
 logger = logging.getLogger(__name__)
 
@@ -10,10 +11,13 @@ class UiSet(QObject):
 
     settingsChanged = Signal()
 
-    def __init__(self, floor_manager: FloorManager):
+    def __init__(self, floor_manager: FloorManager, general_settings_manager=SettingsManager):
         super().__init__()
         self._floor_manager = floor_manager
+        self._settings_manager = general_settings_manager
+
         self._floor_manager.stateChanged.connect(self.settingsChanged.emit)
+        self._settings_manager.settingsChanged.connect(self.settingsChanged.emit)
 
     @Property("QVariantList", notify=settingsChanged)
     def allFloors(self):
@@ -89,3 +93,15 @@ class UiSet(QObject):
     @Slot(int, result=int)
     def getPrefFloor(self, pref_num: int):
         return self._floor_manager.get_pref(pref_num)
+
+    # --- Brightness and display standby time settings --- 
+
+    @Property(int, notify=settingsChanged)
+    def brightness(self): return self._settings_manager.get_brightness()
+    @brightness.setter
+    def brightness(self, val): self._settings_manager.set_setting("brightness", int(val))
+    
+    @Property(int, notify=settingsChanged)
+    def displayTime(self): return self._settings_manager.get_display_time()
+    @displayTime.setter
+    def displayTime(self, val): self._settings_manager.set_setting("displayTime", int(val))
