@@ -17,45 +17,42 @@ ApplicationWindow {
         initialItem: "views/Home.qml"
     }
 
-    // OutgoingCallOverlay overlay
-    Loader {
-        id: outgoingCallOverlay
-        anchors.fill: parent
-        source: "views/call/Outgoing.qml"
-        active: false
-        z: 1000
-    }
+    Item {
+        id: overlayLayer
 
-    // IncomingCallOverlay overlay
-    Loader {
-        id: incomingCallOverlay
         anchors.fill: parent
-        source: "views/call/Incoming.qml"
-        active: false
-        z: 1000
-    }
 
-    // AcceptedCallOverlay overlay
-    Loader {
-        id: acceptedCallOverlay
-        anchors.fill: parent
-        source: "views/call/Accepted.qml"
-        active: false
         z: 1000
+        visible: false
+
+        MouseArea {
+            anchors.fill: parent
+
+            enabled: overlayLayer.visible
+        }
+
+        Loader {
+            id: callOverlayLoader
+            
+            anchors.fill: parent
+        }
     }
 
     Connections {
         target: callHandler
 
         function onCallStateChanged(state) {
-            outgoingCallOverlay.active =
-                (state === "CALLING")
-            
-            incomingCallOverlay.active =
-                (state === "RINGING")
+            overlayLayer.visible = state !== "IDLE"
 
-            acceptedCallOverlay.active =
-                (state === "CONNECTED")
+            if (state === "CALLING") {
+                callOverlayLoader.source = "views/call/Outgoing.qml"
+            }
+            else if (state === "RINGING") {
+                callOverlayLoader.source = "views/call/Incoming.qml"
+            }
+            else if (state === "CONNECTED") {
+                callOverlayLoader.source = "views/call/Accepted.qml"
+            }
         }
     }
 }
