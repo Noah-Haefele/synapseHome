@@ -11,6 +11,7 @@ class FloorManager(QObject):
     """Manages persistent floor configurations, device locations, and shortcut preferences."""
 
     stateChanged = Signal()
+    deviceLocationChanged = Signal()
 
     def __init__(self):
         super().__init__()
@@ -68,6 +69,7 @@ class FloorManager(QObject):
                     new_settings = json.load(f)
                 self._settings.update({k: v for k, v in new_settings.items() if k in self._settings})
                 self.stateChanged.emit()
+                self.deviceLocationChanged.emit()
             except Exception as e:
                 logger.error(f"Settings could not be loaded: {e}")
         else:
@@ -86,6 +88,7 @@ class FloorManager(QObject):
 
         self._rebuild_floor_map()
         self.stateChanged.emit()
+        self.deviceLocationChanged.emit()
 
     def _rebuild_floor_map(self):
         self._floors_by_id = {
@@ -164,6 +167,7 @@ class FloorManager(QObject):
                 if self._settings.get(key) == floor_id:
                     self._settings[key] = -1
             self.stateChanged.emit()
+            self.deviceLocationChanged.emit()
             self._save_timer.start()
 
     def set_pref_floor(self, pref_num: int, floor_id: int) -> None:
