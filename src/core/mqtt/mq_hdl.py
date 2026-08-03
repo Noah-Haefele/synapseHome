@@ -96,6 +96,14 @@ class MQTTHandler:
             else:
                 logger.debug(f"Unsubscribed from topic: {full_topic}")
 
+    def get_subscriptions(self):
+        """Returns all subscribed subtopics."""
+        with self._subscription_lock:
+            return [
+                topic.split("/", 1)[1]
+                for topic in self._subscriptions.keys()
+            ]
+
     def publish(self, subtopic: str, payload: str, qos: int = 1, retain: bool = False) -> None:
         """Publishes a payload to the broker under the configured topic prefix."""
         full_topic = f"{self._mqtt_config.topic_prefix}/{subtopic}"
