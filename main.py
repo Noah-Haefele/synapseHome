@@ -8,8 +8,11 @@ from PySide6.QtQml import QQmlApplicationEngine
 from src.core.net.utils import NetworkInterface
 from src.core.net.node import CallNode
 from src.core.set.floor_manager import FloorManager
+from src.core.set.general import SettingsManager
 from src.core.mqtt.mq_conf import MQTTConfig
 from src.core.mqtt.mq_hdl import MQTTHandler
+from src.core.display.activity import ActivityFilter
+from src.hardware.display import DisplaySetter
 from src.iface.ui.bridge.ui_call import UICall
 from src.iface.ui.bridge.ui_net import UINetwork
 from src.iface.ui.bridge.ui_set import UiSet
@@ -22,14 +25,19 @@ def main():
 
     core_network = NetworkInterface()
     floor_manager = FloorManager()
+    general_settings_manager = SettingsManager()
     mqtt_config = MQTTConfig()
     mqtt_handler = MQTTHandler(mqtt_config=mqtt_config)
     call_node = CallNode(net_interface=core_network, floor_manager=floor_manager, mqtt_handler=mqtt_handler)
 
     # UI Bridges
-    ui_handler = UiSet(floor_manager=floor_manager)
+    ui_handler = UiSet(floor_manager=floor_manager, general_settings_manager=general_settings_manager)
     ui_network_bridge = UINetwork(net_interface=core_network)
     call_handler = UICall(floor_manager=floor_manager, call_node=call_node)
+
+    display_hardware = DisplaySetter()
+    display_manager = ActivityFilter(display_hardware=display_hardware, general_settings_manager=general_settings_manager)
+    app.installEventFilter(display_manager)
 
 
     # QML Engine
