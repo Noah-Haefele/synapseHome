@@ -44,6 +44,12 @@ Item {
             Layout.fillHeight: true
             spacing: 0
 
+            Display {
+                visible: leftViewState === 0
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+            }
+
             System {
                 visible: leftViewState === 3
                 Layout.fillWidth: true
@@ -51,7 +57,7 @@ Item {
             }
 
             Rectangle {
-                visible: leftViewState !== 3
+                visible: leftViewState !== 3 && leftViewState !== 0
                 Layout.fillHeight: true
                 Layout.fillWidth: true
                 color: "white"
