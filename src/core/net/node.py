@@ -1,4 +1,5 @@
 import logging
+import re
 from typing import Callable, Optional
 
 from src.core.mqtt.mq_hdl import MQTTHandler
@@ -13,6 +14,9 @@ class CallNode():
         self._floor_manager = floor_manager
         self._mqtt_handler = mqtt_handler
 
+        # Resubscribe to call mesage if in the systemsettings the floor in which the device is, has changed
+        self._floor_manager.deviceLocationChanged.connect(self._subscribe_to_call_message)
+
         # Incoming call callback, to notify the UI bridge
         self.on_incoming_call: Optional[Callable[[int], None]] = None
         # Accepted call callback, to notify the UI bridge
@@ -24,9 +28,15 @@ class CallNode():
         self._subscribe_to_call_message()  # Subscribe to the call topic for this floor
 
     def _subscribe_to_call_message(self):
-        """Subscribes to the call topic for this floor to listen for incoming calls."""
+        """
+        Subscribes to the current call topic.
+        Resubscribes if a previous call subscription exists.
+        """
+        subscriptions = self._mqtt_handler.get_subscriptions()
+        for topic in subscriptions:
+            if re.match(r"^call/\d+$", topic):
+                self._mqtt_handler.unsubscribe(topic)
         subtopic = f"call/{self._floor_manager.floor_idx}"
-
         self._mqtt_handler.subscribe(subtopic, self._handle_incoming_call_message)
 
     def dial(self, target_floor_id: int):
