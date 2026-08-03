@@ -1,6 +1,8 @@
 import logging
 from pathlib import Path
 
+logger = logging.getLogger(__name__)
+
 class DisplaySetter:
     PATH_POWER = Path("/sys/class/backlight/panel_backlight@1/bl_power")
     PATH_BRIGHT = Path("/sys/class/backlight/panel_backlight@1/brightness")
@@ -18,7 +20,7 @@ class DisplaySetter:
             if DisplaySetter.PATH_POWER.exists():
                 DisplaySetter.PATH_POWER.write_text("0" if on else "1")
             else:
-                logging.warning(f"Power path not found: {DisplaySetter.PATH_POWER}")
+                logger.warning(f"Power path not found: {DisplaySetter.PATH_POWER}")
 
             # Brightness (Value range 0..31)
             if on and DisplaySetter.PATH_BRIGHT.exists():
@@ -26,9 +28,9 @@ class DisplaySetter:
                 target_val = int(round((p / 100.0) * 31))
                 DisplaySetter.PATH_BRIGHT.write_text(str(target_val))
             elif on:
-                logging.warning(f"Brightness path not found: {DisplaySetter.PATH_BRIGHT}")
+                logger.warning(f"Brightness path not found: {DisplaySetter.PATH_BRIGHT}")
 
         except PermissionError:
-            logging.error(f"Permission denied writing to sysfs. Run as root or add udev rules.")
+            logger.error(f"Permission denied writing to sysfs. Run as root or add udev rules.")
         except Exception as e:
-            logging.error(f"Error setting display: {e}")
+            logger.error(f"Error setting display: {e}")
