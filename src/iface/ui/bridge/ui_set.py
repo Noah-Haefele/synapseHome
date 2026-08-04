@@ -1,7 +1,9 @@
 import logging
 from PySide6.QtCore import QObject, Property, Signal, Slot
+
 from src.core.set.floor_manager import FloorManager
 from src.core.set.general import SettingsManager
+from src.core.act.audio.discovery import AudioDeviceDiscovery
 
 logger = logging.getLogger(__name__)
 
@@ -10,11 +12,13 @@ class UiSet(QObject):
     """QML bridge exposing FloorManager properties and methods to the user interface."""
 
     settingsChanged = Signal()
+    audioDevicesChanged = Signal()
 
-    def __init__(self, floor_manager: FloorManager, general_settings_manager=SettingsManager):
+    def __init__(self, floor_manager: FloorManager, general_settings_manager: SettingsManager, audio_device_discovery: AudioDeviceDiscovery):
         super().__init__()
         self._floor_manager = floor_manager
         self._settings_manager = general_settings_manager
+        self._audio_device_disc = audio_device_discovery
 
         self._floor_manager.stateChanged.connect(self.settingsChanged.emit)
         self._settings_manager.settingsChanged.connect(self.settingsChanged.emit)
@@ -94,7 +98,7 @@ class UiSet(QObject):
     def getPrefFloor(self, pref_num: int):
         return self._floor_manager.get_pref(pref_num)
 
-    # --- Brightness and display standby time settings --- 
+    # --- Display Settings --- 
 
     @Property(int, notify=settingsChanged)
     def brightness(self): return self._settings_manager.get_brightness()
@@ -105,3 +109,21 @@ class UiSet(QObject):
     def displayTime(self): return self._settings_manager.get_display_time()
     @displayTime.setter
     def displayTime(self, val): self._settings_manager.set_setting("displayTime", int(val))
+
+    # --- Audio Settings ---
+
+    @Slot()
+    def onAudioDropdownOpened(self):
+        """
+        Is called when input or output model is opened
+        Refreshed input and outputModel
+        """
+        self.audioDevicesChanged.emit()
+
+    @Property("QVariantList", notify=audioDevicesChanged)
+    def inputModel(self):
+        return self._audio_device_disc.get_input_devices()
+
+    @Property("QVariantList", notify=audioDevicesChanged)
+    def outputModel(self):
+        return self._audio_device_disc.get_output_devices()
