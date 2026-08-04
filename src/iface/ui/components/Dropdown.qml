@@ -21,9 +21,13 @@ Column {
     
     // Active selection ID provided by backend state
     property int selectedValue: -1
+
+    readonly property alias popupVisible: popup.visible
     
     // Emitted only on explicit user interaction
     signal userSelected(int value)
+    // Emitted when popup opened
+    signal dropdownOpened()
 
     width: 350
     spacing: 1
@@ -144,6 +148,12 @@ Column {
 
             // Item height is 70px; maximum popup height cap is 400px
             property real expectedHeight: Math.min(combo.count * 70, 400)
+
+            onVisibleChanged: {
+                if (visible) {
+                    root.dropdownOpened()
+                }
+            }
 
             // set height so qt knows the bounds
             height: expectedHeight
