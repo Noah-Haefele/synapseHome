@@ -1,5 +1,6 @@
 import logging
 from PySide6.QtCore import QObject, Property, Signal, Slot
+from typing import Any
 
 from src.core.set.floor_manager import FloorManager
 from src.core.set.general import SettingsManager
@@ -127,3 +128,19 @@ class UiSet(QObject):
     @Property("QVariantList", notify=audioDevicesChanged)
     def outputModel(self):
         return self._audio_device_disc.get_output_devices()
+
+    @Property(str, notify=settingsChanged)
+    def inputDevice(self):
+        return self._settings_manager.get_setting("audioI")
+
+    @Property(str, notify=settingsChanged)
+    def outputDevice(self):
+        return self._settings_manager.get_setting("audioO")
+
+    @Slot(str)
+    def setOutputDevice(self, output_id: str):
+        self._settings_manager.set_setting("audioO", output_id)
+
+    @Slot(str)
+    def setInputDevice(self, input_id: str):
+        self._settings_manager.set_setting("audioI", input_id)
