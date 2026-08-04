@@ -35,7 +35,7 @@ Rectangle {
             model: uiHandler.outputModel
             textRole: "name"
             valueRole: "name"
-            //selectedValue: uiHandler.floorIdx
+            selectedValue: uiHandler.inputDevice
             
             onUserSelected: (val) => uiHandler.setInputDevice(val)
 
@@ -56,7 +56,7 @@ Rectangle {
             model: uiHandler.inputModel
             textRole: "name"
             valueRole: "name"
-            //selectedValue: uiHandler.fastCallIdx1
+            selectedValue: uiHandler.outputDevice
             
             onUserSelected: (val) => uiHandler.setOutputDevice(val)
 
