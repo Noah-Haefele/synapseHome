@@ -34,10 +34,10 @@ Rectangle {
             
             model: uiHandler.outputModel
             textRole: "name"
-            valueRole: "floorId"
+            valueRole: "name"
             //selectedValue: uiHandler.floorIdx
             
-            //onUserSelected: (val) => uiHandler.setMainFloor(val)
+            onUserSelected: (val) => uiHandler.setInputDevice(val)
 
             onDropdownOpened: {
                 if (visible) {
@@ -55,10 +55,10 @@ Rectangle {
             
             model: uiHandler.inputModel
             textRole: "name"
-            valueRole: "floorId"
+            valueRole: "name"
             //selectedValue: uiHandler.fastCallIdx1
             
-            //onUserSelected: (val) => uiHandler.setPrefFloor(1, val)
+            onUserSelected: (val) => uiHandler.setOutputDevice(val)
 
             onDropdownOpened: {
                 if (visible) {
