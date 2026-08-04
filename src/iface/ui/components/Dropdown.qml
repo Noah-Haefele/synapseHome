@@ -19,8 +19,8 @@ Column {
     // Model key used to extract the option's unique identifier/ID
     property alias valueRole: combo.valueRole
     
-    // Active selection ID provided by backend state
-    property int selectedValue: -1
+    // Active selection provided by backend state
+    property var selectedValue: -1
 
     readonly property alias popupVisible: popup.visible
     
