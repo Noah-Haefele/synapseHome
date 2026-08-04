@@ -25,7 +25,7 @@ Column {
     readonly property alias popupVisible: popup.visible
     
     // Emitted only on explicit user interaction
-    signal userSelected(int value)
+    signal userSelected(var value)
     // Emitted when popup opened
     signal dropdownOpened()
 
