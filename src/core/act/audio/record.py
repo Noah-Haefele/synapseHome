@@ -8,9 +8,9 @@ logger = logging.getLogger(__name__)
 
 
 class RecordHandler:
-    CHANNELS = 2
+    CHANNELS = 1
     SAMPLERATE = 48000
-    BLOCKSIZE = 50
+    BLOCKSIZE = 128
     DTYPE = np.int32
 
     def __init__(self):
