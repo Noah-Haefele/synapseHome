@@ -1,2 +1,4 @@
 pyside6
 paho-mqtt
+sounddevice
+numpy
