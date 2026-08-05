@@ -59,7 +59,7 @@ class RecordHandler:
                     logger.info(f"Audio status {status}")
 
                 try:
-                    self.audio_queue.put(indata.copy(), timeout=0.1)
+                    self.audio_queue.put_nowait(indata.copy())
                 except Full:
                     logger.warning("Audio queue is full")
 
