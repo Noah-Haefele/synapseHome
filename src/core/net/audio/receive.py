@@ -8,6 +8,7 @@ from src.core.act.audio.playback import AudioHandler
 
 logger = logging.getLogger(__name__)
 
+
 class AudioReceiver:
     def __init__(
             self, 
@@ -42,7 +43,6 @@ class AudioReceiver:
         playback_thread.start()
         receive_thread.start()
 
-
     def _receive_audio(self):
         """Receives audio packets via UDP"""
         while self.is_running:
@@ -69,13 +69,15 @@ class AudioReceiver:
 
     def stop(self):
         self.is_running = False
-
         self._audio_handler.stop()
+        logger.info("Stopped audio receiver")
+
+    def shutdown(self):
+        self.stop()
 
         try:
             self.socket.close()
-        except:
+        except OSError:
             pass
-        logger.info("Stopped audio handler")
 
-    
+        logger.info("Audio receiver shutdown")
