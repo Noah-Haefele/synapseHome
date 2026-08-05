@@ -3,14 +3,12 @@ import numpy as np
 import sounddevice as sd
 from queue import Queue, Full, Empty
 
-from src.core.set.general import SettingsManager
-
 logging.basicConfig(level=logging.INFO)
 
 logger = logging.getLogger(__name__)
 
 
-class AudioHandler:
+class PlaybackHandler:
     """
     Audio is mainly managed by the discovery.py file which uses pulseAudio to set default
     source and sink to the operating system...

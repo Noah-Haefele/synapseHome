@@ -15,7 +15,7 @@ from src.core.mqtt.mq_conf import MQTTConfig
 from src.core.mqtt.mq_hdl import MQTTHandler
 from src.core.display.activity import ActivityFilter
 from src.core.act.audio.discovery import AudioDeviceDiscovery
-from src.core.act.audio.playback import AudioHandler
+from src.core.act.audio.playback import PlaybackHandler
 from src.core.act.audio.record import RecordHandler
 from src.hardware.display import DisplaySetter
 from src.iface.ui.bridge.ui_call import UICall
@@ -45,8 +45,8 @@ def main():
         audio_device_disc.set_default_source(saved_input)
 
     # Get audio
-    audio_handler = AudioHandler()
-    audio_receiver = AudioReceiver(audio_handler=audio_handler)
+    playback_handler = PlaybackHandler()
+    audio_receiver = AudioReceiver(playback_handler=playback_handler)
     # Stream audio
     record_handler = RecordHandler()
     audio_sender = AudioSender(record_handler=record_handler)

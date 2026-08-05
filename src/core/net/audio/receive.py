@@ -4,7 +4,7 @@ import threading
 import numpy as np
 import time
 
-from src.core.act.audio.playback import AudioHandler
+from src.core.act.audio.playback import PlaybackHandler
 
 logger = logging.getLogger(__name__)
 
@@ -12,19 +12,19 @@ logger = logging.getLogger(__name__)
 class AudioReceiver:
     def __init__(
             self, 
-            audio_handler: AudioHandler,
+            playback_handler: PlaybackHandler,
             host="0.0.0.0", 
             port=5005
         ):
-        self._audio_handler = audio_handler
+        self._playback_handler = playback_handler
 
         self.host = host
         self.port = port
 
         self.is_running = False
 
-        self.DTYPE = self._audio_handler.DTYPE
-        self.CHANNELS = self._audio_handler.CHANNELS
+        self.DTYPE = self._playback_handler.DTYPE
+        self.CHANNELS = self._playback_handler.CHANNELS
 
         # Initialize socket
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -35,9 +35,9 @@ class AudioReceiver:
     def start(self):
         self.is_running = True
 
-        self._audio_handler.start()
+        self._playback_handler.start()
 
-        playback_thread = threading.Thread(target=self._audio_handler.playback_audio, daemon=True)
+        playback_thread = threading.Thread(target=self._playback_handler.playback_audio, daemon=True)
         receive_thread = threading.Thread(target=self._receive_audio, daemon=True)
 
         playback_thread.start()
@@ -56,9 +56,9 @@ class AudioReceiver:
                     
                     # Attach to queue
                     try:
-                        self._audio_handler.attachToAudioQueue(audio_data=audio_data)
+                        self._playback_handler.attachToAudioQueue(audio_data=audio_data)
                     except:
-                        pass  # Queue full
+                        pass # Queue full
             
             except BlockingIOError:
                 time.sleep(0.001)
@@ -69,7 +69,7 @@ class AudioReceiver:
 
     def stop(self):
         self.is_running = False
-        self._audio_handler.stop()
+        self._playback_handler.stop()
         logger.info("Stopped audio receiver")
 
     def shutdown(self):
