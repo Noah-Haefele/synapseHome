@@ -18,8 +18,11 @@ class SettingsManager(QObject):
 
         # defaults
         self._data = {
-            "brightness": 50,
-            "displayTime": 30
+            "brightness": 50,   # Raspberry pi touchdipslay brightness
+            "displayTime": 30,  # Time between no touch and display auto-blackout
+            "audioI": None,     # Selected audio input device
+            "audioO": None      # Selected audio output device
+
         }
         
         self._save_timer = QTimer()

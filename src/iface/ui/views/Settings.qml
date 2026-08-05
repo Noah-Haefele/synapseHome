@@ -56,8 +56,14 @@ Item {
                 Layout.fillHeight: true
             }
 
+            Audio {
+                visible: leftViewState === 1
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+            }
+
             Rectangle {
-                visible: leftViewState !== 3 && leftViewState !== 0
+                visible: leftViewState !== 3 && leftViewState !== 0 && leftViewState !== 1
                 Layout.fillHeight: true
                 Layout.fillWidth: true
                 color: "white"
