@@ -33,6 +33,13 @@ class PlaybackHandler:
         if self.is_running:
             return
 
+        # Clear queue
+        while not self.audio_queue.empty():
+            try:
+                self.audio_queue.get_nowait()
+            except Empty:
+                break
+
         self.is_running = True
         self.play_audio = True
     
@@ -54,9 +61,16 @@ class PlaybackHandler:
         )
         return None
 
-    def attachToAudioQueue(self, audio_data: np.ndarray) -> bool:
+    def attach_to_audio_queue(self, audio_data: np.ndarray) -> bool:
         try:
-            self.audio_queue.put(audio_data, timeout=0.1)
+            # If queue is full, remove oldest pakets
+            if self.audio_queue.full():
+                try:
+                    self.audio_queue.get_nowait()
+                except Empty:
+                    pass
+
+            self.audio_queue.put_nowait(audio_data)
             return True
         except Full:
             logger.error("Audio queue is full")
