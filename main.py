@@ -7,6 +7,7 @@ from PySide6.QtQml import QQmlApplicationEngine
 
 from src.core.net.utils import NetworkInterface
 from src.core.net.node import CallNode
+from src.core.net.audio.receive import AudioReceiver
 from src.core.set.floor_manager import FloorManager
 from src.core.set.general import SettingsManager
 from src.core.mqtt.mq_conf import MQTTConfig
@@ -41,7 +42,8 @@ def main():
     if saved_input:
         audio_device_disc.set_default_source(saved_input)
 
-    audio_handler = AudioHandler(general_settings_manager=general_settings_manager)
+    audio_handler = AudioHandler()
+    audio_receiver = AudioReceiver(audio_handler=audio_handler)
 
     # UI Bridges
     ui_handler = UiSet(floor_manager=floor_manager, general_settings_manager=general_settings_manager, audio_device_discovery=audio_device_disc)
