@@ -33,7 +33,6 @@ def main():
     general_settings_manager = SettingsManager()
     mqtt_config = MQTTConfig()
     mqtt_handler = MQTTHandler(mqtt_config=mqtt_config)
-    call_node = CallNode(net_interface=core_network, floor_manager=floor_manager, mqtt_handler=mqtt_handler)
     audio_device_disc = AudioDeviceDiscovery()
 
     # Apply saved audio device selections to PulseAudio on startup
@@ -50,6 +49,15 @@ def main():
     # Stream audio
     record_handler = RecordHandler()
     audio_sender = AudioSender(record_handler=record_handler)
+
+    # Callnode
+    call_node = CallNode(
+        net_interface=core_network, 
+        floor_manager=floor_manager, 
+        mqtt_handler=mqtt_handler,
+        audio_receiver=audio_receiver,
+        audio_sender=audio_sender
+    )
 
     # UI Bridges
     ui_handler = UiSet(floor_manager=floor_manager, general_settings_manager=general_settings_manager, audio_device_discovery=audio_device_disc)
