@@ -151,7 +151,11 @@ class UiSet(QObject):
     @Slot(str)
     def setOutputDevice(self, output_id: str):
         self._settings_manager.set_setting("audioO", output_id)
+        if output_id:
+            self._audio_device_disc.set_default_sink(output_id)
 
     @Slot(str)
     def setInputDevice(self, input_id: str):
         self._settings_manager.set_setting("audioI", input_id)
+        if input_id:
+            self._audio_device_disc.set_default_source(input_id)

@@ -13,6 +13,7 @@ from src.core.mqtt.mq_conf import MQTTConfig
 from src.core.mqtt.mq_hdl import MQTTHandler
 from src.core.display.activity import ActivityFilter
 from src.core.act.audio.discovery import AudioDeviceDiscovery
+from src.core.act.audio.playback import AudioHandler
 from src.hardware.display import DisplaySetter
 from src.iface.ui.bridge.ui_call import UICall
 from src.iface.ui.bridge.ui_net import UINetwork
@@ -31,6 +32,16 @@ def main():
     mqtt_handler = MQTTHandler(mqtt_config=mqtt_config)
     call_node = CallNode(net_interface=core_network, floor_manager=floor_manager, mqtt_handler=mqtt_handler)
     audio_device_disc = AudioDeviceDiscovery()
+
+    # Apply saved audio device selections to PulseAudio on startup
+    saved_output = general_settings_manager.get_setting("audioO")
+    if saved_output:
+        audio_device_disc.set_default_sink(saved_output)
+    saved_input = general_settings_manager.get_setting("audioI")
+    if saved_input:
+        audio_device_disc.set_default_source(saved_input)
+
+    audio_handler = AudioHandler(general_settings_manager=general_settings_manager)
 
     # UI Bridges
     ui_handler = UiSet(floor_manager=floor_manager, general_settings_manager=general_settings_manager, audio_device_discovery=audio_device_disc)
