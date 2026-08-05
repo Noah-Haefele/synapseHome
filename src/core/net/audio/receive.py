@@ -43,8 +43,26 @@ class AudioReceiver:
         playback_thread.start()
         receive_thread.start()
 
+    def _drain_socket_buffer(self):
+        """Emptys als pakets sent to the socket buffer before the receiver was ready to process"""
+        self.socket.setblocking(False)
+        dropped = 0
+        while True:
+            try:
+                data, _ = self.socket.recvfrom(65536)
+                if not data:
+                    break
+                dropped += 1
+            except BlockingIOError:
+                break
+        if dropped > 0:
+            logger.info(f"{dropped} removed old pakets from socket buffer")
+
     def _receive_audio(self):
         """Receives audio packets via UDP"""
+        # Empty buffer
+        self._drain_socket_buffer()
+
         while self.is_running:
             try:
                 data, _ = self.socket.recvfrom(65536)
@@ -56,7 +74,7 @@ class AudioReceiver:
                     
                     # Attach to queue
                     try:
-                        self._playback_handler.attachToAudioQueue(audio_data=audio_data)
+                        self._playback_handler.attach_to_audio_queue(audio_data=audio_data)
                     except:
                         pass # Queue full
             
