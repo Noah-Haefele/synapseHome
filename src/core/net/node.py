@@ -5,14 +5,26 @@ from typing import Callable, Optional
 from src.core.mqtt.mq_hdl import MQTTHandler
 from src.core.set.floor_manager import FloorManager
 from src.core.net.utils import NetworkInterface
+from src.core.net.audio.receive import AudioReceiver
+from src.core.net.audio.send import AudioSender
 
 logger = logging.getLogger(__name__)
 
 class CallNode():
-    def __init__(self, net_interface: NetworkInterface, floor_manager: FloorManager, mqtt_handler: MQTTHandler):
+    def __init__(
+            self, 
+            net_interface: NetworkInterface, 
+            floor_manager: FloorManager, 
+            mqtt_handler: MQTTHandler,
+            audio_receiver: AudioReceiver,
+            audio_sender: AudioSender
+        ):
+    
         self._net_interface = net_interface
         self._floor_manager = floor_manager
         self._mqtt_handler = mqtt_handler
+        self._audio_receiver = audio_receiver
+        self._audio_sender = audio_sender
 
         # Resubscribe to call mesage if in the systemsettings the floor in which the device is, has changed
         self._floor_manager.deviceLocationChanged.connect(self._subscribe_to_call_message)
@@ -61,6 +73,10 @@ class CallNode():
 
         self._mqtt_handler.publish(subtopic, payload)
 
+        # Start streaming the sound
+        self._audio_receiver.start()
+        self._audio_sender.start(self.caller_ip)
+
         logger.info(
             "Accepted call from floor %s as floor %s with IP: %s",
             self._target_floor_id,
@@ -75,6 +91,9 @@ class CallNode():
 
         self._mqtt_handler.publish(subtopic, payload)
 
+        self._audio_sender.stop()
+        self._audio_receiver.stop()
+
         logger.info(
             "Stopped call with floor %s as floor %s with IP: %s",
             self._target_floor_id,
@@ -86,7 +105,7 @@ class CallNode():
         """Internal handler for incoming call messages."""
         try:
             # Format: "floor_id:ip_address"
-            state, caller_floor_str, caller_ip = payload.split(":", 2)
+            state, caller_floor_str, self.caller_ip = payload.split(":", 2)
             self._target_floor_id = int(caller_floor_str)
 
             if (state == "CALLING"):
@@ -97,21 +116,32 @@ class CallNode():
                 logger.info(
                     "Incoming call from floor %s with IP: %s",
                     self._target_floor_id,
-                    caller_ip
+                    self.caller_ip
                 )
             elif (state == "ACCEPTED"):
                 # Notify the UI bridge about call acceptance if the callback is set
                 if self.on_call_accepted:
+                    # Starts audio stream, hosted by the accepting device
+                    self._audio_receiver.start()
+                    self._audio_sender.start(self.caller_ip)
                     self.on_call_accepted()
+
+                logger.info(
+                    "Call accepted by %s with IP: %s",
+                    self._target_floor_id,
+                    self.caller_ip
+                )
             elif (state == "STOPPED"):
                 # Notify the UI bridge about call stop if the callback is set
                 if self.on_call_stopped:
+                    self._audio_sender.stop()
+                    self._audio_receiver.stop()
                     self.on_call_stopped()
 
                 logger.info(
                     "Stopped call from floor %s with IP: %s",
                     self._target_floor_id,
-                    caller_ip
+                    self.caller_ip
                 )
 
         except ValueError:

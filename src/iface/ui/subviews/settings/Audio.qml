@@ -34,10 +34,10 @@ Rectangle {
             
             model: uiHandler.outputModel
             textRole: "name"
-            valueRole: "name"
-            selectedValue: uiHandler.inputDevice
+            valueRole: "id"
+            selectedValue: uiHandler.outputDevice
             
-            onUserSelected: (val) => uiHandler.setInputDevice(val)
+            onUserSelected: (val) => uiHandler.setOutputDevice(val)
 
             onDropdownOpened: {
                 if (visible) {
@@ -55,10 +55,10 @@ Rectangle {
             
             model: uiHandler.inputModel
             textRole: "name"
-            valueRole: "name"
-            selectedValue: uiHandler.outputDevice
+            valueRole: "id"
+            selectedValue: uiHandler.inputDevice
             
-            onUserSelected: (val) => uiHandler.setOutputDevice(val)
+            onUserSelected: (val) => uiHandler.setInputDevice(val)
 
             onDropdownOpened: {
                 if (visible) {
