@@ -3,6 +3,7 @@ import socket
 import threading
 import numpy as np
 import time
+from queue import Full
 
 from src.core.act.audio.playback import PlaybackHandler
 
@@ -37,26 +38,19 @@ class AudioReceiver:
 
         self._playback_handler.start()
 
-        playback_thread = threading.Thread(target=self._playback_handler.playback_audio, daemon=True)
         receive_thread = threading.Thread(target=self._receive_audio, daemon=True)
-
-        playback_thread.start()
         receive_thread.start()
 
     def _drain_socket_buffer(self):
-        """Emptys als pakets sent to the socket buffer before the receiver was ready to process"""
+        """Emptys all packets sent to the socket buffer before the receiver was ready to process"""
         self.socket.setblocking(False)
-        dropped = 0
         while True:
             try:
                 data, _ = self.socket.recvfrom(65536)
                 if not data:
                     break
-                dropped += 1
             except BlockingIOError:
                 break
-        if dropped > 0:
-            logger.info(f"{dropped} removed old pakets from socket buffer")
 
     def _receive_audio(self):
         """Receives audio packets via UDP"""
@@ -75,8 +69,8 @@ class AudioReceiver:
                     # Attach to queue
                     try:
                         self._playback_handler.attach_to_audio_queue(audio_data=audio_data)
-                    except:
-                        pass # Queue full
+                    except Full:
+                        pass
             
             except BlockingIOError:
                 time.sleep(0.001)

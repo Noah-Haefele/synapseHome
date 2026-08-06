@@ -38,28 +38,22 @@ class AudioSender:
 
         self._record_handler.start()
 
-        record_thread = threading.Thread(target=self._record_handler.record_audio, daemon=True)
         send_thread = threading.Thread(target=self._send_audio, daemon=True)
-
-        record_thread.start()
         send_thread.start()
 
     def _send_audio(self):
         """ Sends audio via UDP """
         while self.is_running:
             try:
-                self.audio_data = self._record_handler.get_audio_queue()
-
-                if self.audio_data is None:
+                audio_data = self._record_handler.get_audio_queue()
+                if audio_data is None:
                     continue
 
-                self.audio_bytes = self.audio_data.astype(self.DTYPE).tobytes()
-                self.socket.sendto(self.audio_bytes, (self.target_ip, self.target_port))
-            except BlockingIOError:
-                time.sleep(0.001)
+                audio_bytes = audio_data.astype(self.DTYPE).tobytes()
+                self.socket.sendto(audio_bytes, (self.target_ip, self.target_port))
             except Exception as e:
                 if self.is_running:
-                    logger.error(f"Error while receiving {e}")
+                    logger.error(f"Error while sending audio {e}")
                 break
 
     def stop(self):

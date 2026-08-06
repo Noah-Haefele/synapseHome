@@ -2,7 +2,7 @@ import logging
 import numpy as np
 import sounddevice as sd
 import time
-from queue import Queue, Empty, Full
+from queue import Queue, Empty
 
 logger = logging.getLogger(__name__)
 
@@ -18,29 +18,68 @@ class RecordHandler:
         self.audio_queue = Queue(maxsize=50)
         
         self.is_running = False
+        self.input_device = self._find_portaudio_device()
+        self.stream = None
+
+    def _find_portaudio_device(self, name: str = "pulse") -> int | None:
+        logger.info(f"Searching for PortAudio device: {name}")
+
+        for i, dev in enumerate(sd.query_devices()):
+            if name == dev["name"]:
+                logger.info(
+                    f"Found PortAudio device '{dev['name']}' with ID {i}"
+                )
+                return i
+
+        logger.warning(
+            f"PortAudio device '{name}' not found, using default device"
+        )
+        return None
 
     def start(self):
         if self.is_running:
             return
 
+        # Clear queue
+        while not self.audio_queue.empty():
+            try:
+                self.audio_queue.get_nowait()
+            except Empty:
+                break
+
         self.is_running = True
 
-        self.input_device = self._find_portaudio_device()
+        def audio_callback(indata, frames, time_info, status):
+            if status:
+                logger.debug(f"Audio status: {status}")
 
-    def _find_portaudio_device(self, name: str = "pulse") -> int | None:
-            logger.info(f"Searching for PortAudio device: {name}")
-    
-            for i, dev in enumerate(sd.query_devices()):
-                if name == dev["name"]:
-                    logger.info(
-                        f"Found PortAudio device '{dev['name']}' with ID {i}"
-                    )
-                    return i
-    
-            logger.warning(
-                f"PortAudio device '{name}' not found, using default device"
+            try:
+                # Ring Buffer behavior
+                if self.audio_queue.full():
+                    try:
+                        self.audio_queue.get_nowait()
+                    except Empty:
+                        pass
+                
+                self.audio_queue.put_nowait(indata.copy())
+            except Exception as e:
+                logger.error(f"Error in record callback: {e}")
+
+        try:
+            self.stream = sd.InputStream(
+                device=self.input_device,
+                channels=self.CHANNELS,
+                samplerate=self.SAMPLERATE,
+                blocksize=self.BLOCKSIZE,
+                dtype=self.DTYPE,
+                callback=audio_callback,
+                latency='low'
             )
-            return None
+            self.stream.start()
+            logger.info("Audio recording started (Callback Mode)")
+        except Exception as e:
+            logger.error(f"Failed to start recording stream: {e}")
+            self.is_running = False
 
     def get_audio_queue(self) -> None | np.ndarray:
             try:
@@ -51,37 +90,9 @@ class RecordHandler:
                 logger.error(f"Failed to get audio data from queue: {e}")
                 return None
 
-    def record_audio(self):
-        """ Record audio from selected input device (in portaudio always pulse because pulsaudio decides source) """
-        try:
-            def audio_callback(indata, frames, time_info, status):
-                if status:
-                    logger.info(f"Audio status {status}")
-
-                try:
-                    self.audio_queue.put_nowait(indata.copy())
-                except Full:
-                    logger.warning("Audio queue is full")
-
-            # Start stream
-            with sd.InputStream(
-                device=self.input_device,
-                channels=self.CHANNELS,
-                samplerate=self.SAMPLERATE,
-                blocksize=self.BLOCKSIZE,
-                dtype=self.DTYPE,
-                callback=audio_callback,
-                latency='low'
-            ):
-                logger.info(f"Audio recording started")
-                while self.is_running:
-                    time.sleep(0.1)
-        except Exception as e:
-            logger.error(f"An error accured: {e}")
-
-        finally:
-            self.stop()
-
     def stop(self):
         self.is_running = False
-        logger.info("Recording stopped")
+        if self.stream:
+            self.stream.stop()
+            self.stream.close()
+            logger.info("Recording stopped")

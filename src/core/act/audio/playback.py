@@ -25,9 +25,10 @@ class PlaybackHandler:
     def __init__(self, gain: float = 1.0):
         self.audio_queue = Queue(maxsize=50)
 
-        self.is_running = False
-
         self.gain = gain
+
+        self.is_running = False
+        self.output_stream = None
 
     def start(self):
         if self.is_running:
@@ -41,9 +42,24 @@ class PlaybackHandler:
                 break
 
         self.is_running = True
-        self.play_audio = True
     
         self.output_device = self._find_portaudio_device()
+
+        try:
+            self.output_stream = sd.OutputStream(
+                device=self.output_device,
+                channels=self.CHANNELS,
+                samplerate=self.SAMPLERATE,
+                blocksize=self.BLOCKSIZE,
+                dtype='float32',
+                latency='low',
+                callback=self._audio_callback
+            )
+            self.output_stream.start()
+            logger.info("Audio stream started")
+        except Exception as e:
+            logger.error(f"Error during stream start: {e}")
+            self.is_running = False
 
 
     def _find_portaudio_device(self, name: str = "pulse") -> int | None:
@@ -63,7 +79,7 @@ class PlaybackHandler:
 
     def attach_to_audio_queue(self, audio_data: np.ndarray) -> bool:
         try:
-            # If queue is full, remove oldest pakets
+            # If queue is full, remove oldest packets
             if self.audio_queue.full():
                 try:
                     self.audio_queue.get_nowait()
@@ -79,59 +95,31 @@ class PlaybackHandler:
             logger.error(f"Failed to attach audio data to queue: {e}")
             return False
 
-    def playback_audio(self):
-        """Main Playback of audio"""
-        output_stream = None
-        
-        try:
-            if self.play_audio:
-                try:
-                    output_stream = sd.OutputStream(
-                        device=self.output_device,
-                        channels=self.CHANNELS,
-                        samplerate=self.SAMPLERATE,
-                        blocksize=self.BLOCKSIZE,
-                        dtype='float32',
-                        latency='low'
-                    )
-                    output_stream.start()
-                    logger.info("Audio stream started")
-                except Exception as e:
-                    logger.error(f"Stream-Fehler: {e}")
-                    logger.info(f"Versuche alternatives Device...")
+    def _audio_callback(self, outdata, frames, time_info, status):
+        """Is called by the soundcard to get the audio to play"""
+        if status:
+            logger.debug(f"Audio output status: {status}")
 
-                    return
-            
-            while self.is_running:
-                try:
-                    audio_data = self.audio_queue.get(timeout=1)
-                    
-                    # Convertion: int32 → float32
-                    audio_normalized = audio_data.astype(np.float32) / (2**31)
-                    
-                    # apply gain
-                    if self.gain != 1.0:
-                        audio_normalized = audio_normalized * self.gain
-                    
-                    audio_normalized = np.clip(audio_normalized, -1.0, 1.0)
-                    
-                    if self.play_audio and output_stream:
-                        output_stream.write(audio_normalized)
-                
-                except Empty:
-                    continue
-                except Exception as e:
-                    logger.error("Error during audio output write: %s", e)
-        
-        finally:
-            if output_stream:
-                try:
-                    output_stream.stop()
-                    output_stream.close()
-                    logger.info("Audio stream closed")
-                except Exception as e:
-                    logger.error("Error closing audio stream: %s", e)
+        try:
+            audio_data = self.audio_queue.get_nowait()
+
+            audio_normalized = audio_data.astype(np.float32) / 2147483648.0
+            if self.gain != 1.0:
+                audio_normalized *= self.gain
+
+            audio_normalized = np.clip(audio_normalized, -1.0, 0.999999)
+
+            outdata[:] = audio_normalized
+        except Empty:
+            # No data available -> send 0
+            outdata.fill(0.0)
+        except Exception as e:
+            outdata.fill(0.0)
+            logger.error(f"Callback error: {e}")
 
     def stop(self):
         self.is_running = False
-        self.play_audio = False
+        if self.output_stream:
+            self.output_stream.stop()
+            self.output_stream.close()
+            logger.info("Audio stream closed")
