@@ -14,7 +14,7 @@ ApplicationWindow {
         id: stackView
 
         anchors.fill: parent
-        initialItem: "views/Home.qml"
+        initialItem: "qml/views/Home.qml"
     }
 
     Item {
@@ -45,13 +45,13 @@ ApplicationWindow {
             overlayLayer.visible = state !== "IDLE"
 
             if (state === "CALLING") {
-                callOverlayLoader.source = "views/call/Outgoing.qml"
+                callOverlayLoader.source = "qml/views/call/Outgoing.qml"
             }
             else if (state === "RINGING") {
-                callOverlayLoader.source = "views/call/Incoming.qml"
+                callOverlayLoader.source = "qml/views/call/Incoming.qml"
             }
             else if (state === "CONNECTED") {
-                callOverlayLoader.source = "views/call/Accepted.qml"
+                callOverlayLoader.source = "qml/views/call/Accepted.qml"
             }
         }
     }

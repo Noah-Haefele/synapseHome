@@ -63,13 +63,13 @@ Rectangle {
         ListElement {
             name: "floorA"
             type: "misc"
-            iconPath: "../../../../assets/icons/button/callA.svg"
+            iconPath: "../../../../../assets/icons/button/callA.svg"
         }
         
         ListElement {
             name: "settings"
             type: "misc"
-            iconPath: "../../../../assets/icons/button/settings.svg"
+            iconPath: "../../../../../assets/icons/button/settings.svg"
         }
     }
 
@@ -100,7 +100,7 @@ Rectangle {
                             return ""
                         }
                     } else if (model.name === "floorA") {
-                        return "../../../../assets/icons/button/call.svg"
+                        return "../../../../../assets/icons/button/call.svg"
                     }
                     return model.iconPath
                 }
