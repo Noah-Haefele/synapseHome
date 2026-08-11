@@ -12,17 +12,9 @@ Rectangle {
     signal singleClicked(string type, var value)
 
     /*
-    Button layout configuration.
-
-    This model defines the order and type of buttons displayed in the GridLayout.
-    Floor-specific data (name, icon, floor index) is stored separately in Floors.qml.
-
-    Floor buttons use floorId to reference the corresponding entry in the Floors model.
-    This avoids duplicating floor information while keeping the UI layout flexible.
-
-    When adding a new floor:
-    1. Add the floor data to Floors.qml.
-    2. Add a button entry here with type "floor" and the matching floorIdx.
+    * Button layout configuration.
+    *
+    * Defines the order and type of buttons displayed in the GridLayout.
     */
     ListModel {
         id: buttonData
@@ -63,7 +55,6 @@ Rectangle {
         ListElement {
             name: "floorA"
             type: "misc"
-            iconPath: "qrc:/qt/qml/UiBridge/assets/icon/button/callA.svg"
         }
         
         ListElement {
