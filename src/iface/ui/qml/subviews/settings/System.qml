@@ -46,7 +46,7 @@ Rectangle {
                 model: uiHandler.allFloors
                 textRole: "name"
                 valueRole: "floorId"
-                selectedValue: uiHandler.floorIdx
+                selectedValue: uiHandler.locationIdx
                 
                 onUserSelected: (val) => uiHandler.setMainFloor(val)
             }
@@ -61,7 +61,7 @@ Rectangle {
                 model: uiHandler.prefModel
                 textRole: "name"
                 valueRole: "floorId"
-                selectedValue: uiHandler.fastCallIdx1
+                selectedValue: uiHandler.prefCallIdx1
                 
                 onUserSelected: (val) => uiHandler.setPrefFloor(1, val)
             }
@@ -76,7 +76,7 @@ Rectangle {
                 model: uiHandler.prefModel
                 textRole: "name"
                 valueRole: "floorId"
-                selectedValue: uiHandler.fastCallIdx2
+                selectedValue: uiHandler.prefCallIdx2
                 
                 onUserSelected: (val) => uiHandler.setPrefFloor(2, val)
             }
@@ -91,7 +91,7 @@ Rectangle {
                 model: uiHandler.prefModel
                 textRole: "name"
                 valueRole: "floorId"
-                selectedValue: uiHandler.fastCallIdx3
+                selectedValue: uiHandler.prefCallIdx3
                 
                 onUserSelected: (val) => uiHandler.setPrefFloor(3, val)
             }
