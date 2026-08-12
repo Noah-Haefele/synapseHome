@@ -2,6 +2,7 @@
 
 #include <QObject>
 #include <QVariantList>
+#include <QString>
 #include <QtQml/qqmlregistration.h>
 
 /**
@@ -11,6 +12,9 @@ class SettingsBridge : public QObject
 {
     Q_OBJECT
     QML_ELEMENT
+    QML_SINGLETON
+
+    // --- System Settings ---
 
     Q_PROPERTY(
         QVariantList allFloors
@@ -48,7 +52,53 @@ class SettingsBridge : public QObject
         NOTIFY settingsChanged
     )
 
+    // --- Display Settings ---
+
+    Q_PROPERTY(
+        int brightness
+        READ brightness
+        WRITE setBrightness
+        NOTIFY settingsChanged
+    )
+
+    Q_PROPERTY(
+        int displayTime
+        READ displayTime
+        WRITE setDisplayTime
+        NOTIFY settingsChanged
+    )
+
+    // --- Audio Settings ---
+
+    Q_PROPERTY(
+        QVariantList inputModel
+        READ inputModel
+        NOTIFY audioDevicesChanged
+    )
+
+    Q_PROPERTY(
+        QVariantList outputModel
+        READ outputModel
+        NOTIFY audioDevicesChanged
+    )
+
+    Q_PROPERTY(
+        QString inputDevice
+        READ inputDevice
+        NOTIFY settingsChanged
+    )
+
+    Q_PROPERTY(
+        QString outputDevice
+        READ outputDevice
+        NOTIFY settingsChanged
+    )
+
 public:
+    explicit SettingsBridge(QObject *parent = nullptr);
+
+    // --- System Settings ---
+
     Q_INVOKABLE void setLocationIdx(int floorId);
     Q_INVOKABLE void setPrefCallIdx(int prefIdx, int floorId);
 
@@ -59,6 +109,26 @@ public:
     int prefCallIdx2() const;
     int prefCallIdx3() const;
 
+    // --- Display Settings ---
+
+    int brightness() const;
+    int displayTime() const;
+    void setBrightness(int val);
+    void setDisplayTime(int val);
+
+    // --- Audio Settings ---
+
+    Q_INVOKABLE void onAudioDropdownOpened();
+
+    Q_INVOKABLE void setSink(const QString &id);
+    Q_INVOKABLE void setSource(const QString &id);
+
+    QVariantList inputModel() const;
+    QVariantList outputModel() const;
+    QString inputDevice() const;
+    QString outputDevice() const;
+
 signals:
     void settingsChanged();
+    void audioDevicesChanged();
 };
