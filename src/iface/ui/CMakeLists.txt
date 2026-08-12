@@ -44,6 +44,11 @@ set(QML_FILES
     qml/components/Slider.qml
 )
 
+set(SRC_FILES
+    src/settings_bridge.hpp
+    src/settings_bridge.cpp
+)
+
 set(ICON_FILES
     ${PROJECT_ROOT}/assets/icons/button/bulb_off.svg
     ${PROJECT_ROOT}/assets/icons/button/bulb_on.svg
@@ -77,7 +82,12 @@ qt_add_qml_module(sHUiBridge
     VERSION 1.0.0
 
     QML_FILES ${QML_FILES}
+    SOURCES ${SRC_FILES}
     RESOURCES ${ICON_FILES}
+)
+
+target_include_directories(sHUiBridge PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}/src
 )
 
 target_link_libraries(sHUiBridge PRIVATE
