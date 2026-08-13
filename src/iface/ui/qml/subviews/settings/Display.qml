@@ -1,5 +1,6 @@
 import QtQuick 2.15
 import QtQuick.Controls 2.15
+import UiBridge
 import "../../components"
 
 /**
@@ -27,21 +28,21 @@ Rectangle {
         // Brightness Slider
         Slider {
             label: "Screen-Brightness"
-            val: uiHandler.brightness
+            val: SettingsBridge.brightness
             unit: "%"
             min: 10
             max: 100
-            onMoved: (v) => uiHandler.brightness = v
+            onMoved: (v) => SettingsBridge.brightness = v
         }
 
         // Display-Standby Slider
         Slider {
             label: "Display-Standby"
-            val: uiHandler.displayTime
+            val: SettingsBridge.displayTime
             unit: "sek"
             min: 10
             max: 300
-            onMoved: (v) => uiHandler.displayTime = v
+            onMoved: (v) => SettingsBridge.displayTime = v
         }
     }
 }

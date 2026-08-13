@@ -1,5 +1,6 @@
 import QtQuick 2.15
 import QtQuick.Controls 2.15
+import UiBridge
 import "../../components"
 
 /**
@@ -32,16 +33,16 @@ Rectangle {
 
             width: parent.width * 0.8
             
-            model: uiHandler.outputModel
+            model: SettingsBridge.outputModel
             textRole: "name"
             valueRole: "id"
-            selectedValue: uiHandler.outputDevice
+            selectedValue: SettingsBridge.outputDevice
             
-            onUserSelected: (val) => uiHandler.setOutputDevice(val)
+            onUserSelected: (val) => SettingsBridge.setSink(val)
 
             onDropdownOpened: {
                 if (visible) {
-                    uiHandler.onAudioDropdownOpened()
+                    SettingsBridge.onAudioDropdownOpened()
                 }
             }
         }
@@ -53,16 +54,16 @@ Rectangle {
 
             width: parent.width * 0.8
             
-            model: uiHandler.inputModel
+            model: SettingsBridge.inputModel
             textRole: "name"
             valueRole: "id"
-            selectedValue: uiHandler.inputDevice
+            selectedValue: SettingsBridge.inputDevice
             
-            onUserSelected: (val) => uiHandler.setInputDevice(val)
+            onUserSelected: (val) => SettingsBridge.setSource(val)
 
             onDropdownOpened: {
                 if (visible) {
-                    uiHandler.onAudioDropdownOpened()
+                    SettingsBridge.onAudioDropdownOpened()
                 }
             }
         }

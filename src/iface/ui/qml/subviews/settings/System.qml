@@ -1,5 +1,6 @@
 import QtQuick 2.15
 import QtQuick.Controls 2.15
+import UiBridge
 import "../../components"
 import "../../models"
 
@@ -43,12 +44,12 @@ Rectangle {
 
                 width: parent.width * 0.8
                 
-                model: uiHandler.allFloors
+                model: SettingsBridge.allFloors
                 textRole: "name"
                 valueRole: "floorId"
-                selectedValue: uiHandler.locationIdx
+                selectedValue: SettingsBridge.locationIdx
                 
-                onUserSelected: (val) => uiHandler.setMainFloor(val)
+                onUserSelected: (val) => SettingsBridge.setLocationIdx(val)
             }
 
             // Pref 1
@@ -58,12 +59,12 @@ Rectangle {
 
                 width: parent.width * 0.8
                 
-                model: uiHandler.prefModel
+                model: SettingsBridge.prefModel
                 textRole: "name"
                 valueRole: "floorId"
-                selectedValue: uiHandler.prefCallIdx1
+                selectedValue: SettingsBridge.prefCallIdx1
                 
-                onUserSelected: (val) => uiHandler.setPrefFloor(1, val)
+                onUserSelected: (val) => SettingsBridge.setPrefCallIdx(1, val)
             }
 
             // Pref 2
@@ -73,12 +74,12 @@ Rectangle {
 
                 width: parent.width * 0.8
                 
-                model: uiHandler.prefModel
+                model: SettingsBridge.prefModel
                 textRole: "name"
                 valueRole: "floorId"
-                selectedValue: uiHandler.prefCallIdx2
+                selectedValue: SettingsBridge.prefCallIdx2
                 
-                onUserSelected: (val) => uiHandler.setPrefFloor(2, val)
+                onUserSelected: (val) => SettingsBridge.setPrefCallIdx(2, val)
             }
 
             // Pref 3
@@ -88,12 +89,12 @@ Rectangle {
 
                 width: parent.width * 0.8
                 
-                model: uiHandler.prefModel
+                model: SettingsBridge.prefModel
                 textRole: "name"
                 valueRole: "floorId"
-                selectedValue: uiHandler.prefCallIdx3
+                selectedValue: SettingsBridge.prefCallIdx3
                 
-                onUserSelected: (val) => uiHandler.setPrefFloor(3, val)
+                onUserSelected: (val) => SettingsBridge.setPrefCallIdx(3, val)
             }
         }
 
