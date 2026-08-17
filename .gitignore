@@ -1,4 +1,12 @@
+# Python
 venv/
 __pycache__/
+
+# C++ build artifacts
 build/
+
+# Rust build artifacts
+target/
+
+# IDE
 .vscode/c_cpp_properties.json
