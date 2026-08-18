@@ -20,13 +20,13 @@ struct ConfigCache {
     devices: Vec<Device>,
 }
 
-pub struct ConfigManager {
+pub struct DeviceManager {
     config_cache: ConfigCache,
 
     config_path: PathBuf,
 }
 
-impl ConfigManager {
+impl DeviceManager {
     pub fn new() -> Result<Self, Box<dyn std::error::Error>> {
         let config_path = setup_paths()?;
 
