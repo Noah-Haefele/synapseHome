@@ -10,7 +10,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     // Just for debuging now
     loop {
+        thread::sleep(Duration::from_secs(5));
         let _ = config_manager.save();
-        thread::sleep(Duration::from_secs(10));
+        println!("Data saved");
     }
 }

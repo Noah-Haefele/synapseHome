@@ -1,17 +1,19 @@
-[
-  {
-    "name": "1st Floor",
-    "shortName": "1",
-    "deviceId": 1
-  },
-  {
-    "name": "2nd Floor",
-    "shortName": "2",
-    "deviceId": 2
-  },
-  {
-    "name": "3rd Floor",
-    "shortName": "3",
-    "deviceId": 3
-  }
-]
+{
+  "devices": [
+    {
+      "name": "1st Floor",
+      "shortName": "1",
+      "deviceId": 1
+    },
+    {
+      "name": "2nd Floor",
+      "shortName": "2",
+      "deviceId": 2
+    },
+    {
+      "name": "3rd Floor",
+      "shortName": "3",
+      "deviceId": 3
+    }
+  ]
+}

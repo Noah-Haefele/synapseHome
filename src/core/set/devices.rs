@@ -1,10 +1,11 @@
 use std::path::Path;
 use std::path::PathBuf;
-use tempfile::NamedTempFile;
 use std::io::Write;
+use std::fs;
+use tempfile::NamedTempFile;
 use serde::{Serialize, Deserialize};
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 struct Device {
     name: Box<str>,
 
@@ -16,6 +17,7 @@ struct Device {
 }
 
 // Data for the user to set in a json
+#[derive(Serialize, Deserialize, Debug)]
 struct ConfigCache {
     devices: Vec<Device>,
 }
@@ -30,8 +32,8 @@ impl DeviceManager {
     pub fn new() -> Result<Self, Box<dyn std::error::Error>> {
         let config_path = setup_paths()?;
 
-        Ok(Self {
-            // Create default floor structure
+        let mut manager = Self {
+            // Default device structure
             config_cache: ConfigCache {
                 devices: vec![
                     Device {
@@ -55,13 +57,31 @@ impl DeviceManager {
             },
 
             config_path,
-        })
+        };
+
+        // Create default devices.json if not exists
+        // Else update config_cache to values of already existing devices.json
+        if manager.config_path.is_file() {
+            manager.load()?;
+        } else {
+            manager.save()?;
+        }
+
+        Ok(manager)
     }
 
     pub fn save(&self) -> Result<(), Box<dyn std::error::Error>> {
-        let json_string = serde_json::to_string_pretty(&self.config_cache.devices)?;
+        let json_string = serde_json::to_string_pretty(&self.config_cache)?;
 
         save_to_disk(&json_string, &self.config_path)?;
+
+        Ok(())
+    }
+
+    pub fn load(&mut self) -> Result<(), Box<dyn std::error::Error>> {
+        let json_string = read_from_disk(&self.config_path)?;
+
+        self.config_cache = serde_json::from_str(&json_string)?;
 
         Ok(())
     }
@@ -89,4 +109,8 @@ fn save_to_disk(data: &str, file_path: &Path) -> Result<(), Box<dyn std::error::
     tmp.persist(file_path)?;
 
     Ok(())
+}
+
+fn read_from_disk(file_path: &Path) -> Result<String, Box<dyn std::error::Error>> {
+    Ok(fs::read_to_string(file_path)?)
 }
