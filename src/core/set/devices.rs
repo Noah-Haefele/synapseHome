@@ -105,17 +105,13 @@ impl DeviceManager {
     pub fn save_config(&self) -> Result<(), Box<dyn std::error::Error>> {
         let json_string = serde_json::to_string_pretty(&self.config_cache)?;
 
-        save_to_disk(&json_string, &self.config_path)?;
-
-        Ok(())
+        save_to_disk(&json_string, &self.config_path)
     }
 
     pub fn save_internal_settings(&self) -> Result<(), Box<dyn std::error::Error>> {
         let json_string = serde_json::to_string_pretty(&self.internal_settings_cache)?;
 
-        save_to_disk(&json_string, &self.internal_settings_path)?;
-
-        Ok(())
+        save_to_disk(&json_string, &self.internal_settings_path)
     }
 
     /// Loads both internal and config data and stores it in runtime struct cache
@@ -152,6 +148,8 @@ fn setup_paths() -> Result<(PathBuf, PathBuf), Box<dyn std::error::Error>> {
 
 fn save_to_disk(data: &str, file_path: &Path) -> Result<(), Box<dyn std::error::Error>> {
     let parent = file_path.parent().unwrap_or_else(|| Path::new("."));
+
+    fs::create_dir_all(parent)?;
 
     let mut tmp = NamedTempFile::new_in(parent)?;
     tmp.write_all(data.as_bytes())?;
