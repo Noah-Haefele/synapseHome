@@ -1,18 +1,18 @@
 {
   "devices": [
     {
-      "name": "1st Floor",
-      "shortName": "1",
+      "deviceName": "1st Floor",
+      "deviceShortName": "1",
       "deviceId": 1
     },
     {
-      "name": "2nd Floor",
-      "shortName": "2",
+      "deviceName": "2nd Floor",
+      "deviceShortName": "2",
       "deviceId": 2
     },
     {
-      "name": "3rd Floor",
-      "shortName": "3",
+      "deviceName": "3rd Floor",
+      "deviceShortName": "3",
       "deviceId": 3
     }
   ]
