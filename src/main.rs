@@ -11,7 +11,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     // Just for debuging now
     loop {
         thread::sleep(Duration::from_secs(5));
-        let _ = config_manager.save();
+        let _ = config_manager.save_config();
+        let _ = config_manager.save_internal_settings();
         println!("Data saved");
     }
 }
