@@ -7,10 +7,10 @@ use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug)]
 struct Device {
-    name: Box<str>,
+    name: String,
 
     #[serde(rename = "shortName")]
-    short_name: Box<str>,
+    short_name: String,
 
     #[serde(rename = "deviceId")]
     device_id: i32,
@@ -37,20 +37,20 @@ impl DeviceManager {
             config_cache: ConfigCache {
                 devices: vec![
                     Device {
-                        name: "1st Floor".to_string().into(),
-                        short_name: "1".to_string().into(),
+                        name: "1st Floor".to_string(),
+                        short_name: "1".to_string(),
                         device_id: 1,
                     },
 
                     Device {
-                        name: "2nd Floor".to_string().into(),
-                        short_name: "2".to_string().into(),
+                        name: "2nd Floor".to_string(),
+                        short_name: "2".to_string(),
                         device_id: 2,
                     },
 
                     Device {
-                        name: "3rd Floor".to_string().into(),
-                        short_name: "3".to_string().into(),
+                        name: "3rd Floor".to_string(),
+                        short_name: "3".to_string(),
                         device_id: 3,
                     },
                 ],
