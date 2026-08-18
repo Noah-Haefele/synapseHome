@@ -3,10 +3,10 @@ mod core;
 use std::thread;
 use std::time::Duration;
 
-use crate::core::set::devices::ConfigManager;
+use crate::core::set::devices::DeviceManager;
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let config_manager = ConfigManager::new()?;
+    let config_manager = DeviceManager::new()?;
 
     // Just for debuging now
     loop {
