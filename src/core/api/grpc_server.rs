@@ -29,6 +29,7 @@ use synapsed::settings::api::GetPrefCallId1Reply;
 use synapsed::settings::api::GetPrefCallId2Reply;
 use synapsed::settings::api::GetPrefCallId3Reply;
 
+/// Handles frontend gRPC requests and forwards them to the device manager.
 #[derive(Debug, Clone)]
 pub struct ThisSystem {
     device_manager: Arc<Mutex<DeviceManager>>,
