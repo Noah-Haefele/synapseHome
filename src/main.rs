@@ -16,7 +16,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let device_manager = DeviceManager::new()?;
     let shared_device_manager = Arc::new(Mutex::new(device_manager));
 
-    let addr = "[::1]:50051".parse()?;
+    let addr = "0.0.0.0:50051".parse()?;
     let grpc_server = ThisSystem::new(shared_device_manager);
     let service = SystemServer::new(grpc_server);
 
