@@ -12,6 +12,12 @@ using synapsed::settings::api::System;
 // --- Data Message ---
 using ProtoDeviceData = synapsed::settings::api::DeviceData;
 
+/**
+ * @brief Client for communicating with the backend via gRPC.
+ *
+ * Provides methods for retrieving and modifying system settings
+ * through the backend gRPC service.
+ */
 class Client {
 public:
     Client(std::shared_ptr<grpc::ChannelInterface> channel,
