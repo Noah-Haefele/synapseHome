@@ -4,6 +4,7 @@
 #include <QVariantList>
 #include <QString>
 #include <QtQml/qqmlregistration.h>
+#include "grpc_client.hpp"
 
 /**
 * @brief Bridges the QML settings view with the backend.
@@ -11,45 +12,45 @@
 class SettingsBridge : public QObject
 {
     Q_OBJECT
-    QML_ELEMENT
-    QML_SINGLETON
+    //QML_ELEMENT
+    //QML_SINGLETON
 
     // --- System Settings ---
 
     Q_PROPERTY(
-        QVariantList allFloors
-        READ allFloors
-        NOTIFY settingsChanged
+        QVariantList all_devices
+        READ all_devices
+        NOTIFY settings_changed
     )
 
     Q_PROPERTY(
-        QVariantList prefModel
-        READ prefModel
-        NOTIFY settingsChanged
+        QVariantList pref_model
+        READ pref_model
+        NOTIFY settings_changed
     )
 
     Q_PROPERTY(
-        int locationIdx
-        READ locationIdx
-        NOTIFY settingsChanged
+        int location_id
+        READ location_id
+        NOTIFY settings_changed
     )
 
     Q_PROPERTY(
-        int prefCallIdx1
-        READ prefCallIdx1
-        NOTIFY settingsChanged
+        int pref_call_id1
+        READ pref_call_id1
+        NOTIFY settings_changed
     )
 
     Q_PROPERTY(
-        int prefCallIdx2
-        READ prefCallIdx2
-        NOTIFY settingsChanged
+        int pref_call_id2
+        READ pref_call_id2
+        NOTIFY settings_changed
     )
 
     Q_PROPERTY(
-        int prefCallIdx3
-        READ prefCallIdx3
-        NOTIFY settingsChanged
+        int pref_call_id3
+        READ pref_call_id3
+        NOTIFY settings_changed
     )
 
     // --- Display Settings ---
@@ -57,78 +58,81 @@ class SettingsBridge : public QObject
     Q_PROPERTY(
         int brightness
         READ brightness
-        WRITE setBrightness
-        NOTIFY settingsChanged
+        WRITE set_brightness
+        NOTIFY settings_changed
     )
 
     Q_PROPERTY(
-        int displayTime
-        READ displayTime
-        WRITE setDisplayTime
-        NOTIFY settingsChanged
+        int display_time
+        READ display_time
+        WRITE set_display_time
+        NOTIFY settings_changed
     )
 
     // --- Audio Settings ---
 
     Q_PROPERTY(
-        QVariantList inputModel
-        READ inputModel
-        NOTIFY audioDevicesChanged
+        QVariantList input_model
+        READ input_model
+        NOTIFY audio_devices_changed
     )
 
     Q_PROPERTY(
-        QVariantList outputModel
-        READ outputModel
-        NOTIFY audioDevicesChanged
+        QVariantList output_model
+        READ output_model
+        NOTIFY audio_devices_changed
     )
 
     Q_PROPERTY(
-        QString inputDevice
-        READ inputDevice
-        NOTIFY settingsChanged
+        QString input_device
+        READ input_device
+        NOTIFY settings_changed
     )
 
     Q_PROPERTY(
-        QString outputDevice
-        READ outputDevice
-        NOTIFY settingsChanged
+        QString output_device
+        READ output_device
+        NOTIFY settings_changed
     )
 
 public:
-    explicit SettingsBridge(QObject *parent = nullptr);
+    explicit SettingsBridge(std::shared_ptr<Client> client, QObject *parent = nullptr);
 
     // --- System Settings ---
 
-    Q_INVOKABLE void setLocationIdx(int floorId);
-    Q_INVOKABLE void setPrefCallIdx(int prefIdx, int floorId);
+    Q_INVOKABLE void set_location_id(int floorId);
+    Q_INVOKABLE void set_pref_call_id(int prefIdx, int floorId);
 
-    QVariantList allFloors() const;
-    QVariantList prefModel() const;
-    int locationIdx() const;
-    int prefCallIdx1() const;
-    int prefCallIdx2() const;
-    int prefCallIdx3() const;
+    QVariantList all_devices() const;
+    QVariantList pref_model() const;
+    int location_id() const;
+    int pref_call_id1() const;
+    int pref_call_id2() const;
+    int pref_call_id3() const;
 
     // --- Display Settings ---
 
     int brightness() const;
-    int displayTime() const;
-    void setBrightness(int val);
-    void setDisplayTime(int val);
+    int display_time() const;
+    void set_brightness(int val);
+    void set_display_time(int val);
 
     // --- Audio Settings ---
 
     Q_INVOKABLE void onAudioDropdownOpened();
 
-    Q_INVOKABLE void setSink(const QString &id);
-    Q_INVOKABLE void setSource(const QString &id);
+    Q_INVOKABLE void set_sink(const QString &id);
+    Q_INVOKABLE void set_source(const QString &id);
 
-    QVariantList inputModel() const;
-    QVariantList outputModel() const;
-    QString inputDevice() const;
-    QString outputDevice() const;
+    QVariantList input_model() const;
+    QVariantList output_model() const;
+    QString input_device() const;
+    QString output_device() const;
+
+private:
+    std::shared_ptr<Client> client_;
 
 signals:
-    void settingsChanged();
-    void audioDevicesChanged();
+    void settings_changed();
+    void audio_devices_changed();
 };

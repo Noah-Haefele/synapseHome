@@ -7,7 +7,7 @@ import "../../models"
 /**
  * System-Settings Screen View
  * 
- * Provides UI controls for configuring the device floor location, 
+ * Provides UI controls for identifying the device, 
  * shortcut call preferences, and device network status.
  */
 Rectangle {
@@ -27,9 +27,9 @@ Rectangle {
 
         spacing: 45
 
-        // Floor Configuration Section
+        // Device Configuration Section
         Column {
-            id: floorSelections
+            id: deviceSelections
 
             width: parent.width
 
@@ -37,19 +37,19 @@ Rectangle {
             
             spacing: 16
 
-            // In which floor the device is
+            // Which available device (in devices.json) the device is
             Dropdown {
                 anchors.horizontalCenter: parent.horizontalCenter
-                label: "Floor"
+                label: "Device Identification"
 
                 width: parent.width * 0.8
                 
-                model: SettingsBridge.allFloors
-                textRole: "name"
-                valueRole: "floorId"
-                selectedValue: SettingsBridge.locationIdx
+                model: SettingsBridge.all_devices
+                textRole: "device_name"
+                valueRole: "device_id"
+                selectedValue: SettingsBridge.location_id
                 
-                onUserSelected: (val) => SettingsBridge.setLocationIdx(val)
+                onUserSelected: (val) => SettingsBridge.set_pref_call_id(val)
             }
 
             // Pref 1
@@ -59,12 +59,12 @@ Rectangle {
 
                 width: parent.width * 0.8
                 
-                model: SettingsBridge.prefModel
-                textRole: "name"
-                valueRole: "floorId"
-                selectedValue: SettingsBridge.prefCallIdx1
+                model: SettingsBridge.pref_model
+                textRole: "device_name"
+                valueRole: "device_id"
+                selectedValue: SettingsBridge.pref_call_id1
                 
-                onUserSelected: (val) => SettingsBridge.setPrefCallIdx(1, val)
+                onUserSelected: (val) => SettingsBridge.set_pref_call_id(1, val)
             }
 
             // Pref 2
@@ -74,12 +74,12 @@ Rectangle {
 
                 width: parent.width * 0.8
                 
-                model: SettingsBridge.prefModel
-                textRole: "name"
-                valueRole: "floorId"
-                selectedValue: SettingsBridge.prefCallIdx2
+                model: SettingsBridge.pref_model
+                textRole: "device_name"
+                valueRole: "device_id"
+                selectedValue: SettingsBridge.pref_call_id2
                 
-                onUserSelected: (val) => SettingsBridge.setPrefCallIdx(2, val)
+                onUserSelected: (val) => SettingsBridge.set_pref_call_id(2, val)
             }
 
             // Pref 3
@@ -89,12 +89,12 @@ Rectangle {
 
                 width: parent.width * 0.8
                 
-                model: SettingsBridge.prefModel
-                textRole: "name"
-                valueRole: "floorId"
-                selectedValue: SettingsBridge.prefCallIdx3
+                model: SettingsBridge.pref_model
+                textRole: "device_name"
+                valueRole: "device_id"
+                selectedValue: SettingsBridge.pref_call_id3
                 
-                onUserSelected: (val) => SettingsBridge.setPrefCallIdx(3, val)
+                onUserSelected: (val) => SettingsBridge.set_pref_call_id(3, val)
             }
         }
 

@@ -26,19 +26,19 @@ Rectangle {
 
         spacing: 45
 
-        // In which floor the device is
+        // Sink (audio output)
         Dropdown {
             anchors.horizontalCenter: parent.horizontalCenter
             label: "Output"
 
             width: parent.width * 0.8
             
-            model: SettingsBridge.outputModel
+            model: SettingsBridge.output_model
             textRole: "name"
             valueRole: "id"
-            selectedValue: SettingsBridge.outputDevice
+            selectedValue: SettingsBridge.output_device
             
-            onUserSelected: (val) => SettingsBridge.setSink(val)
+            onUserSelected: (val) => SettingsBridge.set_sink(val)
 
             onDropdownOpened: {
                 if (visible) {
@@ -47,19 +47,19 @@ Rectangle {
             }
         }
 
-        // Pref 1
+        // Source (audio input)
         Dropdown {
             anchors.horizontalCenter: parent.horizontalCenter
             label: "Input"
 
             width: parent.width * 0.8
             
-            model: SettingsBridge.inputModel
+            model: SettingsBridge.input_model
             textRole: "name"
             valueRole: "id"
-            selectedValue: SettingsBridge.inputDevice
+            selectedValue: SettingsBridge.input_device
             
-            onUserSelected: (val) => SettingsBridge.setSource(val)
+            onUserSelected: (val) => SettingsBridge.set_source(val)
 
             onDropdownOpened: {
                 if (visible) {
