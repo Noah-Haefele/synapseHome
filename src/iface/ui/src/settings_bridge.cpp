@@ -117,24 +117,32 @@ int SettingsBridge::pref_call_id3() const
 
 int SettingsBridge::brightness() const
 {
-    print("brightness");
-    return 0;
+    auto val = client_->get_brightness();
+    if (val == std::nullopt) {
+        return -1;
+    }
+
+    return *val;
 }
 
 int SettingsBridge::display_time() const
 {
-    print("displayTime");
-    return 0;
+    auto val = client_->get_display_time();
+    if (val == std::nullopt) {
+        return -1;
+    }
+
+    return *val;
 }
 
 void SettingsBridge::set_brightness(int val)
 {
-    print("setBrightness");
+    client_->set_brightness(val);
 }
 
 void SettingsBridge::set_display_time(int val)
 {
-    print("setDisplayTime");
+    client_->set_display_time(val);
 }
 
 // --- Audio Settings ---
