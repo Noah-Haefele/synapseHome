@@ -3,6 +3,7 @@ use std::sync::Mutex;
 use tonic::{Request, Response, Status};
 
 use crate::core::state::devices::DeviceManager;
+use crate::core::display::brightness::DisplayManager;
 
 pub mod synapsed {
     pub mod settings {
@@ -13,36 +14,54 @@ pub mod synapsed {
 }
 
 use synapsed::settings::api::system_server::System;
+use synapsed::settings::api::display_server::Display;
 
 // --- Data Message ---
 use synapsed::settings::api::DeviceData as ProtoDeviceData;
 
 // --- Request Messages ---
+// System
 use synapsed::settings::api::SetLocationIdRequest;
 use synapsed::settings::api::SetPrefCallIdRequest;
+// Display
+use synapsed::settings::api::SetBrightnessRequest;
+use synapsed::settings::api::SetDisplayTimeRequest;
 
 // --- Reply Messages ---
+// System
 use synapsed::settings::api::GetAllDevicesReply;
 use synapsed::settings::api::GetPrefModelReply;
 use synapsed::settings::api::GetLocationIdReply;
 use synapsed::settings::api::GetPrefCallId1Reply;
 use synapsed::settings::api::GetPrefCallId2Reply;
 use synapsed::settings::api::GetPrefCallId3Reply;
+// Display
+use synapsed::settings::api::GetBrightnessReply;
+use synapsed::settings::api::GetDisplayTimeReply;
 
 /// Handles frontend gRPC requests and forwards them to the device manager.
 #[derive(Debug, Clone)]
 pub struct ThisSystem {
     device_manager: Arc<Mutex<DeviceManager>>,
+    display_manager: Arc<Mutex<DisplayManager>>,
 }
 
 impl ThisSystem {
-    pub fn new(device_manager: Arc<Mutex<DeviceManager>>) -> Self {
-        Self { device_manager }
+    pub fn new(
+        device_manager: Arc<Mutex<DeviceManager>>,
+        display_manager: Arc<Mutex<DisplayManager>>,
+    ) -> Self {
+        Self {
+            device_manager,
+            display_manager,
+        }
     }
 }
 
 #[tonic::async_trait]
 impl System for ThisSystem {
+    // --- System Settings ---
+
     async fn get_all_devices(
         &self,
         _: Request<()>,
@@ -174,6 +193,75 @@ impl System for ThisSystem {
 
         manager
             .set_pref_call_id(req.num, req.device_id)
+            .map_err(|e| Status::internal(e.to_string()))?;
+
+        Ok(Response::new(()))
+    }
+}
+
+#[tonic::async_trait]
+impl Display for ThisSystem {
+    // --- Display Settings ---
+
+    async fn get_brightness(
+        &self,
+        _: Request<()>,
+    ) -> Result<Response<GetBrightnessReply>, Status> {
+        let display_manager = self
+            .display_manager
+            .lock()
+            .map_err(|_| Status::internal("Lock failed"))?;
+
+        let val = display_manager.get_brightness();
+
+        Ok(Response::new(GetBrightnessReply { val }))
+    }
+
+    async fn get_display_time(
+        &self,
+        _: Request<()>,
+    ) -> Result<Response<GetDisplayTimeReply>, Status> {
+        let display_manager = self
+            .display_manager
+            .lock()
+            .map_err(|_| Status::internal("Lock failed"))?;
+
+        let val = display_manager.get_display_time();
+
+        Ok(Response::new(GetDisplayTimeReply { val }))
+    }
+
+    async fn set_brightness(
+        &self,
+        request: Request<SetBrightnessRequest>,
+    ) -> Result<Response<()>, Status> {
+        let req = request.into_inner();
+
+        let mut display_manager = self
+            .display_manager
+            .lock()
+            .map_err(|_| Status::internal("Lock failed"))?;
+
+        display_manager
+            .set_brightness(req.val)
+            .map_err(|e| Status::internal(e.to_string()))?;
+
+        Ok(Response::new(()))
+    }
+
+    async fn set_display_time(
+        &self,
+        request: Request<SetDisplayTimeRequest>,
+    ) -> Result<Response<()>, Status> {
+        let req = request.into_inner();
+
+        let mut display_manager = self
+            .display_manager
+            .lock()
+            .map_err(|_| Status::internal("Lock failed"))?;
+
+        display_manager
+            .set_display_time(req.val)
             .map_err(|e| Status::internal(e.to_string()))?;
 
         Ok(Response::new(()))
