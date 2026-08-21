@@ -6,7 +6,7 @@ use std::sync::Arc;
 use std::sync::Mutex;
 use tonic::transport::Server;
 
-use crate::core::set::devices::DeviceManager;
+use crate::core::state::devices::DeviceManager;
 use crate::core::api::grpc_server::ThisSystem;
 
 use crate::core::api::grpc_server::synapsed::settings::api::system_server::SystemServer;

@@ -2,7 +2,7 @@ use std::sync::Arc;
 use std::sync::Mutex;
 use tonic::{Request, Response, Status};
 
-use crate::core::set::devices::DeviceManager;
+use crate::core::state::devices::DeviceManager;
 
 pub mod synapsed {
     pub mod settings {

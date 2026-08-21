@@ -14,6 +14,13 @@ service System {
     rpc GetPrefCallId3(google.protobuf.Empty) returns (GetPrefCallId3Reply);
 }
 
+service Display {
+    rpc GetBrightness(google.protobuf.Empty) returns (GetBrightnessReply);
+    rpc GetDisplayTime(google.protobuf.Empty) returns (GetDisplayTimeReply);
+    rpc SetBrightness(SetBrightnessRequest) returns (google.protobuf.Empty);
+    rpc SetDisplayTime(SetDisplayTimeRequest) returns (google.protobuf.Empty);
+}
+
 // --- System Settings ---
 // Represents DeviceData struct in devices.rs
 message DeviceData {
@@ -53,4 +60,22 @@ message GetPrefCallId2Reply {
 
 message GetPrefCallId3Reply {
     int32 device_id = 1;
+}
+
+// --- Display Settings ---
+
+message GetBrightnessReply {
+    int32 val = 1;
+}
+
+message GetDisplayTimeReply {
+    int32 val = 1;
+}
+
+message SetBrightnessRequest {
+    int32 val = 1;
+}
+
+message SetDisplayTimeRequest {
+    int32 val = 1;
 }
