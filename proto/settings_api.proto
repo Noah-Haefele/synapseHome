@@ -65,17 +65,17 @@ message GetPrefCallId3Reply {
 // --- Display Settings ---
 
 message GetBrightnessReply {
-    int32 val = 1;
+    uint32 val = 1;
 }
 
 message GetDisplayTimeReply {
-    int32 val = 1;
+    uint32 val = 1;
 }
 
 message SetBrightnessRequest {
-    int32 val = 1;
+    uint32 val = 1;
 }
 
 message SetDisplayTimeRequest {
-    int32 val = 1;
+    uint32 val = 1;
 }
