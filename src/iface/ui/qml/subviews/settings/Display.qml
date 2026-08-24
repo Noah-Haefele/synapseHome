@@ -38,11 +38,11 @@ Rectangle {
         // Display-Standby Slider
         Slider {
             label: "Display-Standby"
-            val: SettingsBridge.displayTime
+            val: SettingsBridge.display_time
             unit: "sek"
             min: 10
             max: 300
-            onMoved: (v) => SettingsBridge.displayTime = v
+            onMoved: (v) => SettingsBridge.display_time = v
         }
     }
 }
