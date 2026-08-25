@@ -1,0 +1,81 @@
+syntax = "proto3";
+package synapsed.api.pref;
+
+import "google/protobuf/empty.proto";
+import "helper.proto";
+
+service PrefIconPaths {
+    rpc GetPref1IconPath(google.protobuf.Empty) returns (GetPref1IconPathReply);
+    rpc GetPref2IconPath(google.protobuf.Empty) returns (GetPref2IconPathReply);
+    rpc GetPref3IconPath(google.protobuf.Empty) returns (GetPref3IconPathReply);
+}
+
+service PrefCallIds {
+    rpc GetPref1CallId(google.protobuf.Empty) returns (GetPref1CallIdReply);
+    rpc GetPref2CallId(google.protobuf.Empty) returns (GetPref2CallIdReply);
+    rpc GetPref3CallId(google.protobuf.Empty) returns (GetPref3CallIdReply);
+    rpc SetPrefCallId(SetPrefCallIdRequest) returns (google.protobuf.Empty);
+}
+
+service PrefShortNames {
+    rpc GetPref1ShortName(google.protobuf.Empty) returns (GetPref1ShortNameReply);
+    rpc GetPref2ShortName(google.protobuf.Empty) returns (GetPref2ShortNameReply);
+    rpc GetPref3ShortName(google.protobuf.Empty) returns (GetPref3ShortNameReply);
+}
+
+service PrefModels {
+    rpc GetPrefModel(google.protobuf.Empty) returns (GetPrefModelReply);
+}
+
+// --- Paths ---
+
+message GetPref1IconPathReply {
+    string path = 1;
+}
+
+message GetPref2IconPathReply {
+    string path = 1;
+}
+
+message GetPref3IconPathReply {
+    string path = 1;
+}
+
+// --- Ids ---
+
+message GetPref1CallIdReply {
+    int32 device_id = 1;
+}
+
+message GetPref2CallIdReply {
+    int32 device_id = 1;
+}
+
+message GetPref3CallIdReply {
+    int32 device_id = 1;
+}
+
+message SetPrefCallIdRequest {
+    int32 num = 1;
+    int32 device_id = 2;
+}
+
+// --- Short Names ---
+
+message GetPref1ShortNameReply {
+    string name = 1;
+}
+
+message GetPref2ShortNameReply {
+    string name = 1;
+}
+
+message GetPref3ShortNameReply {
+    string name = 1;
+}
+
+// --- Models ---
+
+message GetPrefModelReply {
+    repeated synapsed.api.helper.DeviceData devices = 1;
+}
