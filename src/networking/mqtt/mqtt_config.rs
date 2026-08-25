@@ -34,7 +34,7 @@ impl MqttConfig {
         let hostname = hostname::get()?.to_string_lossy().into_owned();
 
         let mut mqtt_config = Self {
-            // Default device structure
+            // Default mqtt config structure
             mqtt_config_cache: MqttConfigCache {
                 id: String::new(),
                 broker_ip: "127.0.0.1".to_string(),
