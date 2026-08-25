@@ -1,11 +1,11 @@
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
 #include <QQmlContext>
-#include <memory>
 #include <grpcpp/grpcpp.h>
 
 #include "grpc_client.hpp"
 #include "settings_bridge.hpp"
+#include "control_grid_bridge.hpp"
 
 
 int main(int argc, char *argv[])
@@ -17,12 +17,15 @@ int main(int argc, char *argv[])
 
     // create instance and bound to app
     auto settingsBridge = new SettingsBridge(grpcClient, &app);
+    auto controlGridBridge = new ControlGridBridge(grpcClient, &app);
 
     // c++ keeps memory contorl
     QQmlEngine::setObjectOwnership(settingsBridge, QQmlEngine::CppOwnership);
+    QQmlEngine::setObjectOwnership(controlGridBridge, QQmlEngine::CppOwnership);
 
     // qml singletone
-    qmlRegisterSingletonInstance("UiBridge", 1, 0, "SettingsBridge", settingsBridge);
+    qmlRegisterSingletonInstance("SettingsBridge", 1, 0, "SettingsBridge", settingsBridge);
+    qmlRegisterSingletonInstance("ControlGridBridge", 1, 0, "ControlGridBridge", controlGridBridge);
 
     QQmlApplicationEngine engine;
     engine.loadFromModule("UiBridge", "Main");
