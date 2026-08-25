@@ -1,4 +1,5 @@
 mod core;
+mod networking;
 mod platform;
 
 //use std::thread;
@@ -7,17 +8,21 @@ use std::sync::Arc;
 use std::sync::Mutex;
 use tonic::transport::Server;
 
-use crate::core::state::devices::DeviceManager;
 use crate::core::api::grpc_server::ThisSystem;
 use crate::core::display::brightness::DisplayManager;
+use crate::core::state::devices::DeviceManager;
 
-use crate::core::api::grpc_server::synapsed::settings::api::system_server::SystemServer;
 use crate::core::api::grpc_server::synapsed::settings::api::display_server::DisplayServer;
+use crate::core::api::grpc_server::synapsed::settings::api::system_server::SystemServer;
 
 use crate::platform::linux::display_controller::DspCtrl;
 
+use crate::networking::mqtt::mqtt_config::MqttConfig;
+
 #[tokio::main]
-async fn main() -> Result<(), Box<dyn std::error::Error>> { 
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let _mqtt_setup = MqttConfig::new()?;
+
     let device_manager = Arc::new(Mutex::new(DeviceManager::new()?));
     let display_controller = Arc::new(Mutex::new(DspCtrl::new()));
     let display_manager = Arc::new(Mutex::new(DisplayManager::new(display_controller)?));
