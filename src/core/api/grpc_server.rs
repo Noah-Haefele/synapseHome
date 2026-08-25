@@ -2,48 +2,78 @@ use std::sync::Arc;
 use std::sync::Mutex;
 use tonic::{Request, Response, Status};
 
-use crate::core::state::devices::DeviceManager;
 use crate::core::display::brightness::DisplayManager;
+use crate::core::state::devices::DeviceManager;
 
 pub mod synapsed {
-    pub mod settings {
-        pub mod api {
-            tonic::include_proto!("synapsed.settings.api");
+    pub mod api {
+        pub mod settings {
+            tonic::include_proto!("synapsed.api.settings");
+        }
+        pub mod pref {
+            tonic::include_proto!("synapsed.api.pref");
+        }
+        pub mod helper {
+            tonic::include_proto!("synapsed.api.helper");
         }
     }
+    pub mod pref {}
 }
 
-use synapsed::settings::api::system_server::System;
-use synapsed::settings::api::display_server::Display;
+// --- Settings Api ---
+use synapsed::api::settings::display_server::Display;
+use synapsed::api::settings::system_server::System;
+
+// --- Preference Api ---
+use synapsed::api::pref::pref_call_ids_server::PrefCallIds;
+use synapsed::api::pref::pref_icon_paths_server::PrefIconPaths;
+use synapsed::api::pref::pref_models_server::PrefModels;
+use synapsed::api::pref::pref_short_names_server::PrefShortNames;
 
 // --- Data Message ---
-use synapsed::settings::api::DeviceData as ProtoDeviceData;
+use synapsed::api::helper::DeviceData as ProtoDeviceData;
 
 // --- Request Messages ---
 // System
-use synapsed::settings::api::SetLocationIdRequest;
-use synapsed::settings::api::SetPrefCallIdRequest;
+use synapsed::api::settings::SetLocationIdRequest;
 // Display
-use synapsed::settings::api::SetBrightnessRequest;
-use synapsed::settings::api::SetDisplayTimeRequest;
+use synapsed::api::settings::SetBrightnessRequest;
+use synapsed::api::settings::SetDisplayTimeRequest;
+// Pref Ids
+use synapsed::api::pref::SetPrefCallIdRequest;
 
 // --- Reply Messages ---
 // System
-use synapsed::settings::api::GetAllDevicesReply;
-use synapsed::settings::api::GetPrefModelReply;
-use synapsed::settings::api::GetLocationIdReply;
-use synapsed::settings::api::GetPrefCallId1Reply;
-use synapsed::settings::api::GetPrefCallId2Reply;
-use synapsed::settings::api::GetPrefCallId3Reply;
+use synapsed::api::settings::GetAllDevicesReply;
+use synapsed::api::settings::GetLocationIdReply;
 // Display
-use synapsed::settings::api::GetBrightnessReply;
-use synapsed::settings::api::GetDisplayTimeReply;
+use synapsed::api::settings::GetBrightnessReply;
+use synapsed::api::settings::GetDisplayTimeReply;
+// Pref Paths
+use synapsed::api::pref::GetPref1IconPathReply;
+use synapsed::api::pref::GetPref2IconPathReply;
+use synapsed::api::pref::GetPref3IconPathReply;
+// Pref Ids
+use synapsed::api::pref::GetPref1CallIdReply;
+use synapsed::api::pref::GetPref2CallIdReply;
+use synapsed::api::pref::GetPref3CallIdReply;
+// Pref short Labels
+use synapsed::api::pref::GetPref1ShortNameReply;
+use synapsed::api::pref::GetPref2ShortNameReply;
+use synapsed::api::pref::GetPref3ShortNameReply;
+// Pref Models
+use synapsed::api::pref::GetPrefModelReply;
 
 /// Handles frontend gRPC requests and forwards them to the device manager.
 #[derive(Debug, Clone)]
 pub struct ThisSystem {
     device_manager: Arc<Mutex<DeviceManager>>,
     display_manager: Arc<Mutex<DisplayManager>>,
+}
+
+#[derive(Debug, Clone)]
+pub struct CallIcons {
+    device_manager: Arc<Mutex<DeviceManager>>,
 }
 
 impl ThisSystem {
@@ -55,6 +85,12 @@ impl ThisSystem {
             device_manager,
             display_manager,
         }
+    }
+}
+
+impl CallIcons {
+    pub fn new(device_manager: Arc<Mutex<DeviceManager>>) -> Self {
+        Self { device_manager }
     }
 }
 
@@ -98,70 +134,6 @@ impl System for ThisSystem {
         Ok(Response::new(GetLocationIdReply { device_id }))
     }
 
-    async fn get_pref_call_id1(
-        &self,
-        _: Request<()>,
-    ) -> Result<Response<GetPrefCallId1Reply>, Status> {
-        let manager = self
-            .device_manager
-            .lock()
-            .map_err(|_| Status::internal("Lock failed"))?;
-
-        let device_id = manager.get_pref_call_id(1);
-
-        Ok(Response::new(GetPrefCallId1Reply { device_id }))
-    }
-
-    async fn get_pref_call_id2(
-        &self,
-        _: Request<()>,
-    ) -> Result<Response<GetPrefCallId2Reply>, Status> {
-        let manager = self
-            .device_manager
-            .lock()
-            .map_err(|_| Status::internal("Lock failed"))?;
-
-        let device_id = manager.get_pref_call_id(2);
-
-        Ok(Response::new(GetPrefCallId2Reply { device_id }))
-    }
-
-    async fn get_pref_call_id3(
-        &self,
-        _: Request<()>,
-    ) -> Result<Response<GetPrefCallId3Reply>, Status> {
-        let manager = self
-            .device_manager
-            .lock()
-            .map_err(|_| Status::internal("Lock failed"))?;
-
-        let device_id = manager.get_pref_call_id(3);
-
-        Ok(Response::new(GetPrefCallId3Reply { device_id }))
-    }
-
-    async fn get_pref_model(
-        &self,
-        _: Request<()>,
-    ) -> Result<Response<GetPrefModelReply>, Status> {
-        let manager = self
-            .device_manager
-            .lock()
-            .map_err(|_| Status::internal("Lock failed"))?;
-
-        let devices = manager
-            .get_pref_model()
-            .into_iter()
-            .map(|device| ProtoDeviceData {
-                device_name: device.device_name,
-                device_short_name: device.device_short_name,
-                device_id: device.device_id,
-            })
-            .collect();
-
-        Ok(Response::new(GetPrefModelReply { devices }))
-    }
-
     async fn set_location_id(
         &self,
         request: Request<SetLocationIdRequest>,
@@ -178,6 +150,51 @@ impl System for ThisSystem {
             .map_err(|e| Status::internal(e.to_string()))?;
 
         Ok(Response::new(()))
+    }
+}
+
+#[tonic::async_trait]
+impl PrefCallIds for ThisSystem {
+    async fn get_pref1_call_id(
+        &self,
+        _: Request<()>,
+    ) -> Result<Response<GetPref1CallIdReply>, Status> {
+        let manager = self
+            .device_manager
+            .lock()
+            .map_err(|_| Status::internal("Lock failed"))?;
+
+        let device_id = manager.get_pref_call_id(1);
+
+        Ok(Response::new(GetPref1CallIdReply { device_id }))
+    }
+
+    async fn get_pref2_call_id(
+        &self,
+        _: Request<()>,
+    ) -> Result<Response<GetPref2CallIdReply>, Status> {
+        let manager = self
+            .device_manager
+            .lock()
+            .map_err(|_| Status::internal("Lock failed"))?;
+
+        let device_id = manager.get_pref_call_id(2);
+
+        Ok(Response::new(GetPref2CallIdReply { device_id }))
+    }
+
+    async fn get_pref3_call_id(
+        &self,
+        _: Request<()>,
+    ) -> Result<Response<GetPref3CallIdReply>, Status> {
+        let manager = self
+            .device_manager
+            .lock()
+            .map_err(|_| Status::internal("Lock failed"))?;
+
+        let device_id = manager.get_pref_call_id(3);
+
+        Ok(Response::new(GetPref3CallIdReply { device_id }))
     }
 
     async fn set_pref_call_id(
@@ -200,13 +217,32 @@ impl System for ThisSystem {
 }
 
 #[tonic::async_trait]
+impl PrefModels for ThisSystem {
+    async fn get_pref_model(&self, _: Request<()>) -> Result<Response<GetPrefModelReply>, Status> {
+        let manager = self
+            .device_manager
+            .lock()
+            .map_err(|_| Status::internal("Lock failed"))?;
+
+        let devices = manager
+            .get_pref_model()
+            .into_iter()
+            .map(|device| ProtoDeviceData {
+                device_name: device.device_name,
+                device_short_name: device.device_short_name,
+                device_id: device.device_id,
+            })
+            .collect();
+
+        Ok(Response::new(GetPrefModelReply { devices }))
+    }
+}
+
+#[tonic::async_trait]
 impl Display for ThisSystem {
     // --- Display Settings ---
 
-    async fn get_brightness(
-        &self,
-        _: Request<()>,
-    ) -> Result<Response<GetBrightnessReply>, Status> {
+    async fn get_brightness(&self, _: Request<()>) -> Result<Response<GetBrightnessReply>, Status> {
         let display_manager = self
             .display_manager
             .lock()
@@ -265,5 +301,95 @@ impl Display for ThisSystem {
             .map_err(|e| Status::internal(e.to_string()))?;
 
         Ok(Response::new(()))
+    }
+}
+
+#[tonic::async_trait]
+impl PrefIconPaths for CallIcons {
+    async fn get_pref1_icon_path(
+        &self,
+        _: Request<()>,
+    ) -> Result<Response<GetPref1IconPathReply>, Status> {
+        let manager = self
+            .device_manager
+            .lock()
+            .map_err(|_| Status::internal("Lock failed"))?;
+
+        let path = manager.get_pref_icon_path(1);
+
+        Ok(Response::new(GetPref1IconPathReply { path }))
+    }
+
+    async fn get_pref2_icon_path(
+        &self,
+        _: Request<()>,
+    ) -> Result<Response<GetPref2IconPathReply>, Status> {
+        let manager = self
+            .device_manager
+            .lock()
+            .map_err(|_| Status::internal("Lock failed"))?;
+
+        let path = manager.get_pref_icon_path(2);
+
+        Ok(Response::new(GetPref2IconPathReply { path }))
+    }
+
+    async fn get_pref3_icon_path(
+        &self,
+        _: Request<()>,
+    ) -> Result<Response<GetPref3IconPathReply>, Status> {
+        let manager = self
+            .device_manager
+            .lock()
+            .map_err(|_| Status::internal("Lock failed"))?;
+
+        let path = manager.get_pref_icon_path(3);
+
+        Ok(Response::new(GetPref3IconPathReply { path }))
+    }
+}
+
+#[tonic::async_trait]
+impl PrefShortNames for CallIcons {
+    async fn get_pref1_short_name(
+        &self,
+        _: Request<()>,
+    ) -> Result<Response<GetPref1ShortNameReply>, Status> {
+        let manager = self
+            .device_manager
+            .lock()
+            .map_err(|_| Status::internal("Lock failed"))?;
+
+        let name = manager.get_device_short_name(1);
+
+        Ok(Response::new(GetPref1ShortNameReply { name }))
+    }
+
+    async fn get_pref2_short_name(
+        &self,
+        _: Request<()>,
+    ) -> Result<Response<GetPref2ShortNameReply>, Status> {
+        let manager = self
+            .device_manager
+            .lock()
+            .map_err(|_| Status::internal("Lock failed"))?;
+
+        let name = manager.get_device_short_name(2);
+
+        Ok(Response::new(GetPref2ShortNameReply { name }))
+    }
+
+    async fn get_pref3_short_name(
+        &self,
+        _: Request<()>,
+    ) -> Result<Response<GetPref3ShortNameReply>, Status> {
+        let manager = self
+            .device_manager
+            .lock()
+            .map_err(|_| Status::internal("Lock failed"))?;
+
+        let name = manager.get_device_short_name(3);
+
+        Ok(Response::new(GetPref3ShortNameReply { name }))
     }
 }
