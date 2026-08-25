@@ -1,13 +1,13 @@
 import QtQuick 2.15
 import QtQuick.Controls 2.15
-import UiBridge
+import SettingsBridge
 import "../../components"
 import "../../models"
 
 /**
  * System-Settings Screen View
- * 
- * Provides UI controls for identifying the device, 
+ *
+ * Provides UI controls for identifying the device,
  * shortcut call preferences, and device network status.
  */
 Rectangle {
@@ -34,7 +34,7 @@ Rectangle {
             width: parent.width
 
             anchors.horizontalCenter: parent.horizontalCenter
-            
+
             spacing: 16
 
             // Which available device (in devices.json) the device is
@@ -43,57 +43,57 @@ Rectangle {
                 label: "Device Identification"
 
                 width: parent.width * 0.8
-                
+
                 model: SettingsBridge.all_devices
                 textRole: "device_name"
                 valueRole: "device_id"
                 selectedValue: SettingsBridge.location_id
-                
+
                 onUserSelected: (val) => SettingsBridge.set_pref_call_id(val)
             }
 
             // Pref 1
             Dropdown {
                 anchors.horizontalCenter: parent.horizontalCenter
-                label: "Pref 1"
+                label: "Primary Call Preference"
 
                 width: parent.width * 0.8
-                
+
                 model: SettingsBridge.pref_model
                 textRole: "device_name"
                 valueRole: "device_id"
-                selectedValue: SettingsBridge.pref_call_id1
-                
+                selectedValue: SettingsBridge.pref1_call_id
+
                 onUserSelected: (val) => SettingsBridge.set_pref_call_id(1, val)
             }
 
             // Pref 2
             Dropdown {
                 anchors.horizontalCenter: parent.horizontalCenter
-                label: "Pref 2"
+                label: "Secondary Call Preference"
 
                 width: parent.width * 0.8
-                
+
                 model: SettingsBridge.pref_model
                 textRole: "device_name"
                 valueRole: "device_id"
-                selectedValue: SettingsBridge.pref_call_id2
-                
+                selectedValue: SettingsBridge.pref2_call_id
+
                 onUserSelected: (val) => SettingsBridge.set_pref_call_id(2, val)
             }
 
             // Pref 3
             Dropdown {
                 anchors.horizontalCenter: parent.horizontalCenter
-                label: "Pref 3"
+                label: "Tertiary Call Preference"
 
                 width: parent.width * 0.8
-                
+
                 model: SettingsBridge.pref_model
                 textRole: "device_name"
                 valueRole: "device_id"
-                selectedValue: SettingsBridge.pref_call_id3
-                
+                selectedValue: SettingsBridge.pref3_call_id
+
                 onUserSelected: (val) => SettingsBridge.set_pref_call_id(3, val)
             }
         }
@@ -101,7 +101,7 @@ Rectangle {
         // Display IP-Address of device
         Column {
             anchors.horizontalCenter: parent.horizontalCenter
-            
+
             spacing: 6
 
             Text {
