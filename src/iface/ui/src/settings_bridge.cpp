@@ -1,6 +1,5 @@
 #include <iostream>
 #include <string>
-#include <format>
 #include <QVariantMap>
 
 #include "settings_bridge.hpp"
@@ -83,9 +82,9 @@ int SettingsBridge::location_id() const
     return *location_id;
 }
 
-int SettingsBridge::pref_call_id1() const
+int SettingsBridge::pref1_call_id() const
 {
-    auto device_id = client_->get_pref_call_id1();
+    auto device_id = client_->get_pref1_call_id();
     if (device_id == std::nullopt) {
         return -1;
     }
@@ -93,9 +92,9 @@ int SettingsBridge::pref_call_id1() const
     return *device_id;
 }
 
-int SettingsBridge::pref_call_id2() const
+int SettingsBridge::pref2_call_id() const
 {
-    auto device_id = client_->get_pref_call_id2();
+    auto device_id = client_->get_pref2_call_id();
     if (device_id == std::nullopt) {
         return -1;
     }
@@ -103,9 +102,9 @@ int SettingsBridge::pref_call_id2() const
     return *device_id;
 }
 
-int SettingsBridge::pref_call_id3() const
+int SettingsBridge::pref3_call_id() const
 {
-    auto device_id = client_->get_pref_call_id3();
+    auto device_id = client_->get_pref3_call_id();
     if (device_id == std::nullopt) {
         return -1;
     }

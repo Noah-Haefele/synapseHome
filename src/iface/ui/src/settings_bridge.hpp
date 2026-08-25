@@ -36,20 +36,20 @@ class SettingsBridge : public QObject
     )
 
     Q_PROPERTY(
-        int pref_call_id1
-        READ pref_call_id1
+        int pref1_call_id
+        READ pref1_call_id
         NOTIFY settings_changed
     )
 
     Q_PROPERTY(
-        int pref_call_id2
-        READ pref_call_id2
+        int pref2_call_id
+        READ pref2_call_id
         NOTIFY settings_changed
     )
 
     Q_PROPERTY(
-        int pref_call_id3
-        READ pref_call_id3
+        int pref3_call_id
+        READ pref3_call_id
         NOTIFY settings_changed
     )
 
@@ -106,9 +106,9 @@ public:
     QVariantList all_devices() const;
     QVariantList pref_model() const;
     int location_id() const;
-    int pref_call_id1() const;
-    int pref_call_id2() const;
-    int pref_call_id3() const;
+    int pref1_call_id() const;
+    int pref2_call_id() const;
+    int pref3_call_id() const;
 
     // --- Display Settings ---
 
