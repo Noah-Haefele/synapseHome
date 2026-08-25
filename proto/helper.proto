@@ -1,0 +1,9 @@
+syntax = "proto3";
+package synapsed.api.helper;
+
+// Represents DeviceData struct in devices.rs
+message DeviceData {
+    string device_name = 1;
+    string device_short_name = 2;
+    int32 device_id = 3;
+}
