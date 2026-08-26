@@ -40,33 +40,34 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let addr = "0.0.0.0:50051".parse()?;
 
-    let grpc_signals_server = LiveEventService::new();
+    let live_event_service = LiveEventService::new();
 
     let grpc_server = ThisSystem::new(
         Arc::clone(&device_manager),
         display_manager,
-        Arc::new(Mutex::new(grpc_signals_server.clone())),
+        Arc::new(Mutex::new(live_event_service.clone())),
     );
+
     let grpc_server_call_icon = CallIcons::new(Arc::clone(&device_manager));
 
     let system_service = SystemServer::new(grpc_server.clone());
     let display_service = DisplayServer::new(grpc_server.clone());
-    let pref_call_ids_server = PrefCallIdsServer::new(grpc_server.clone());
-    let pref_models_server = PrefModelsServer::new(grpc_server);
+    let pref_call_ids_service = PrefCallIdsServer::new(grpc_server.clone());
+    let pref_models_service = PrefModelsServer::new(grpc_server);
 
-    let pref_icon_paths = PrefIconPathsServer::new(grpc_server_call_icon.clone());
-    let pref_short_names = PrefShortNamesServer::new(grpc_server_call_icon);
+    let pref_icon_paths_service = PrefIconPathsServer::new(grpc_server_call_icon.clone());
+    let pref_short_names_service = PrefShortNamesServer::new(grpc_server_call_icon);
 
-    let event_service_server = EventServiceServer::new(grpc_signals_server);
+    let event_service = EventServiceServer::new(live_event_service);
 
     Server::builder()
         .add_service(system_service)
         .add_service(display_service)
-        .add_service(pref_call_ids_server)
-        .add_service(pref_models_server)
-        .add_service(pref_icon_paths)
-        .add_service(pref_short_names)
-        .add_service(event_service_server)
+        .add_service(pref_call_ids_service)
+        .add_service(pref_models_service)
+        .add_service(pref_icon_paths_service)
+        .add_service(pref_short_names_service)
+        .add_service(event_service)
         .serve(addr)
         .await?;
 
