@@ -153,11 +153,13 @@ int SettingsBridge::display_time() const
 
 void SettingsBridge::set_brightness(int val)
 {
+    emit brightness_changed();
     client_->set_brightness(val);
 }
 
 void SettingsBridge::set_display_time(int val)
 {
+    emit display_time_changed();
     client_->set_display_time(val);
 }
 

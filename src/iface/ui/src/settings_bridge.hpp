@@ -59,14 +59,14 @@ class SettingsBridge : public QObject
         int brightness
         READ brightness
         WRITE set_brightness
-        NOTIFY settings_changed
+        NOTIFY brightness_changed
     )
 
     Q_PROPERTY(
         int display_time
         READ display_time
         WRITE set_display_time
-        NOTIFY settings_changed
+        NOTIFY display_time_changed
     )
 
     // --- Audio Settings ---
@@ -135,6 +135,8 @@ private:
 signals:
     void location_id_changed();
     void pref_call_id_changed();
+    void brightness_changed();
+    void display_time_changed();
     void settings_changed();
     void audio_devices_changed();
     void pref_call_icon_changed();
