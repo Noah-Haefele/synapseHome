@@ -21,11 +21,13 @@ void print(const std::string &msg)
 Q_INVOKABLE void SettingsBridge::set_location_id(int device_id)
 {
     client_->set_location_id(device_id);
+    emit settings_changed();
 }
 
 Q_INVOKABLE void SettingsBridge::set_pref_call_id(int num, int device_id)
 {
     client_->set_pref_call_id(num, device_id);
+    emit settings_changed();
 }
 
 QVariantList SettingsBridge::all_devices() const
