@@ -18,21 +18,31 @@ void print(const std::string &msg)
 
 // --- System Settings ---
 
-Q_INVOKABLE void SettingsBridge::set_location_id(int device_id)
+void SettingsBridge::set_location_id(int device_id)
 {
     client_->set_location_id(device_id);
-    // Emit both
-    // Location id because of a new preference model available
-    // Pref call id because of some invalid and then deleted preferences
+
+    // Emit:
+    // - location_id_changed because the location changed
+    //   and a new preference model was created
+    // - pref_call_id_changed because existing preferences may
+    //   become invalid and get reset to UNASSIGNED
+    // - pref_call_icon_changed because the preference call IDs changed
     emit location_id_changed();
     emit pref_call_id_changed();
+    emit pref_call_icon_changed();
 }
 
-Q_INVOKABLE void SettingsBridge::set_pref_call_id(int num, int device_id)
+void SettingsBridge::set_pref_call_id(int num, int device_id)
 {
     client_->set_pref_call_id(num, device_id);
-    // Emit pref call id because of some pref which might be already on this id and hasEmit pref call id because of some pref which might be already on this id and hasEmit pref call id because of some pref which might be already on this id and hasEmit pref call id because of some pref which might be already on this id and hasEmit pref call id because of some pref which might be already on this id and has
+
+    // Emit:
+    // - pref_call_id_changed because another preference may already
+    //   use this device ID and therefore be reset to UNASSIGNED
+    // - pref_call_icon_changed because the preference call IDs changed
     emit pref_call_id_changed();
+    emit pref_call_icon_changed();
 }
 
 QVariantList SettingsBridge::all_devices() const

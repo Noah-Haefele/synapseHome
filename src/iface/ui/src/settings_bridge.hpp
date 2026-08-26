@@ -137,4 +137,5 @@ signals:
     void pref_call_id_changed();
     void settings_changed();
     void audio_devices_changed();
+    void pref_call_icon_changed();
 };
