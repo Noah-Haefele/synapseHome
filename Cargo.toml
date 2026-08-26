@@ -12,6 +12,7 @@ prost = "0.14"
 tonic-prost = "*"
 tokio = { version = "1.0", features = ["macros", "rt-multi-thread"] }
 hostname = "0.4.2"
+tokio-stream = "0.1.19"
 
 [build-dependencies]
 tonic-prost-build = "*"
