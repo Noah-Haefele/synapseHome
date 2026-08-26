@@ -21,11 +21,18 @@ void print(const std::string &msg)
 Q_INVOKABLE void SettingsBridge::set_location_id(int device_id)
 {
     client_->set_location_id(device_id);
+    // Emit both
+    // Location id because of a new preference model available
+    // Pref call id because of some invalid and then deleted preferences
+    emit location_id_changed();
+    emit pref_call_id_changed();
 }
 
 Q_INVOKABLE void SettingsBridge::set_pref_call_id(int num, int device_id)
 {
     client_->set_pref_call_id(num, device_id);
+    // Emit pref call id because of some pref which might be already on this id and hasEmit pref call id because of some pref which might be already on this id and hasEmit pref call id because of some pref which might be already on this id and hasEmit pref call id because of some pref which might be already on this id and hasEmit pref call id because of some pref which might be already on this id and has
+    emit pref_call_id_changed();
 }
 
 QVariantList SettingsBridge::all_devices() const
