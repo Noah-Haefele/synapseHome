@@ -5,6 +5,9 @@ use tonic::{Request, Response, Status};
 use crate::core::display::brightness::DisplayManager;
 use crate::core::state::devices::DeviceManager;
 
+// Signals grpc server
+use crate::core::api::grpc_signals_server::LiveEventService;
+
 pub mod synapsed {
     pub mod api {
         pub mod settings {
@@ -17,7 +20,6 @@ pub mod synapsed {
             tonic::include_proto!("synapsed.api.helper");
         }
     }
-    pub mod pref {}
 }
 
 // --- Settings Api ---
@@ -69,6 +71,7 @@ use synapsed::api::pref::GetPrefModelReply;
 pub struct ThisSystem {
     device_manager: Arc<Mutex<DeviceManager>>,
     display_manager: Arc<Mutex<DisplayManager>>,
+    signals_grpc_server: Arc<Mutex<LiveEventService>>,
 }
 
 #[derive(Debug, Clone)]
@@ -80,10 +83,12 @@ impl ThisSystem {
     pub fn new(
         device_manager: Arc<Mutex<DeviceManager>>,
         display_manager: Arc<Mutex<DisplayManager>>,
+        signals_grpc_server: Arc<Mutex<LiveEventService>>,
     ) -> Self {
         Self {
             device_manager,
             display_manager,
+            signals_grpc_server,
         }
     }
 }
@@ -139,6 +144,12 @@ impl System for ThisSystem {
         request: Request<SetLocationIdRequest>,
     ) -> Result<Response<()>, Status> {
         let req = request.into_inner();
+
+        let signals_server = self
+            .signals_grpc_server
+            .lock()
+            .map_err(|_| Status::internal("Lock failed"))?;
+        signals_server.trigger_call_icon_changed();
 
         let mut manager = self
             .device_manager
@@ -202,6 +213,12 @@ impl PrefCallIds for ThisSystem {
         request: Request<SetPrefCallIdRequest>,
     ) -> Result<Response<()>, Status> {
         let req = request.into_inner();
+
+        let signals_server = self
+            .signals_grpc_server
+            .lock()
+            .map_err(|_| Status::internal("Lock failed"))?;
+        signals_server.trigger_call_icon_changed();
 
         let mut manager = self
             .device_manager
