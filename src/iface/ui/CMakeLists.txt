@@ -31,6 +31,7 @@ set(PROTOFILES
     "${PROJECT_ROOT}/proto/settings_api.proto"
     "${PROJECT_ROOT}/proto/pref_api.proto"
     "${PROJECT_ROOT}/proto/helper.proto"
+    "${PROJECT_ROOT}/proto/events_api.proto"
 )
 
 set(PROTO_SRC_FILES)
@@ -140,6 +141,8 @@ set(SRC_FILES
     src/control_grid_bridge.cpp
     api/grpc_client.hpp
     api/grpc_client.cpp
+    api/grpc_signals_client.hpp
+    api/grpc_signals_client.cpp
 )
 
 set(ICON_FILES
