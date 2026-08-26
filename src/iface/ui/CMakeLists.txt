@@ -20,46 +20,77 @@ FetchContent_MakeAvailable(gRPC)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-set(PROJECT_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/../../../")
+get_filename_component(PROJECT_ROOT
+    "${CMAKE_CURRENT_SOURCE_DIR}/../../../"
+    ABSOLUTE
+)
 
 # --- Grpc setup ---
 # Proto file
-get_filename_component(hw_proto
+set(PROTOFILES
     "${PROJECT_ROOT}/proto/settings_api.proto"
-    ABSOLUTE
-)
-get_filename_component(hw_proto_path
-    "${hw_proto}"
-    PATH
+    "${PROJECT_ROOT}/proto/pref_api.proto"
+    "${PROJECT_ROOT}/proto/helper.proto"
 )
 
-# Generated sources
-set(hw_proto_srcs "${CMAKE_CURRENT_BINARY_DIR}/settings_api.pb.cc")
-set(hw_proto_hdrs "${CMAKE_CURRENT_BINARY_DIR}/settings_api.pb.h")
-set(hw_grpc_srcs "${CMAKE_CURRENT_BINARY_DIR}/settings_api.grpc.pb.cc")
-set(hw_grpc_hdrs "${CMAKE_CURRENT_BINARY_DIR}/settings_api.grpc.pb.h")
+set(PROTO_SRC_FILES)
+set(GRPC_SRC_FILES)
+set(PROTO_HDR_FILES)
+set(GRPC_HDR_FILES)
 
 set(_PROTOBUF_PROTOC $<TARGET_FILE:protoc>)
 set(_GRPC_CPP_PLUGIN_EXECUTABLE $<TARGET_FILE:grpc_cpp_plugin>)
 
-add_custom_command(
-    OUTPUT
-        "${hw_proto_srcs}"
-        "${hw_proto_hdrs}"
-        "${hw_grpc_srcs}"
-        "${hw_grpc_hdrs}"
+foreach(PROTOFILE ${PROTOFILES})
 
-    COMMAND ${_PROTOBUF_PROTOC}
-    ARGS
-        --grpc_out "${CMAKE_CURRENT_BINARY_DIR}"
-        --cpp_out "${CMAKE_CURRENT_BINARY_DIR}"
-        -I "${hw_proto_path}"
-        -I "${grpc_SOURCE_DIR}/third_party/protobuf/src"
-        --plugin=protoc-gen-grpc="${_GRPC_CPP_PLUGIN_EXECUTABLE}"
-        "${hw_proto}"
+    get_filename_component(PROTO_NAME "${PROTOFILE}" NAME_WE)
+    get_filename_component(PROTO_PATH "${PROTOFILE}" PATH)
 
-    DEPENDS "${hw_proto}"
-)
+    set(PROTO_SRC
+        "${CMAKE_CURRENT_BINARY_DIR}/${PROTO_NAME}.pb.cc"
+    )
+
+    set(PROTO_HDR
+        "${CMAKE_CURRENT_BINARY_DIR}/${PROTO_NAME}.pb.h"
+    )
+
+    set(GRPC_SRC
+        "${CMAKE_CURRENT_BINARY_DIR}/${PROTO_NAME}.grpc.pb.cc"
+    )
+
+    set(GRPC_HDR
+        "${CMAKE_CURRENT_BINARY_DIR}/${PROTO_NAME}.grpc.pb.h"
+    )
+
+    add_custom_command(
+        OUTPUT
+            "${PROTO_SRC}"
+            "${PROTO_HDR}"
+            "${GRPC_SRC}"
+            "${GRPC_HDR}"
+
+        COMMAND $<TARGET_FILE:protoc>
+            --proto_path=${PROJECT_ROOT}/proto
+            --proto_path=${protobuf_SOURCE_DIR}/src
+            --cpp_out=${CMAKE_CURRENT_BINARY_DIR}
+            --grpc_out=${CMAKE_CURRENT_BINARY_DIR}
+            --plugin=protoc-gen-grpc=$<TARGET_FILE:grpc_cpp_plugin>
+            ${PROTOFILE}
+
+        DEPENDS
+            "${PROTOFILE}"
+            protoc
+            grpc_cpp_plugin
+
+        VERBATIM
+    )
+
+    list(APPEND PROTO_SRC_FILES "${PROTO_SRC}")
+    list(APPEND PROTO_HDR_FILES "${PROTO_HDR}")
+    list(APPEND GRPC_SRC_FILES "${GRPC_SRC}")
+    list(APPEND GRPC_HDR_FILES "${GRPC_HDR}")
+
+endforeach()
 
 find_package(Qt6 6.5 COMPONENTS REQUIRED
     Quick
@@ -71,10 +102,11 @@ qt_standard_project_setup(REQUIRES 6.5)
 
 qt_add_executable(sHUiBridge
     main.cpp
-    ${hw_proto_srcs}
-    ${hw_proto_hdrs}
-    ${hw_grpc_srcs}
-    ${hw_grpc_hdrs}
+
+    ${PROTO_SRC_FILES}
+    ${PROTO_HDR_FILES}
+    ${GRPC_SRC_FILES}
+    ${GRPC_HDR_FILES}
 )
 
 set(QML_FILES
@@ -104,6 +136,8 @@ set(QML_FILES
 set(SRC_FILES
     src/settings_bridge.hpp
     src/settings_bridge.cpp
+    src/control_grid_bridge.hpp
+    src/control_grid_bridge.cpp
     api/grpc_client.hpp
     api/grpc_client.cpp
 )

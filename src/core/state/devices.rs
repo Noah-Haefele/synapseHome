@@ -1,9 +1,9 @@
+use serde::{Deserialize, Serialize};
+use std::fs;
+use std::io::Write;
 use std::path::Path;
 use std::path::PathBuf;
-use std::io::Write;
-use std::fs;
 use tempfile::NamedTempFile;
-use serde::{Serialize, Deserialize};
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Device {
@@ -27,9 +27,9 @@ struct ConfigCache {
 #[derive(Serialize, Deserialize, Debug, Default)]
 struct InternalSettingsCache {
     location_id: i32,
-    pref_call_id1: i32,
-    pref_call_id2: i32,
-    pref_call_id3: i32,
+    pref1_call_id: i32,
+    pref2_call_id: i32,
+    pref3_call_id: i32,
 }
 
 #[derive(Debug, Default)]
@@ -81,13 +81,11 @@ impl DeviceManager {
                         device_short_name: "1".to_string(),
                         device_id: 1,
                     },
-
                     Device {
                         device_name: "2nd Floor".to_string(),
                         device_short_name: "2".to_string(),
                         device_id: 2,
                     },
-
                     Device {
                         device_name: "3rd Floor".to_string(),
                         device_short_name: "3".to_string(),
@@ -95,12 +93,11 @@ impl DeviceManager {
                     },
                 ],
             },
-
             InternalSettingsCache {
                 location_id: 1,
-                pref_call_id1: 2,
-                pref_call_id2: 3,
-                pref_call_id3: -1,
+                pref1_call_id: 2,
+                pref2_call_id: 3,
+                pref3_call_id: -1,
             },
         )
     }
@@ -150,7 +147,7 @@ impl DeviceManager {
         self.internal_settings_cache.location_id
     }
 
-    fn get_device_config(&self, device_id: i32,) -> Option<&Device> {
+    fn get_device_config(&self, device_id: i32) -> Option<&Device> {
         self.config_cache
             .devices
             .iter()
@@ -165,21 +162,23 @@ impl DeviceManager {
     }
 
     // Used for little label on each call icon
-    pub fn get_device_short_name(&self, device_id: i32) -> String {
-        if device_id == -1 {
+    pub fn get_device_short_name(&self, num: i32) -> String {
+        let pref_call_id = self.get_pref_call_id(num);
+
+        if pref_call_id == -1 {
             return String::new();
         }
 
-        self.get_device_config(device_id)
+        self.get_device_config(pref_call_id)
             .map(|device| device.device_short_name.clone())
             .unwrap_or_else(|| "?".to_string())
     }
 
     pub fn get_pref_call_id(&self, num: i32) -> i32 {
         match num {
-            1 => self.internal_settings_cache.pref_call_id1,
-            2 => self.internal_settings_cache.pref_call_id2,
-            3 => self.internal_settings_cache.pref_call_id3,
+            1 => self.internal_settings_cache.pref1_call_id,
+            2 => self.internal_settings_cache.pref2_call_id,
+            3 => self.internal_settings_cache.pref3_call_id,
             _ => -1,
         }
     }
@@ -187,13 +186,11 @@ impl DeviceManager {
     pub fn get_pref_model(&self) -> Vec<Device> {
         let location_id = self.get_location_id();
 
-        let mut model = vec![
-            Device {
-                device_name: "Unassigned".to_string(),
-                device_short_name: String::new(),
-                device_id: -1,
-            }
-        ];
+        let mut model = vec![Device {
+            device_name: "Unassigned".to_string(),
+            device_short_name: String::new(),
+            device_id: -1,
+        }];
 
         model.extend(
             self.config_cache
@@ -204,7 +201,7 @@ impl DeviceManager {
                     device_name: device.device_name.clone(),
                     device_short_name: device.device_short_name.clone(),
                     device_id: device.device_id,
-                })
+                }),
         );
 
         model
@@ -223,24 +220,28 @@ impl DeviceManager {
     pub fn set_location_id(&mut self, device_id: i32) -> Result<(), Box<dyn std::error::Error>> {
         if self.get_location_id() != device_id {
             self.internal_settings_cache.location_id = device_id;
-            
-            if self.internal_settings_cache.pref_call_id1 == device_id {
-                self.internal_settings_cache.pref_call_id1 = -1;
+
+            if self.internal_settings_cache.pref1_call_id == device_id {
+                self.internal_settings_cache.pref1_call_id = -1;
             }
 
-            if self.internal_settings_cache.pref_call_id2 == device_id {
-                self.internal_settings_cache.pref_call_id2 = -1;
+            if self.internal_settings_cache.pref2_call_id == device_id {
+                self.internal_settings_cache.pref2_call_id = -1;
             }
 
-            if self.internal_settings_cache.pref_call_id3 == device_id {
-                self.internal_settings_cache.pref_call_id3 = -1;
+            if self.internal_settings_cache.pref3_call_id == device_id {
+                self.internal_settings_cache.pref3_call_id = -1;
             }
         }
 
         self.save_internal_settings()
     }
 
-    pub fn set_pref_call_id(&mut self, num: i32, device_id: i32) -> Result<(), Box<dyn std::error::Error>> {
+    pub fn set_pref_call_id(
+        &mut self,
+        num: i32,
+        device_id: i32,
+    ) -> Result<(), Box<dyn std::error::Error>> {
         if self.get_pref_call_id(num) == device_id {
             return Ok(());
         }
@@ -249,20 +250,20 @@ impl DeviceManager {
             for i in [1, 2, 3] {
                 if i != num && self.get_pref_call_id(i) == device_id {
                     match i {
-                        1 => self.internal_settings_cache.pref_call_id1 = -1,
-                        2 => self.internal_settings_cache.pref_call_id2 = -1,
-                        3 => self.internal_settings_cache.pref_call_id3 = -1,
-                        _ => {},
+                        1 => self.internal_settings_cache.pref1_call_id = -1,
+                        2 => self.internal_settings_cache.pref2_call_id = -1,
+                        3 => self.internal_settings_cache.pref3_call_id = -1,
+                        _ => {}
                     }
                 }
             }
         }
 
         match num {
-            1 => self.internal_settings_cache.pref_call_id1 = device_id,
-            2 => self.internal_settings_cache.pref_call_id2 = device_id,
-            3 => self.internal_settings_cache.pref_call_id3 = device_id,
-            _ => {},
+            1 => self.internal_settings_cache.pref1_call_id = device_id,
+            2 => self.internal_settings_cache.pref2_call_id = device_id,
+            3 => self.internal_settings_cache.pref3_call_id = device_id,
+            _ => {}
         }
 
         self.save_internal_settings()
@@ -280,10 +281,7 @@ fn setup_paths() -> Result<(PathBuf, PathBuf), Box<dyn std::error::Error>> {
     let config_path = proj_basedir.join("config").join("devices.json");
     let internal_settings_path = proj_basedir.join("internal").join("settings.json");
 
-    Ok((
-        config_path,
-        internal_settings_path,
-    ))
+    Ok((config_path, internal_settings_path))
 }
 
 fn save_to_disk(data: &str, file_path: &Path) -> Result<(), Box<dyn std::error::Error>> {

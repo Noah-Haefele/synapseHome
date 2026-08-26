@@ -1,43 +1,63 @@
-#include <iostream>
-#include <memory>
-#include <vector>
 #include <optional>
 #include <grpcpp/grpcpp.h>
 #include <google/protobuf/empty.pb.h>
 
 #include "settings_api.grpc.pb.h"
+#include "pref_api.grpc.pb.h"
 #include "grpc_client.hpp"
 
-using synapsed::settings::api::System;
-using synapsed::settings::api::Display;
+// --- Settings Api ---
+using synapsed::api::settings::System;
+using synapsed::api::settings::Display;
+
+// --- Preference Api ---
+using synapsed::api::pref::PrefIconPaths;
+using synapsed::api::pref::PrefCallIds;
+using synapsed::api::pref::PrefShortNames;
+using synapsed::api::pref::PrefModels;
 
 // --- Data Message ---
-using ProtoDeviceData = synapsed::settings::api::DeviceData;
+using ProtoDeviceData = synapsed::api::helper::DeviceData;
 
 // --- Request Messages ---
-// System
-using synapsed::settings::api::SetLocationIdRequest;
-using synapsed::settings::api::SetPrefCallIdRequest;
-// Display
-using synapsed::settings::api::SetBrightnessRequest;
-using synapsed::settings::api::SetDisplayTimeRequest;
+// System Settings
+using synapsed::api::settings::SetLocationIdRequest;
+// Display Settings
+using synapsed::api::settings::SetBrightnessRequest;
+using synapsed::api::settings::SetDisplayTimeRequest;
+// Pref Ids
+using synapsed::api::pref::SetPrefCallIdRequest;
 
 // --- Reply Messages ---
-// System
-using synapsed::settings::api::GetAllDevicesReply;
-using synapsed::settings::api::GetPrefModelReply;
-using synapsed::settings::api::GetLocationIdReply;
-using synapsed::settings::api::GetPrefCallId1Reply;
-using synapsed::settings::api::GetPrefCallId2Reply;
-using synapsed::settings::api::GetPrefCallId3Reply;
-// Display
-using synapsed::settings::api::GetBrightnessReply;
-using synapsed::settings::api::GetDisplayTimeReply;
+// System Settings
+using synapsed::api::settings::GetAllDevicesReply;
+using synapsed::api::settings::GetLocationIdReply;
+// Display Settings
+using synapsed::api::settings::GetBrightnessReply;
+using synapsed::api::settings::GetDisplayTimeReply;
+// Pref Paths
+using synapsed::api::pref::GetPref1IconPathReply;
+using synapsed::api::pref::GetPref2IconPathReply;
+using synapsed::api::pref::GetPref3IconPathReply;
+// Pref Ids
+using synapsed::api::pref::GetPref1CallIdReply;
+using synapsed::api::pref::GetPref2CallIdReply;
+using synapsed::api::pref::GetPref3CallIdReply;
+// Pref short Labels
+using synapsed::api::pref::GetPref1ShortNameReply;
+using synapsed::api::pref::GetPref2ShortNameReply;
+using synapsed::api::pref::GetPref3ShortNameReply;
+// Pref Models
+using synapsed::api::pref::GetPrefModelReply;
 
 Client::Client(std::shared_ptr<grpc::ChannelInterface> channel,
                const std::string& db)
     : system_stub_(System::NewStub(channel)),
-      display_stub_(Display::NewStub(channel)) {
+      display_stub_(Display::NewStub(channel)),
+      pref_icon_paths_stub_(PrefIconPaths::NewStub(channel)),
+      pref_call_ids_stub_(PrefCallIds::NewStub(channel)),
+      pref_short_names_stub_(PrefShortNames::NewStub(channel)),
+      pref_models_stub_(PrefModels::NewStub(channel)) {
 }
 
 // --- System Settings ---
@@ -67,36 +87,36 @@ std::optional<int> Client::get_location_id() {
     return std::nullopt;
 }
 
-std::optional<int> Client::get_pref_call_id1() {
+std::optional<int> Client::get_pref1_call_id() {
     google::protobuf::Empty request;
-    GetPrefCallId1Reply reply;
+    GetPref1CallIdReply reply;
     grpc::ClientContext context;
 
-    grpc::Status status = system_stub_->GetPrefCallId1(&context, request, &reply);
+    grpc::Status status = pref_call_ids_stub_->GetPref1CallId(&context, request, &reply);
     if (status.ok()) {
         return reply.device_id();
     }
     return std::nullopt;
 }
 
-std::optional<int> Client::get_pref_call_id2() {
+std::optional<int> Client::get_pref2_call_id() {
     google::protobuf::Empty request;
-    GetPrefCallId2Reply reply;
+    GetPref2CallIdReply reply;
     grpc::ClientContext context;
 
-    grpc::Status status = system_stub_->GetPrefCallId2(&context, request, &reply);
+    grpc::Status status = pref_call_ids_stub_->GetPref2CallId(&context, request, &reply);
     if (status.ok()) {
         return reply.device_id();
     }
     return std::nullopt;
 }
 
-std::optional<int> Client::get_pref_call_id3() {
+std::optional<int> Client::get_pref3_call_id() {
     google::protobuf::Empty request;
-    GetPrefCallId3Reply reply;
+    GetPref3CallIdReply reply;
     grpc::ClientContext context;
 
-    grpc::Status status = system_stub_->GetPrefCallId3(&context, request, &reply);
+    grpc::Status status = pref_call_ids_stub_->GetPref3CallId(&context, request, &reply);
     if (status.ok()) {
         return reply.device_id();
     }
@@ -108,7 +128,7 @@ std::optional<std::vector<ProtoDeviceData>> Client::get_pref_model() {
     GetPrefModelReply reply;
     grpc::ClientContext context;
 
-    grpc::Status status = system_stub_->GetPrefModel(&context, request, &reply);
+    grpc::Status status = pref_models_stub_->GetPrefModel(&context, request, &reply);
     if (status.ok()) {
         // Convert repeatedfield of grpc into vec
         return std::vector<ProtoDeviceData>(reply.devices().begin(), reply.devices().end());
@@ -134,7 +154,7 @@ void Client::set_pref_call_id(int num, int device_id) {
     google::protobuf::Empty reply;
     grpc::ClientContext context;
 
-    grpc::Status status = system_stub_->SetPrefCallId(&context, request, &reply);
+    grpc::Status status = pref_call_ids_stub_->SetPrefCallId(&context, request, &reply);
 }
 
 // --- Display Settings ---
@@ -183,3 +203,76 @@ void Client::set_display_time(int val) {
     grpc::Status status = display_stub_->SetDisplayTime(&context, request, &reply);
 }
 
+// --- Control Grid ---
+
+std::optional<std::string> Client::get_pref1_icon_path() {
+    google::protobuf::Empty request;
+    GetPref1IconPathReply reply;
+    grpc::ClientContext context;
+
+    grpc::Status status = pref_icon_paths_stub_->GetPref1IconPath(&context, request, &reply);
+    if (status.ok()) {
+        return reply.path();
+    }
+    return std::nullopt;
+}
+
+std::optional<std::string> Client::get_pref2_icon_path() {
+    google::protobuf::Empty request;
+    GetPref2IconPathReply reply;
+    grpc::ClientContext context;
+
+    grpc::Status status = pref_icon_paths_stub_->GetPref2IconPath(&context, request, &reply);
+    if (status.ok()) {
+        return reply.path();
+    }
+    return std::nullopt;
+}
+
+std::optional<std::string> Client::get_pref3_icon_path() {
+    google::protobuf::Empty request;
+    GetPref3IconPathReply reply;
+    grpc::ClientContext context;
+
+    grpc::Status status = pref_icon_paths_stub_->GetPref3IconPath(&context, request, &reply);
+    if (status.ok()) {
+        return reply.path();
+    }
+    return std::nullopt;
+}
+
+std::optional<std::string> Client::get_pref1_short_name() {
+    google::protobuf::Empty request;
+    GetPref1ShortNameReply reply;
+    grpc::ClientContext context;
+
+    grpc::Status status = pref_short_names_stub_->GetPref1ShortName(&context, request, &reply);
+    if (status.ok()) {
+        return reply.name();
+    }
+    return std::nullopt;
+}
+
+std::optional<std::string> Client::get_pref2_short_name() {
+    google::protobuf::Empty request;
+    GetPref2ShortNameReply reply;
+    grpc::ClientContext context;
+
+    grpc::Status status = pref_short_names_stub_->GetPref2ShortName(&context, request, &reply);
+    if (status.ok()) {
+        return reply.name();
+    }
+    return std::nullopt;
+}
+
+std::optional<std::string> Client::get_pref3_short_name() {
+    google::protobuf::Empty request;
+    GetPref3ShortNameReply reply;
+    grpc::ClientContext context;
+
+    grpc::Status status = pref_short_names_stub_->GetPref3ShortName(&context, request, &reply);
+    if (status.ok()) {
+        return reply.name();
+    }
+    return std::nullopt;
+}

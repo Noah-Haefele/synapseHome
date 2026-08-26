@@ -1,11 +1,11 @@
 import QtQuick 2.15
 import QtQuick.Controls 2.15
-import UiBridge
+import SettingsBridge
 import "../../components"
 
 /**
  * Audio-Settings Screen View
- * 
+ *
  * Provides UI controls for configuring the devices audio input and output
  * as well as setting the volume and checking the volume
  */
@@ -32,12 +32,12 @@ Rectangle {
             label: "Output"
 
             width: parent.width * 0.8
-            
+
             model: SettingsBridge.output_model
             textRole: "name"
             valueRole: "id"
             selectedValue: SettingsBridge.output_device
-            
+
             onUserSelected: (val) => SettingsBridge.set_sink(val)
 
             onDropdownOpened: {
@@ -53,12 +53,12 @@ Rectangle {
             label: "Input"
 
             width: parent.width * 0.8
-            
+
             model: SettingsBridge.input_model
             textRole: "name"
             valueRole: "id"
             selectedValue: SettingsBridge.input_device
-            
+
             onUserSelected: (val) => SettingsBridge.set_source(val)
 
             onDropdownOpened: {

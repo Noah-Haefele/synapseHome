@@ -1,17 +1,13 @@
 syntax = "proto3";
-package synapsed.settings.api;
+package synapsed.api.settings;
 
 import "google/protobuf/empty.proto";
+import "helper.proto";
 
 service System {
     rpc SetLocationId(SetLocationIdRequest) returns (google.protobuf.Empty);
-    rpc SetPrefCallId(SetPrefCallIdRequest) returns (google.protobuf.Empty);
     rpc GetAllDevices(google.protobuf.Empty) returns (GetAllDevicesReply);
-    rpc GetPrefModel(google.protobuf.Empty) returns (GetPrefModelReply);
     rpc GetLocationId(google.protobuf.Empty) returns (GetLocationIdReply);
-    rpc GetPrefCallId1(google.protobuf.Empty) returns (GetPrefCallId1Reply);
-    rpc GetPrefCallId2(google.protobuf.Empty) returns (GetPrefCallId2Reply);
-    rpc GetPrefCallId3(google.protobuf.Empty) returns (GetPrefCallId3Reply);
 }
 
 service Display {
@@ -22,43 +18,16 @@ service Display {
 }
 
 // --- System Settings ---
-// Represents DeviceData struct in devices.rs
-message DeviceData {
-    string device_name = 1;
-    string device_short_name = 2;
-    int32 device_id = 3;
-}
 
 message SetLocationIdRequest {
     int32 device_id = 1;
 }
 
-message SetPrefCallIdRequest {
-    int32 num = 1;
-    int32 device_id = 2;
-}
-
 message GetAllDevicesReply {
-    repeated DeviceData devices = 1;
-}
-
-message GetPrefModelReply {
-    repeated DeviceData devices = 1;
+    repeated synapsed.api.helper.DeviceData devices = 1;
 }
 
 message GetLocationIdReply {
-    int32 device_id = 1;
-}
-
-message GetPrefCallId1Reply {
-    int32 device_id = 1;
-}
-
-message GetPrefCallId2Reply {
-    int32 device_id = 1;
-}
-
-message GetPrefCallId3Reply {
     int32 device_id = 1;
 }
 

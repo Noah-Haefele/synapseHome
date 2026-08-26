@@ -1,12 +1,13 @@
 import QtQuick 2.15
 import QtQuick.Controls 2.15
 import QtQuick.Layouts 1.15
+import ControlGridBridge
 import "../components"
 import "../models"
 
 Rectangle {
     id: root
-    
+
     color: "black"
 
     signal singleClicked(string type, var value)
@@ -56,7 +57,7 @@ Rectangle {
             name: "floorA"
             type: "misc"
         }
-        
+
         ListElement {
             name: "settings"
             type: "misc"
@@ -82,11 +83,11 @@ Rectangle {
                     if (model.type === "floor") {
                         switch (model.prefNum) {
                         case 1:
-                            return uiHandler.pref1IconPath
+                            return ControlGridBridge.pref1IconPath
                         case 2:
-                            return uiHandler.pref2IconPath
+                            return ControlGridBridge.pref2IconPath
                         case 3:
-                            return uiHandler.pref3IconPath
+                            return ControlGridBridge.pref3IconPath
                         default:
                             return ""
                         }
@@ -102,11 +103,11 @@ Rectangle {
                     if (model.type === "floor") {
                         switch (model.prefNum) {
                         case 1:
-                            return uiHandler.pref1ShortName
+                            return ControlGridBridge.pref1ShortName
                         case 2:
-                            return uiHandler.pref2ShortName
+                            return ControlGridBridge.pref2ShortName
                         case 3:
-                            return uiHandler.pref3ShortName
+                            return ControlGridBridge.pref3ShortName
                         default:
                             return ""
                         }

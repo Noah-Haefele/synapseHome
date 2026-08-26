@@ -1,11 +1,11 @@
 import QtQuick 2.15
 import QtQuick.Controls 2.15
-import UiBridge
+import SettingsBridge
 import "../../components"
 
 /**
  * Display-Settings Screen View
- * 
+ *
  * Provides UI controls for configuring the devices display brightness and screen timeout duration.
  */
 Rectangle {
