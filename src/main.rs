@@ -6,6 +6,10 @@ use std::sync::Arc;
 use std::sync::Mutex;
 use tonic::transport::Server;
 
+// Api for exchanging signals between frontend and backend
+use crate::core::api::grpc_signals_server::LiveEventService;
+use crate::core::api::grpc_signals_server::synapsed::api::events::event_service_server::EventServiceServer;
+
 use crate::core::api::grpc_server::CallIcons;
 use crate::core::api::grpc_server::ThisSystem;
 
@@ -36,7 +40,13 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let addr = "0.0.0.0:50051".parse()?;
 
-    let grpc_server = ThisSystem::new(Arc::clone(&device_manager), display_manager);
+    let grpc_signals_server = LiveEventService::new();
+
+    let grpc_server = ThisSystem::new(
+        Arc::clone(&device_manager),
+        display_manager,
+        Arc::new(Mutex::new(grpc_signals_server.clone())),
+    );
     let grpc_server_call_icon = CallIcons::new(Arc::clone(&device_manager));
 
     let system_service = SystemServer::new(grpc_server.clone());
@@ -47,6 +57,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let pref_icon_paths = PrefIconPathsServer::new(grpc_server_call_icon.clone());
     let pref_short_names = PrefShortNamesServer::new(grpc_server_call_icon);
 
+    let event_service_server = EventServiceServer::new(grpc_signals_server);
+
     Server::builder()
         .add_service(system_service)
         .add_service(display_service)
@@ -54,6 +66,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .add_service(pref_models_server)
         .add_service(pref_icon_paths)
         .add_service(pref_short_names)
+        .add_service(event_service_server)
         .serve(addr)
         .await?;
 
