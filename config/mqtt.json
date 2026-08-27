@@ -1,5 +1,5 @@
 {
-  "id": "hedgehog",
+  "clientId": "hedgehog",
   "brokerIp": "127.0.0.1",
   "brokerPort": 1883
 }
