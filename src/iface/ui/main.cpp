@@ -6,6 +6,8 @@
 #include "grpc_client.hpp"
 #include "settings_bridge.hpp"
 #include "control_grid_bridge.hpp"
+#include "src/control_grid_bridge.hpp"
+#include "src/settings_bridge.hpp"
 
 
 int main(int argc, char *argv[])
@@ -18,6 +20,14 @@ int main(int argc, char *argv[])
     // create instance and bound to app
     auto settingsBridge = new SettingsBridge(grpcClient, &app);
     auto controlGridBridge = new ControlGridBridge(grpcClient, &app);
+
+    // Connect pref_call_icon_changed signals between settings_bridge and control_grid_bridge
+    QObject::connect(
+        settingsBridge,
+        &SettingsBridge::pref_call_icon_changed,
+        controlGridBridge,
+        &ControlGridBridge::pref_call_icon_changed
+    );
 
     // c++ keeps memory contorl
     QQmlEngine::setObjectOwnership(settingsBridge, QQmlEngine::CppOwnership);

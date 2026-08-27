@@ -20,37 +20,37 @@ class SettingsBridge : public QObject
     Q_PROPERTY(
         QVariantList all_devices
         READ all_devices
-        NOTIFY settings_changed
+        NOTIFY location_id_changed
     )
 
     Q_PROPERTY(
         QVariantList pref_model
         READ pref_model
-        NOTIFY settings_changed
+        NOTIFY location_id_changed
     )
 
     Q_PROPERTY(
         int location_id
         READ location_id
-        NOTIFY settings_changed
+        NOTIFY location_id_changed
     )
 
     Q_PROPERTY(
         int pref1_call_id
         READ pref1_call_id
-        NOTIFY settings_changed
+        NOTIFY pref_call_id_changed
     )
 
     Q_PROPERTY(
         int pref2_call_id
         READ pref2_call_id
-        NOTIFY settings_changed
+        NOTIFY pref_call_id_changed
     )
 
     Q_PROPERTY(
         int pref3_call_id
         READ pref3_call_id
-        NOTIFY settings_changed
+        NOTIFY pref_call_id_changed
     )
 
     // --- Display Settings ---
@@ -59,14 +59,14 @@ class SettingsBridge : public QObject
         int brightness
         READ brightness
         WRITE set_brightness
-        NOTIFY settings_changed
+        NOTIFY brightness_changed
     )
 
     Q_PROPERTY(
         int display_time
         READ display_time
         WRITE set_display_time
-        NOTIFY settings_changed
+        NOTIFY display_time_changed
     )
 
     // --- Audio Settings ---
@@ -133,6 +133,11 @@ private:
     std::shared_ptr<Client> client_;
 
 signals:
+    void location_id_changed();
+    void pref_call_id_changed();
+    void brightness_changed();
+    void display_time_changed();
     void settings_changed();
     void audio_devices_changed();
+    void pref_call_icon_changed();
 };

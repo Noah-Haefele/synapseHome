@@ -49,7 +49,7 @@ Rectangle {
                 valueRole: "device_id"
                 selectedValue: SettingsBridge.location_id
 
-                onUserSelected: (val) => SettingsBridge.set_pref_call_id(val)
+                onUserSelected: (val) => SettingsBridge.set_location_id(val)
             }
 
             // Pref 1

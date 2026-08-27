@@ -17,32 +17,38 @@ class ControlGridBridge : public QObject
     Q_PROPERTY(
         QString pref1IconPath
         READ pref1IconPath
+        NOTIFY pref_call_icon_changed
     )
 
     Q_PROPERTY(
         QString pref2IconPath
         READ pref2IconPath
+        NOTIFY pref_call_icon_changed
     )
 
     Q_PROPERTY(
         QString pref3IconPath
         READ pref3IconPath
+        NOTIFY pref_call_icon_changed
     )
 
     // Returns specific label for indibidual prefcall icon
     Q_PROPERTY(
         QString pref1ShortName
         READ pref1ShortName
+        NOTIFY pref_call_icon_changed
     )
 
     Q_PROPERTY(
         QString pref2ShortName
         READ pref2ShortName
+        NOTIFY pref_call_icon_changed
     )
 
     Q_PROPERTY(
         QString pref3ShortName
         READ pref3ShortName
+        NOTIFY pref_call_icon_changed
     )
 
 public:
@@ -60,5 +66,5 @@ private:
     std::shared_ptr<Client> client_;
 
 signals:
-    void icon_changed();
+    void pref_call_icon_changed();
 };
