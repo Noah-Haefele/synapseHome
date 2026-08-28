@@ -50,6 +50,7 @@ impl MqttHandler {
     pub fn subscribe(&mut self, subtopic: String) -> Result<(), rumqttc::ClientError> {
         let topic = format!("{}{}", self.mqtt_config.mqtt_topic_prefix, subtopic);
 
+        println!("Subscribed to: {}", topic);
         self.client.subscribe(topic.clone(), QoS::AtMostOnce)?;
         self.subtopics.insert(subtopic);
 
@@ -59,6 +60,7 @@ impl MqttHandler {
     pub fn unsubscribe(&mut self, subtopic: String) -> Result<(), rumqttc::ClientError> {
         let topic = format!("{}{}", self.mqtt_config.mqtt_topic_prefix, subtopic);
 
+        println!("Unsubscribed from {}", topic);
         self.client.unsubscribe(topic.clone())?;
         self.subtopics.remove(&subtopic);
 
