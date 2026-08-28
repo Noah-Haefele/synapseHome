@@ -20,7 +20,10 @@ use crate::core::api::grpc_server::synapsed::api::settings::display_server::Disp
 use crate::core::api::grpc_server::synapsed::api::settings::system_server::SystemServer;
 
 use crate::core::display::brightness::DisplayManager;
+
 use crate::core::state::devices::DeviceManager;
+
+use crate::core::act::call::setup::CallSetup;
 
 use crate::platform::linux::display_controller::DspCtrl;
 
@@ -30,11 +33,13 @@ use crate::networking::mqtt::mqtt_handler::MqttHandler;
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mqtt_config = MqttConfig::new()?;
-    let _mqtt_handler = MqttHandler::new(mqtt_config)?;
+    let mqtt_handler = MqttHandler::new(mqtt_config)?;
 
     let device_manager = Arc::new(Mutex::new(DeviceManager::new()?));
     let display_controller = Arc::new(Mutex::new(DspCtrl::new()));
     let display_manager = Arc::new(Mutex::new(DisplayManager::new(display_controller)?));
+
+    let _call_setup = CallSetup::new(mqtt_handler, Arc::clone(&device_manager))?;
 
     let addr = "0.0.0.0:50051".parse()?;
 
