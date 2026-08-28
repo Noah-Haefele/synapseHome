@@ -4,8 +4,11 @@ mod platform;
 
 use std::sync::Arc;
 use std::sync::Mutex;
+use std::thread;
+use std::time::Duration;
 use tonic::transport::Server;
 
+use crate::core::api::grpc_call_server::LiveSignalsService;
 use crate::core::api::grpc_server::CallIcons;
 use crate::core::api::grpc_server::ThisSystem;
 
@@ -18,6 +21,9 @@ use crate::core::api::grpc_server::synapsed::api::pref::pref_short_names_server:
 // --- Settings Api ---
 use crate::core::api::grpc_server::synapsed::api::settings::display_server::DisplayServer;
 use crate::core::api::grpc_server::synapsed::api::settings::system_server::SystemServer;
+
+// --- Signals Api ---
+use crate::core::api::grpc_call_server::synapsed::api::call::call_signals_server::CallSignalsServer;
 
 use crate::core::display::brightness::DisplayManager;
 
@@ -45,6 +51,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let grpc_server = ThisSystem::new(Arc::clone(&device_manager), display_manager);
     let grpc_server_call_icon = CallIcons::new(Arc::clone(&device_manager));
+    let grpc_call_server = LiveSignalsService::new();
 
     let system_service = SystemServer::new(grpc_server.clone());
     let display_service = DisplayServer::new(grpc_server.clone());
@@ -54,6 +61,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let pref_icon_paths = PrefIconPathsServer::new(grpc_server_call_icon.clone());
     let pref_short_names = PrefShortNamesServer::new(grpc_server_call_icon);
 
+    let call_signals_service = CallSignalsServer::new(grpc_call_server.clone());
+
     Server::builder()
         .add_service(system_service)
         .add_service(display_service)
@@ -61,16 +70,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .add_service(pref_models_server)
         .add_service(pref_icon_paths)
         .add_service(pref_short_names)
+        .add_service(call_signals_service)
         .serve(addr)
         .await?;
 
     Ok(())
-
-    // Just for debuging now
-    //loop {
-    //    thread::sleep(Duration::from_secs(5));
-    //    let _ = config_manager.save_config();
-    //    let _ = config_manager.save_internal_settings();
-    //    println!("Data saved");
-    //}
 }
