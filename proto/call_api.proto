@@ -1,0 +1,15 @@
+syntax = "proto3";
+package synapsed.api.call;
+
+service CallSignals {
+    rpc Subscribe(SubscribeRequest) returns (stream Event);
+}
+
+message SubscribeRequest {
+    string topic = 1;
+}
+
+message Event {
+    string event_type = 1;
+    string state = 2;
+}
