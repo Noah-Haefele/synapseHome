@@ -8,7 +8,8 @@ use tempfile::NamedTempFile;
 #[derive(Serialize, Deserialize, Debug)]
 pub struct MqttConfigCache {
     // Id to identify the device connecting to a MQTT broker
-    pub id: String,
+    #[serde(rename = "clientId")]
+    pub client_id: String,
 
     // Ip address of the MQTT broker
     #[serde(rename = "brokerIp")]
@@ -16,14 +17,16 @@ pub struct MqttConfigCache {
 
     // Port of the MQTT broker
     #[serde(rename = "brokerPort")]
-    pub broker_port: u32,
+    pub broker_port: u16,
 }
 
 #[derive(Debug)]
 pub struct MqttConfig {
-    mqtt_config_cache: MqttConfigCache,
+    pub mqtt_config_cache: MqttConfigCache,
 
     mqtt_config_path: PathBuf,
+
+    pub mqtt_topic_prefix: String,
 }
 
 /// Internal functions except for new for impl setup
@@ -36,20 +39,24 @@ impl MqttConfig {
         let mut mqtt_config = Self {
             // Default mqtt config structure
             mqtt_config_cache: MqttConfigCache {
-                id: String::new(),
+                client_id: String::new(),
                 broker_ip: "127.0.0.1".to_string(),
                 broker_port: 1883,
             },
 
             mqtt_config_path,
+
+            mqtt_topic_prefix: "synapsed/".to_string(),
         };
 
         // Load existing configuration into runtime cache.
         mqtt_config.load()?;
 
         // Create default mqtt config if not exists.
-        if !mqtt_config.mqtt_config_path.is_file() || mqtt_config.mqtt_config_cache.id != hostname {
-            mqtt_config.mqtt_config_cache.id = hostname;
+        if !mqtt_config.mqtt_config_path.is_file()
+            || mqtt_config.mqtt_config_cache.client_id != hostname
+        {
+            mqtt_config.mqtt_config_cache.client_id = hostname;
             mqtt_config.save_mqtt_config()?;
         }
 

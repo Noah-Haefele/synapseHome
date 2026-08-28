@@ -25,10 +25,12 @@ use crate::core::state::devices::DeviceManager;
 use crate::platform::linux::display_controller::DspCtrl;
 
 use crate::networking::mqtt::mqtt_config::MqttConfig;
+use crate::networking::mqtt::mqtt_handler::MqttHandler;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let _mqtt_setup = MqttConfig::new()?;
+    let mqtt_config = MqttConfig::new()?;
+    let _mqtt_handler = MqttHandler::new(mqtt_config)?;
 
     let device_manager = Arc::new(Mutex::new(DeviceManager::new()?));
     let display_controller = Arc::new(Mutex::new(DspCtrl::new()));
