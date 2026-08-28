@@ -1,5 +1,6 @@
 use rumqttc::{Client, Connection, Event, MqttOptions, Packet, QoS};
 use std::{
+    collections::HashSet,
     sync::{
         Arc,
         atomic::{AtomicBool, Ordering},
@@ -15,6 +16,7 @@ pub struct MqttHandler {
     client: Client,
     connection: Option<Connection>,
     running: Arc<AtomicBool>,
+    subtopics: HashSet<String>,
 }
 
 impl MqttHandler {
@@ -30,11 +32,14 @@ impl MqttHandler {
 
         let running = Arc::new(AtomicBool::new(true));
 
+        let subtopics = HashSet::new();
+
         let mut handler = Self {
             mqtt_config,
             client,
             connection: Some(connection),
             running,
+            subtopics,
         };
 
         handler.start_client();
@@ -42,10 +47,26 @@ impl MqttHandler {
         Ok(handler)
     }
 
-    pub fn subscribe(&self, subtopic: &str) -> Result<(), rumqttc::ClientError> {
+    pub fn subscribe(&mut self, subtopic: String) -> Result<(), rumqttc::ClientError> {
         let topic = format!("{}{}", self.mqtt_config.mqtt_topic_prefix, subtopic);
 
-        self.client.subscribe(topic, QoS::AtMostOnce)
+        self.client.subscribe(topic.clone(), QoS::AtMostOnce)?;
+        self.subtopics.insert(subtopic);
+
+        Ok(())
+    }
+
+    pub fn unsubscribe(&mut self, subtopic: String) -> Result<(), rumqttc::ClientError> {
+        let topic = format!("{}{}", self.mqtt_config.mqtt_topic_prefix, subtopic);
+
+        self.client.unsubscribe(topic.clone())?;
+        self.subtopics.remove(&subtopic);
+
+        Ok(())
+    }
+
+    pub fn get_subtopics(&self) -> Vec<String> {
+        self.subtopics.iter().cloned().collect()
     }
 
     pub fn publish(&self, subtopic: &str, payload: String) -> Result<(), rumqttc::ClientError> {
@@ -69,7 +90,6 @@ impl MqttHandler {
                 match notification {
                     Ok(Event::Incoming(Packet::Publish(publish))) => {
                         println!("Topic: {}", publish.topic);
-                        println!("Payload: {:?}", publish.payload);
 
                         if let Ok(payload) = String::from_utf8(publish.payload.to_vec()) {
                             println!("Payload als String: {}", payload);
