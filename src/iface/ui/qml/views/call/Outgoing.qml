@@ -31,7 +31,7 @@ Rectangle {
         height: 120
         width: height
 
-        icon: "../../../../assets/icons/call/call_off.svg"
+        icon: "qrc:/qt/qml/UiBridge/assets/icons/call/call_off.svg"
 
         onClicked: callHandler.endCall()
     }

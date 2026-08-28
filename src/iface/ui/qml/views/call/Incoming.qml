@@ -33,8 +33,8 @@ Rectangle {
         ButtonIcon {
             height: 120
             width: height
-            
-            icon: "../../../../assets/icons/call/call_on.svg"
+
+            icon: "qrc:/qt/qml/UiBridge/assets/icons/call/call_on.svg"
 
             onClicked: callHandler.acceptCall()
         }
@@ -43,7 +43,7 @@ Rectangle {
             height: 120
             width: height
 
-            icon: "../../../../assets/icons/call/call_off.svg"
+            icon: "qrc:/qt/qml/UiBridge/assets/icons/call/call_off.svg"
 
             onClicked: callHandler.endCall()
         }

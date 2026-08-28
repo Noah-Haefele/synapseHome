@@ -33,15 +33,15 @@ Rectangle {
         ButtonIcon {
             height: 120
             width: height
-            
-            icon: "../../../../assets/icons/call/muteMic_on.svg"
+
+            icon: "qrc:/qt/qml/UiBridge/assets/icons/call/mutMic_on.svg"
         }
 
         ButtonIcon {
             height: 120
             width: height
 
-            icon: "../../../../assets/icons/call/call_off.svg"
+            icon: "qrc:/qt/qml/UiBridge/assets/icons/call/call_off.svg"
 
             onClicked: callHandler.endCall()
         }
@@ -49,8 +49,8 @@ Rectangle {
         ButtonIcon {
             height: 120
             width: height
-            
-            icon: "../../../../assets/icons/call/muteMic_off.svg"
+
+            icon: "qrc:/qt/qml/UiBridge/assets/icons/call/mutMic_off.svg"
         }
     }
 }
