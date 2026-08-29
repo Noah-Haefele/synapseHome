@@ -1,6 +1,7 @@
 import QtQuick 2.15
 import QtQuick.Controls 2.15
 import QtQuick.Layouts 1.15
+import ControlGridBridge
 import "../subviews"
 
 Item {
@@ -31,12 +32,12 @@ Item {
 
             onSingleClicked:  (type, value) => {
                 if (type === "floor") {
-                    const floor = uiHandler.getPrefFloor(value)
+                    const floor = ControlGridBridge.getPrefCallId(value)
 
                     if (floor >= 0) {
                         callHandler.initiateCall(floor)
                     }
-                } else{ 
+                } else{
                     switch (value) {
                         case "settings":
                             stackView.push("Settings.qml")
