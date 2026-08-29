@@ -19,6 +19,10 @@ public:
     void subscribe();
     void stop();
 
+    void initiateCall(int device_id);
+    void acceptCall();
+    void endCall();
+
 signals:
     void callStateChanged(const QString &state);
 
@@ -27,4 +31,5 @@ private:
 
     std::unique_ptr<grpc::ClientContext> context_;
     std::unique_ptr<synapsed::api::call::CallSignals::Stub> call_signals_stub_;
+    std::unique_ptr<synapsed::api::call::CallActions::Stub> call_actions_stub_;
 };
