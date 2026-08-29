@@ -1,5 +1,6 @@
 import QtQuick 2.15
 import QtQuick.Controls 2.15
+import CallBridge
 import "../../components"
 
 Rectangle {
@@ -36,7 +37,7 @@ Rectangle {
 
             icon: "qrc:/qt/qml/UiBridge/assets/icons/call/call_on.svg"
 
-            onClicked: callHandler.acceptCall()
+            onClicked: CallBridge.acceptCall()
         }
 
         ButtonIcon {
@@ -45,7 +46,7 @@ Rectangle {
 
             icon: "qrc:/qt/qml/UiBridge/assets/icons/call/call_off.svg"
 
-            onClicked: callHandler.endCall()
+            onClicked: CallBridge.endCall()
         }
     }
 }
