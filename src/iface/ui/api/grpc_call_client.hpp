@@ -26,5 +26,5 @@ private:
     void onCallStateChanged(const std::string& state);
 
     std::unique_ptr<grpc::ClientContext> context_;
-    std::unique_ptr<synapsed::api::call::CallSignals::Stub> stub_;
+    std::unique_ptr<synapsed::api::call::CallSignals::Stub> call_signals_stub_;
 };

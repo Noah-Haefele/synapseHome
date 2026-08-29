@@ -11,7 +11,7 @@ GrpcCallClient::GrpcCallClient(
     QObject *parent
 )
     : QObject(parent),
-      stub_(CallSignals::NewStub(channel))
+      call_signals_stub_(CallSignals::NewStub(channel))
 {
 }
 
@@ -23,7 +23,7 @@ void GrpcCallClient::subscribe()
     context_ = std::make_unique<grpc::ClientContext>();
 
     std::unique_ptr<grpc::ClientReader<Event>> reader(
-        stub_->Subscribe(context_.get(), request)
+        call_signals_stub_->Subscribe(context_.get(), request)
     );
 
     Event event;
