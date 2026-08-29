@@ -4,14 +4,21 @@
 #include <QVariantList>
 #include <QString>
 #include <QtQml/qqmlregistration.h>
-#include "grpc_client.hpp"
+#include "grpc_call_client.hpp"
 
 class CallBridge : public QObject
 {
     Q_OBJECT
 
 public:
-    explicit CallBridge(QObject *parent = nullptr);
+    explicit CallBridge(GrpcCallClient *grpc_call_client, QObject *parent = nullptr);
+
+    Q_INVOKABLE void initiateCall(int device_id);
+    Q_INVOKABLE void acceptCall();
+    Q_INVOKABLE void endCall();
+
+private:
+    GrpcCallClient *grpc_call_client_;
 
 signals:
     void callStateChanged(const QString &state);
