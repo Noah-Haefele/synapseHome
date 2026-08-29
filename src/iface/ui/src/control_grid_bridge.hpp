@@ -62,6 +62,8 @@ public:
     QString pref2ShortName() const;
     QString pref3ShortName() const;
 
+    Q_INVOKABLE int getPrefCallId(int num) const;
+
 private:
     std::shared_ptr<Client> client_;
 

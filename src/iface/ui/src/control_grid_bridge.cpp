@@ -68,3 +68,13 @@ QString ControlGridBridge::pref3ShortName() const
 
     return QString::fromStdString(*name);
 }
+
+int ControlGridBridge::getPrefCallId(int num) const
+{
+    auto device_id = client_->get_pref_call_id(num);
+    if (device_id == std::nullopt) {
+        return -1;
+    }
+
+    return *device_id;
+}
