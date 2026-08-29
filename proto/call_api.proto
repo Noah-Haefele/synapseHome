@@ -1,9 +1,19 @@
 syntax = "proto3";
 package synapsed.api.call;
 
+import "google/protobuf/empty.proto";
+
 service CallSignals {
     rpc Subscribe(SubscribeRequest) returns (stream Event);
 }
+
+service CallActions {
+    rpc Initiate(InitiateRequest) returns (google.protobuf.Empty);
+    rpc Accept(google.protobuf.Empty) returns (google.protobuf.Empty);
+    rpc End(google.protobuf.Empty) returns (google.protobuf.Empty);
+}
+
+// --- Call Signals ---
 
 message SubscribeRequest {
     string topic = 1;
@@ -12,4 +22,9 @@ message SubscribeRequest {
 message Event {
     string event_type = 1;
     string state = 2;
+}
+
+// --- Call Actions ---
+message InitiateRequest {
+    int32 device_id = 1;
 }
