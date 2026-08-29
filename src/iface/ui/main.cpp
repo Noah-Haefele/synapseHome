@@ -2,6 +2,7 @@
 #include <QQmlApplicationEngine>
 #include <QQmlContext>
 #include <grpcpp/grpcpp.h>
+#include <memory>
 #include <thread>
 
 #include "api/grpc_client.hpp"
@@ -26,7 +27,7 @@ int main(int argc, char *argv[])
     // create instance and bound to app
     auto settingsBridge = new SettingsBridge(grpcClient, &app);
     auto controlGridBridge = new ControlGridBridge(grpcClient, &app);
-    auto callBridge = new CallBridge(&app);
+    auto callBridge = new CallBridge(grpcCallClient, &app);
 
     // Connect pref_call_icon_changed signals between settings_bridge and control_grid_bridge
     QObject::connect(
