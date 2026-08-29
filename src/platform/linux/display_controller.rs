@@ -15,7 +15,7 @@ impl DspCtrl {
     pub fn set_display(&self, display_state: bool, display_brightness: u32) {
         if Path::new(Self::PATH_POWER).is_file() {
             let power = if display_state { "1" } else { "0" };
-            
+
             if let Err(e) = fs::write(Self::PATH_POWER, power) {
                 eprintln!("Failed to set display power: {}", e);
             }
@@ -32,7 +32,10 @@ impl DspCtrl {
         } else if display_state && !Path::new(Self::PATH_BRIGHT).is_file() {
             println!("Brightness path not found: {}", Self::PATH_BRIGHT);
         } else if display_state && display_brightness > 100 {
-            println!("Display brightness value was given but was over 100: {}", display_brightness);
+            println!(
+                "Display brightness value was given but was over 100: {}",
+                display_brightness
+            );
         }
     }
 }
