@@ -40,6 +40,7 @@ use synapsed::api::settings::SetLocationIdRequest;
 use synapsed::api::settings::SetBrightnessRequest;
 use synapsed::api::settings::SetDisplayTimeRequest;
 // Pref Ids
+use synapsed::api::pref::GetPrefCallIdRequest;
 use synapsed::api::pref::SetPrefCallIdRequest;
 
 // --- Reply Messages ---
@@ -54,9 +55,7 @@ use synapsed::api::pref::GetPref1IconPathReply;
 use synapsed::api::pref::GetPref2IconPathReply;
 use synapsed::api::pref::GetPref3IconPathReply;
 // Pref Ids
-use synapsed::api::pref::GetPref1CallIdReply;
-use synapsed::api::pref::GetPref2CallIdReply;
-use synapsed::api::pref::GetPref3CallIdReply;
+use synapsed::api::pref::GetPrefCallIdReply;
 // Pref short Labels
 use synapsed::api::pref::GetPref1ShortNameReply;
 use synapsed::api::pref::GetPref2ShortNameReply;
@@ -155,46 +154,20 @@ impl System for ThisSystem {
 
 #[tonic::async_trait]
 impl PrefCallIds for ThisSystem {
-    async fn get_pref1_call_id(
+    async fn get_pref_call_id(
         &self,
-        _: Request<()>,
-    ) -> Result<Response<GetPref1CallIdReply>, Status> {
+        request: Request<GetPrefCallIdRequest>,
+    ) -> Result<Response<GetPrefCallIdReply>, Status> {
+        let req = request.into_inner();
+
         let manager = self
             .device_manager
             .lock()
             .map_err(|_| Status::internal("Lock failed"))?;
 
-        let device_id = manager.get_pref_call_id(1);
+        let device_id = manager.get_pref_call_id(req.num);
 
-        Ok(Response::new(GetPref1CallIdReply { device_id }))
-    }
-
-    async fn get_pref2_call_id(
-        &self,
-        _: Request<()>,
-    ) -> Result<Response<GetPref2CallIdReply>, Status> {
-        let manager = self
-            .device_manager
-            .lock()
-            .map_err(|_| Status::internal("Lock failed"))?;
-
-        let device_id = manager.get_pref_call_id(2);
-
-        Ok(Response::new(GetPref2CallIdReply { device_id }))
-    }
-
-    async fn get_pref3_call_id(
-        &self,
-        _: Request<()>,
-    ) -> Result<Response<GetPref3CallIdReply>, Status> {
-        let manager = self
-            .device_manager
-            .lock()
-            .map_err(|_| Status::internal("Lock failed"))?;
-
-        let device_id = manager.get_pref_call_id(3);
-
-        Ok(Response::new(GetPref3CallIdReply { device_id }))
+        Ok(Response::new(GetPrefCallIdReply { device_id }))
     }
 
     async fn set_pref_call_id(
