@@ -29,19 +29,19 @@ pub struct LiveSignalsService {
 }
 
 pub struct CallApi {
-    call_handler: Mutex<CallHandler>,
+    call_handler: Arc<Mutex<CallHandler>>,
     device_manager: Arc<Mutex<DeviceManager>>,
     net_iface: Arc<Mutex<NetIface>>,
 }
 
 impl CallApi {
     pub fn new(
-        call_handler: CallHandler,
+        call_handler: Arc<Mutex<CallHandler>>,
         device_manager: Arc<Mutex<DeviceManager>>,
         net_iface: Arc<Mutex<NetIface>>,
     ) -> Self {
         Self {
-            call_handler: Mutex::new(call_handler),
+            call_handler,
             device_manager,
             net_iface,
         }

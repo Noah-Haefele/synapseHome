@@ -4,8 +4,10 @@ mod platform;
 
 use std::sync::Arc;
 use std::sync::Mutex;
+use std::thread;
 use tonic::transport::Server;
 
+use crate::core::act::call::call_mqtt_event_handler;
 use crate::core::api::grpc_call_server::CallApi;
 use crate::core::api::grpc_call_server::LiveSignalsService;
 use crate::core::api::grpc_server::CallIcons;
@@ -32,6 +34,7 @@ use crate::core::display::brightness::DisplayManager;
 use crate::core::state::devices::DeviceManager;
 
 use crate::core::act::call::call_handler::CallHandler;
+use crate::core::act::call::call_mqtt_event_handler::CallEventHandler;
 use crate::core::act::call::call_setup::CallSetup;
 
 use crate::platform::linux::display_controller::DspCtrl;
@@ -42,9 +45,11 @@ use crate::networking::net_iface::NetIface;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let (event_sender, event_receiver) = std::sync::mpsc::channel();
+
     let net_iface = Arc::new(Mutex::new(NetIface::new()));
     let mqtt_config = MqttConfig::new()?;
-    let mqtt_handler = Arc::new(Mutex::new(MqttHandler::new(mqtt_config)?));
+    let mqtt_handler = Arc::new(Mutex::new(MqttHandler::new(mqtt_config, event_sender)?));
 
     let device_manager = Arc::new(Mutex::new(DeviceManager::new()?));
     let display_controller = Arc::new(Mutex::new(DspCtrl::new()));
@@ -66,7 +71,18 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let grpc_server_call_icon = CallIcons::new(Arc::clone(&device_manager));
     let grpc_call_signals_server = LiveSignalsService::new();
 
-    let call_handler = CallHandler::new(grpc_call_signals_server.clone(), mqtt_handler);
+    let call_handler = Arc::new(Mutex::new(CallHandler::new(
+        grpc_call_signals_server.clone(),
+        mqtt_handler,
+    )));
+    let mut call_mqtt_event_handler =
+        CallEventHandler::new(Arc::clone(&call_handler), event_receiver);
+    // Start call_event_handler to listen to events from mqtt_handler
+    thread::spawn(move || {
+        if let Err(e) = call_mqtt_event_handler.run() {
+            eprintln!("CallEventHandler error: {}", e);
+        }
+    });
 
     let grpc_call_actions_server = CallApi::new(call_handler, device_manager, net_iface);
 
