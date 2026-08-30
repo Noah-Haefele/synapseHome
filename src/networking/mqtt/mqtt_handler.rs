@@ -4,12 +4,14 @@ use std::{
     sync::{
         Arc,
         atomic::{AtomicBool, Ordering},
+        mpsc::Sender,
     },
     thread,
     time::Duration,
 };
 
 use crate::networking::mqtt::mqtt_config::MqttConfig;
+use crate::{core::act::call::call_mqtt_event::CallEvent, networking::mqtt::mqtt_parser};
 
 pub struct MqttHandler {
     mqtt_config: MqttConfig,
@@ -17,10 +19,14 @@ pub struct MqttHandler {
     connection: Option<Connection>,
     running: Arc<AtomicBool>,
     subtopics: HashSet<String>,
+    event_sender: Sender<CallEvent>,
 }
 
 impl MqttHandler {
-    pub fn new(mqtt_config: MqttConfig) -> Result<Self, Box<dyn std::error::Error>> {
+    pub fn new(
+        mqtt_config: MqttConfig,
+        event_sender: Sender<CallEvent>,
+    ) -> Result<Self, Box<dyn std::error::Error>> {
         let client_id = &mqtt_config.mqtt_config_cache.client_id;
         let broker_ip = &mqtt_config.mqtt_config_cache.broker_ip;
         let broker_port = mqtt_config.mqtt_config_cache.broker_port;
@@ -40,6 +46,7 @@ impl MqttHandler {
             connection: Some(connection),
             running,
             subtopics,
+            event_sender,
         };
 
         handler.start_client();
@@ -51,7 +58,7 @@ impl MqttHandler {
         let topic = format!("{}{}", self.mqtt_config.mqtt_topic_prefix, subtopic);
 
         println!("Subscribed to: {}", topic);
-        self.client.subscribe(topic.clone(), QoS::AtMostOnce)?;
+        self.client.subscribe(topic, QoS::AtMostOnce)?;
         self.subtopics.insert(subtopic);
 
         Ok(())
@@ -61,7 +68,7 @@ impl MqttHandler {
         let topic = format!("{}{}", self.mqtt_config.mqtt_topic_prefix, subtopic);
 
         println!("Unsubscribed from {}", topic);
-        self.client.unsubscribe(topic.clone())?;
+        self.client.unsubscribe(topic)?;
         self.subtopics.remove(&subtopic);
 
         Ok(())
@@ -80,6 +87,7 @@ impl MqttHandler {
     // Starts the incoming event loop in seperate thread
     pub fn start_client(&mut self) {
         let running_thread = Arc::clone(&self.running);
+        let event_sender = self.event_sender.clone();
 
         let mut connection = self.connection.take().unwrap();
 
@@ -94,7 +102,11 @@ impl MqttHandler {
                         println!("Topic: {}", publish.topic);
 
                         if let Ok(payload) = String::from_utf8(publish.payload.to_vec()) {
-                            println!("Payload als String: {}", payload);
+                            if let Some(event) = mqtt_parser::parse(&publish.topic, &payload) {
+                                if let Err(e) = event_sender.send(event) {
+                                    eprintln!("Failed to send CallEvent: {}", e);
+                                }
+                            }
                         }
                     }
 
