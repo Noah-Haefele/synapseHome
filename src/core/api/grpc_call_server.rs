@@ -1,4 +1,4 @@
-use std::sync::Mutex;
+use std::sync::{Arc, Mutex};
 use tokio::sync::{broadcast, mpsc};
 use tokio_stream::wrappers::ReceiverStream;
 use tonic::{Request, Response, Status};
@@ -12,6 +12,8 @@ pub mod synapsed {
 }
 
 use crate::core::act::call::call_handler::CallHandler;
+use crate::core::state::devices::DeviceManager;
+use crate::networking::net_iface::NetIface;
 
 use synapsed::api::call::call_actions_server::CallActions;
 use synapsed::api::call::call_signals_server::CallSignals;
@@ -28,12 +30,20 @@ pub struct LiveSignalsService {
 
 pub struct CallApi {
     call_handler: Mutex<CallHandler>,
+    device_manager: Arc<Mutex<DeviceManager>>,
+    net_iface: Arc<Mutex<NetIface>>,
 }
 
 impl CallApi {
-    pub fn new(call_handler: CallHandler) -> Self {
+    pub fn new(
+        call_handler: CallHandler,
+        device_manager: Arc<Mutex<DeviceManager>>,
+        net_iface: Arc<Mutex<NetIface>>,
+    ) -> Self {
         Self {
             call_handler: Mutex::new(call_handler),
+            device_manager,
+            net_iface,
         }
     }
 }
@@ -91,8 +101,27 @@ impl CallActions for CallApi {
     async fn initiate(&self, request: Request<InitiateRequest>) -> Result<Response<()>, Status> {
         let req = request.into_inner();
 
-        let mut handler = self.call_handler.lock().unwrap();
-        handler.initiate_call(req.device_id);
+        let mut handler = self
+            .call_handler
+            .lock()
+            .map_err(|_| Status::internal("Failed to lock CallHandler"))?;
+        let device_manager = self
+            .device_manager
+            .lock()
+            .map_err(|_| Status::internal("Failed to lock DeviceManager"))?;
+        let net_iface = self
+            .net_iface
+            .lock()
+            .map_err(|_| Status::internal("Failed to lock NetIface"))?;
+
+        let location_id = device_manager.get_location_id();
+        let ip_address = net_iface
+            .get_ip_address()
+            .map_err(|e| Status::internal(e.to_string()))?;
+
+        handler
+            .initiate_call(req.device_id, location_id, &ip_address)
+            .map_err(|e| Status::internal(e.to_string()))?;
 
         println!("Initiate {}", req.device_id);
         Ok(Response::new(()))

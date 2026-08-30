@@ -38,11 +38,13 @@ use crate::platform::linux::display_controller::DspCtrl;
 
 use crate::networking::mqtt::mqtt_config::MqttConfig;
 use crate::networking::mqtt::mqtt_handler::MqttHandler;
+use crate::networking::net_iface::NetIface;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let net_iface = Arc::new(Mutex::new(NetIface::new()));
     let mqtt_config = MqttConfig::new()?;
-    let mqtt_handler = MqttHandler::new(mqtt_config)?;
+    let mqtt_handler = Arc::new(Mutex::new(MqttHandler::new(mqtt_config)?));
 
     let device_manager = Arc::new(Mutex::new(DeviceManager::new()?));
     let display_controller = Arc::new(Mutex::new(DspCtrl::new()));
@@ -53,7 +55,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .map_err(|_| "Device manager lock failed")?
         .get_location_id();
 
-    let call_setup = Arc::new(Mutex::new(CallSetup::new(mqtt_handler, location_id)?));
+    let call_setup = Arc::new(Mutex::new(CallSetup::new(
+        Arc::clone(&mqtt_handler),
+        location_id,
+    )?));
 
     let addr = "0.0.0.0:50051".parse()?;
 
@@ -61,9 +66,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let grpc_server_call_icon = CallIcons::new(Arc::clone(&device_manager));
     let grpc_call_signals_server = LiveSignalsService::new();
 
-    let call_handler = CallHandler::new(grpc_call_signals_server.clone());
+    let call_handler = CallHandler::new(grpc_call_signals_server.clone(), mqtt_handler);
 
-    let grpc_call_actions_server = CallApi::new(call_handler);
+    let grpc_call_actions_server = CallApi::new(call_handler, device_manager, net_iface);
 
     let system_service = SystemServer::new(grpc_server.clone());
     let display_service = DisplayServer::new(grpc_server.clone());
