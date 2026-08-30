@@ -32,7 +32,7 @@ use crate::core::display::brightness::DisplayManager;
 use crate::core::state::devices::DeviceManager;
 
 use crate::core::act::call::call_handler::CallHandler;
-use crate::core::act::call::setup::CallSetup;
+use crate::core::act::call::call_setup::CallSetup;
 
 use crate::platform::linux::display_controller::DspCtrl;
 
@@ -48,11 +48,16 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let display_controller = Arc::new(Mutex::new(DspCtrl::new()));
     let display_manager = Arc::new(Mutex::new(DisplayManager::new(display_controller)?));
 
-    let _call_setup = CallSetup::new(mqtt_handler, Arc::clone(&device_manager))?;
+    let location_id = device_manager
+        .lock()
+        .map_err(|_| "Device manager lock failed")?
+        .get_location_id();
+
+    let call_setup = Arc::new(Mutex::new(CallSetup::new(mqtt_handler, location_id)?));
 
     let addr = "0.0.0.0:50051".parse()?;
 
-    let grpc_server = ThisSystem::new(Arc::clone(&device_manager), display_manager);
+    let grpc_server = ThisSystem::new(Arc::clone(&device_manager), display_manager, call_setup);
     let grpc_server_call_icon = CallIcons::new(Arc::clone(&device_manager));
     let grpc_call_signals_server = LiveSignalsService::new();
 

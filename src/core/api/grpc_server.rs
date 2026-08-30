@@ -2,6 +2,7 @@ use std::sync::Arc;
 use std::sync::Mutex;
 use tonic::{Request, Response, Status};
 
+use crate::core::act::call::call_setup::CallSetup;
 use crate::core::display::brightness::DisplayManager;
 use crate::core::state::devices::DeviceManager;
 
@@ -64,13 +65,14 @@ use synapsed::api::pref::GetPref3ShortNameReply;
 use synapsed::api::pref::GetPrefModelReply;
 
 /// Handles frontend gRPC requests and forwards them to the device manager.
-#[derive(Debug, Clone)]
+#[derive(Clone)]
 pub struct ThisSystem {
     device_manager: Arc<Mutex<DeviceManager>>,
     display_manager: Arc<Mutex<DisplayManager>>,
+    call_setup: Arc<Mutex<CallSetup>>,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Clone)]
 pub struct CallIcons {
     device_manager: Arc<Mutex<DeviceManager>>,
 }
@@ -79,10 +81,12 @@ impl ThisSystem {
     pub fn new(
         device_manager: Arc<Mutex<DeviceManager>>,
         display_manager: Arc<Mutex<DisplayManager>>,
+        call_setup: Arc<Mutex<CallSetup>>,
     ) -> Self {
         Self {
             device_manager,
             display_manager,
+            call_setup,
         }
     }
 }
@@ -144,8 +148,17 @@ impl System for ThisSystem {
             .lock()
             .map_err(|_| Status::internal("Lock failed"))?;
 
+        let mut call_setup = self
+            .call_setup
+            .lock()
+            .map_err(|_| Status::internal("Lock failed"))?;
+
         manager
             .set_location_id(req.device_id)
+            .map_err(|e| Status::internal(e.to_string()))?;
+
+        call_setup
+            .subscribe_to_call_message(req.device_id)
             .map_err(|e| Status::internal(e.to_string()))?;
 
         Ok(Response::new(()))
