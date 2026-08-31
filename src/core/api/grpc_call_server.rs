@@ -128,16 +128,54 @@ impl CallActions for CallApi {
     }
 
     async fn accept(&self, _: Request<()>) -> Result<Response<()>, Status> {
-        let handler = self.call_handler.lock().unwrap();
-        handler.accept_call();
+        let mut handler = self
+            .call_handler
+            .lock()
+            .map_err(|_| Status::internal("Failed to lock CallHandler"))?;
+        let device_manager = self
+            .device_manager
+            .lock()
+            .map_err(|_| Status::internal("Failed to lock DeviceManager"))?;
+        let net_iface = self
+            .net_iface
+            .lock()
+            .map_err(|_| Status::internal("Failed to lock NetIface"))?;
+
+        let location_id = device_manager.get_location_id();
+        let ip_address = net_iface
+            .get_ip_address()
+            .map_err(|e| Status::internal(e.to_string()))?;
+
+        handler
+            .accept_call(location_id, &ip_address)
+            .map_err(|e| Status::internal(e.to_string()))?;
 
         println!("Accept");
         Ok(Response::new(()))
     }
 
     async fn end(&self, _: Request<()>) -> Result<Response<()>, Status> {
-        let mut handler = self.call_handler.lock().unwrap();
-        handler.end_call();
+        let mut handler = self
+            .call_handler
+            .lock()
+            .map_err(|_| Status::internal("Failed to lock CallHandler"))?;
+        let device_manager = self
+            .device_manager
+            .lock()
+            .map_err(|_| Status::internal("Failed to lock DeviceManager"))?;
+        let net_iface = self
+            .net_iface
+            .lock()
+            .map_err(|_| Status::internal("Failed to lock NetIface"))?;
+
+        let location_id = device_manager.get_location_id();
+        let ip_address = net_iface
+            .get_ip_address()
+            .map_err(|e| Status::internal(e.to_string()))?;
+
+        handler
+            .end_call(location_id, &ip_address)
+            .map_err(|e| Status::internal(e.to_string()))?;
 
         println!("End");
         Ok(Response::new(()))

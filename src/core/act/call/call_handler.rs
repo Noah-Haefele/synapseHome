@@ -49,11 +49,47 @@ impl CallHandler {
         Ok(())
     }
 
-    pub fn accept_call(&self) {}
+    pub fn accept_call(
+        &self,
+        location_id: i32,
+        this_ip_address: &str,
+    ) -> Result<(), Box<dyn std::error::Error>> {
+        self.grpc_call_signal_api
+            .trigger_call_state_changed("CONNECTED");
 
-    pub fn end_call(&mut self) {
-        self.call_device_id = -1;
+        let mqtt_handler = self
+            .mqtt_handler
+            .lock()
+            .map_err(|_| "Failed to lock MqttHandler")?;
+
+        let subtopic = format!("call/{}", self.call_device_id);
+        let topic = format!("ACCEPTED:{}:{}", location_id, this_ip_address);
+
+        mqtt_handler.publish(&subtopic, topic)?;
+
+        Ok(())
+    }
+
+    pub fn end_call(
+        &mut self,
+        location_id: i32,
+        this_ip_address: &str,
+    ) -> Result<(), Box<dyn std::error::Error>> {
         self.grpc_call_signal_api.trigger_call_state_changed("IDLE");
+
+        let mqtt_handler = self
+            .mqtt_handler
+            .lock()
+            .map_err(|_| "Failed to lock MqttHandler")?;
+
+        let subtopic = format!("call/{}", self.call_device_id);
+        let topic = format!("END:{}:{}", location_id, this_ip_address);
+
+        mqtt_handler.publish(&subtopic, topic)?;
+
+        self.call_device_id = -1;
+
+        Ok(())
     }
 }
 
