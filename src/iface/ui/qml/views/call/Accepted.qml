@@ -35,7 +35,7 @@ Rectangle {
             height: 120
             width: height
 
-            icon: "qrc:/qt/qml/UiBridge/assets/icons/call/mutMic_on.svg"
+            icon: "qrc:/qt/qml/UiBridge/assets/icons/call/muteMic_on.svg"
         }
 
         ButtonIcon {
@@ -51,7 +51,7 @@ Rectangle {
             height: 120
             width: height
 
-            icon: "qrc:/qt/qml/UiBridge/assets/icons/call/mutMic_off.svg"
+            icon: "qrc:/qt/qml/UiBridge/assets/icons/call/muteMic_off.svg"
         }
     }
 }
