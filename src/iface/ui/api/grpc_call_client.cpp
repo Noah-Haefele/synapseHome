@@ -62,8 +62,6 @@ void GrpcCallClient::stop()
 
 void GrpcCallClient::onCallStateChanged(const std::string& state)
 {
-    std::cout << "Call icon changed!" << std::endl;
-
     emit callStateChanged(QString::fromStdString(state));
 }
 
