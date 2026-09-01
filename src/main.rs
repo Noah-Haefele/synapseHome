@@ -28,6 +28,7 @@ use crate::core::api::grpc_call_server::synapsed::api::call::call_signals_server
 
 // --- Call Api ---
 use crate::core::api::grpc_call_server::synapsed::api::call::call_actions_server::CallActionsServer;
+use crate::core::api::grpc_call_server::synapsed::api::call::call_helpers_server::CallHelpersServer;
 
 use crate::core::display::brightness::DisplayManager;
 
@@ -95,7 +96,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let pref_short_names = PrefShortNamesServer::new(grpc_server_call_icon);
 
     let call_signals_service = CallSignalsServer::new(grpc_call_signals_server);
-    let call_actions_service = CallActionsServer::new(grpc_call_actions_server);
+    let call_actions_service = CallActionsServer::new(grpc_call_actions_server.clone());
+    let call_helpers_service = CallHelpersServer::new(grpc_call_actions_server);
 
     Server::builder()
         .add_service(system_service)
@@ -106,6 +108,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .add_service(pref_short_names)
         .add_service(call_signals_service)
         .add_service(call_actions_service)
+        .add_service(call_helpers_service)
         .serve(addr)
         .await?;
 
