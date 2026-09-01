@@ -101,7 +101,7 @@ int SettingsBridge::location_id() const
 
 int SettingsBridge::pref1_call_id() const
 {
-    auto device_id = client_->get_pref1_call_id();
+    auto device_id = client_->get_pref_call_id(1);
     if (device_id == std::nullopt) {
         return -1;
     }
@@ -111,7 +111,7 @@ int SettingsBridge::pref1_call_id() const
 
 int SettingsBridge::pref2_call_id() const
 {
-    auto device_id = client_->get_pref2_call_id();
+    auto device_id = client_->get_pref_call_id(2);
     if (device_id == std::nullopt) {
         return -1;
     }
@@ -121,7 +121,7 @@ int SettingsBridge::pref2_call_id() const
 
 int SettingsBridge::pref3_call_id() const
 {
-    auto device_id = client_->get_pref3_call_id();
+    auto device_id = client_->get_pref_call_id(3);
     if (device_id == std::nullopt) {
         return -1;
     }

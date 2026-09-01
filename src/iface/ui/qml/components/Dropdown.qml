@@ -3,8 +3,8 @@ import QtQuick.Controls 2.15
 
 /**
  * Custom Dropdown / ComboBox Component
- * 
- * Wraps QtQuick ComboBox with automatic index synchronization 
+ *
+ * Wraps QtQuick ComboBox with automatic index synchronization
  * based on backend model keys (valueRole) and dynamic popup positioning.
  */
 
@@ -18,12 +18,12 @@ Column {
 
     // Model key used to extract the option's unique identifier/ID
     property alias valueRole: combo.valueRole
-    
+
     // Active selection provided by backend state
     property var selectedValue: -1
 
     readonly property alias popupVisible: popup.visible
-    
+
     // Emitted only on explicit user interaction
     signal userSelected(var value)
     // Emitted when popup opened
@@ -89,8 +89,8 @@ Column {
             // Safely resolve display text from Python dictionaries or primitive values
             text: {
                 if (typeof modelData === "object" && modelData !== null) {
-                    return combo.textRole !== "" && modelData[combo.textRole] !== undefined 
-                           ? modelData[combo.textRole] 
+                    return combo.textRole !== "" && modelData[combo.textRole] !== undefined
+                           ? modelData[combo.textRole]
                            : ""
                 }
                 return modelData !== undefined ? modelData : ""
@@ -130,7 +130,7 @@ Column {
         // content
         contentItem: Text {
             text: combo.displayText
-            
+
             color: "#333333"
             font: combo.font
 
@@ -170,7 +170,7 @@ Column {
                 // if lower edge of popup smaller than actual popup height
                 return spaceBelow < expectedHeight + 10;
             }
-            
+
             // upwards: -height of popup - 10
             // downwards: height of popup + 10
             y: opensUpwards ? -expectedHeight - 15 : combo.height + 15
@@ -192,7 +192,7 @@ Column {
 
                 clip: true
                 spacing: 0
-                
+
                 implicitHeight: Math.min(contentHeight, 400)
             }
         }

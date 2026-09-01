@@ -12,7 +12,7 @@ Item {
     signal moved(int value)
 
     height: 80
-    width: parent.width 
+    width: parent.width
 
     Column {
         anchors.fill: parent
@@ -27,7 +27,7 @@ Item {
                 anchors.left: parent.left
 
                 text: root.label
-                
+
                 font.pixelSize: 22
                 font.bold: true
                 color: "#2c3e50"
@@ -36,7 +36,7 @@ Item {
                 anchors.right: parent.right
 
                 text: root.val + " " + root.unit
-                
+
                 font.pixelSize: 22
                 font.bold: true
                 color: "black"

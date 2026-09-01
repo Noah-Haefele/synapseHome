@@ -4,6 +4,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             "proto/settings_api.proto",
             "proto/pref_api.proto",
             "proto/helper.proto",
+            "proto/call_api.proto",
         ],
         &["proto/"],
     )?;

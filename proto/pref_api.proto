@@ -11,9 +11,7 @@ service PrefIconPaths {
 }
 
 service PrefCallIds {
-    rpc GetPref1CallId(google.protobuf.Empty) returns (GetPref1CallIdReply);
-    rpc GetPref2CallId(google.protobuf.Empty) returns (GetPref2CallIdReply);
-    rpc GetPref3CallId(google.protobuf.Empty) returns (GetPref3CallIdReply);
+    rpc GetPrefCallId(GetPrefCallIdRequest) returns (GetPrefCallIdReply);
     rpc SetPrefCallId(SetPrefCallIdRequest) returns (google.protobuf.Empty);
 }
 
@@ -43,15 +41,11 @@ message GetPref3IconPathReply {
 
 // --- Ids ---
 
-message GetPref1CallIdReply {
-    int32 device_id = 1;
+message GetPrefCallIdRequest {
+    int32 num = 1;
 }
 
-message GetPref2CallIdReply {
-    int32 device_id = 1;
-}
-
-message GetPref3CallIdReply {
+message GetPrefCallIdReply {
     int32 device_id = 1;
 }
 

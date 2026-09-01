@@ -27,6 +27,7 @@ using synapsed::api::settings::SetBrightnessRequest;
 using synapsed::api::settings::SetDisplayTimeRequest;
 // Pref Ids
 using synapsed::api::pref::SetPrefCallIdRequest;
+using synapsed::api::pref::GetPrefCallIdRequest;
 
 // --- Reply Messages ---
 // System Settings
@@ -40,9 +41,7 @@ using synapsed::api::pref::GetPref1IconPathReply;
 using synapsed::api::pref::GetPref2IconPathReply;
 using synapsed::api::pref::GetPref3IconPathReply;
 // Pref Ids
-using synapsed::api::pref::GetPref1CallIdReply;
-using synapsed::api::pref::GetPref2CallIdReply;
-using synapsed::api::pref::GetPref3CallIdReply;
+using synapsed::api::pref::GetPrefCallIdReply;
 // Pref short Labels
 using synapsed::api::pref::GetPref1ShortNameReply;
 using synapsed::api::pref::GetPref2ShortNameReply;
@@ -87,36 +86,13 @@ std::optional<int> Client::get_location_id() {
     return std::nullopt;
 }
 
-std::optional<int> Client::get_pref1_call_id() {
-    google::protobuf::Empty request;
-    GetPref1CallIdReply reply;
+std::optional<int> Client::get_pref_call_id(int num) {
+    GetPrefCallIdRequest request;
+    request.set_num(num);
+    GetPrefCallIdReply reply;
     grpc::ClientContext context;
 
-    grpc::Status status = pref_call_ids_stub_->GetPref1CallId(&context, request, &reply);
-    if (status.ok()) {
-        return reply.device_id();
-    }
-    return std::nullopt;
-}
-
-std::optional<int> Client::get_pref2_call_id() {
-    google::protobuf::Empty request;
-    GetPref2CallIdReply reply;
-    grpc::ClientContext context;
-
-    grpc::Status status = pref_call_ids_stub_->GetPref2CallId(&context, request, &reply);
-    if (status.ok()) {
-        return reply.device_id();
-    }
-    return std::nullopt;
-}
-
-std::optional<int> Client::get_pref3_call_id() {
-    google::protobuf::Empty request;
-    GetPref3CallIdReply reply;
-    grpc::ClientContext context;
-
-    grpc::Status status = pref_call_ids_stub_->GetPref3CallId(&context, request, &reply);
+    grpc::Status status = pref_call_ids_stub_->GetPrefCallId(&context, request, &reply);
     if (status.ok()) {
         return reply.device_id();
     }

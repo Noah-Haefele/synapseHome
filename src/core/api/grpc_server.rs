@@ -2,6 +2,7 @@ use std::sync::Arc;
 use std::sync::Mutex;
 use tonic::{Request, Response, Status};
 
+use crate::core::act::call::call_setup::CallSetup;
 use crate::core::display::brightness::DisplayManager;
 use crate::core::state::devices::DeviceManager;
 
@@ -40,6 +41,7 @@ use synapsed::api::settings::SetLocationIdRequest;
 use synapsed::api::settings::SetBrightnessRequest;
 use synapsed::api::settings::SetDisplayTimeRequest;
 // Pref Ids
+use synapsed::api::pref::GetPrefCallIdRequest;
 use synapsed::api::pref::SetPrefCallIdRequest;
 
 // --- Reply Messages ---
@@ -54,9 +56,7 @@ use synapsed::api::pref::GetPref1IconPathReply;
 use synapsed::api::pref::GetPref2IconPathReply;
 use synapsed::api::pref::GetPref3IconPathReply;
 // Pref Ids
-use synapsed::api::pref::GetPref1CallIdReply;
-use synapsed::api::pref::GetPref2CallIdReply;
-use synapsed::api::pref::GetPref3CallIdReply;
+use synapsed::api::pref::GetPrefCallIdReply;
 // Pref short Labels
 use synapsed::api::pref::GetPref1ShortNameReply;
 use synapsed::api::pref::GetPref2ShortNameReply;
@@ -65,13 +65,14 @@ use synapsed::api::pref::GetPref3ShortNameReply;
 use synapsed::api::pref::GetPrefModelReply;
 
 /// Handles frontend gRPC requests and forwards them to the device manager.
-#[derive(Debug, Clone)]
+#[derive(Clone)]
 pub struct ThisSystem {
     device_manager: Arc<Mutex<DeviceManager>>,
     display_manager: Arc<Mutex<DisplayManager>>,
+    call_setup: Arc<Mutex<CallSetup>>,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Clone)]
 pub struct CallIcons {
     device_manager: Arc<Mutex<DeviceManager>>,
 }
@@ -80,10 +81,12 @@ impl ThisSystem {
     pub fn new(
         device_manager: Arc<Mutex<DeviceManager>>,
         display_manager: Arc<Mutex<DisplayManager>>,
+        call_setup: Arc<Mutex<CallSetup>>,
     ) -> Self {
         Self {
             device_manager,
             display_manager,
+            call_setup,
         }
     }
 }
@@ -145,8 +148,17 @@ impl System for ThisSystem {
             .lock()
             .map_err(|_| Status::internal("Lock failed"))?;
 
+        let mut call_setup = self
+            .call_setup
+            .lock()
+            .map_err(|_| Status::internal("Lock failed"))?;
+
         manager
             .set_location_id(req.device_id)
+            .map_err(|e| Status::internal(e.to_string()))?;
+
+        call_setup
+            .subscribe_to_call_message(req.device_id)
             .map_err(|e| Status::internal(e.to_string()))?;
 
         Ok(Response::new(()))
@@ -155,46 +167,20 @@ impl System for ThisSystem {
 
 #[tonic::async_trait]
 impl PrefCallIds for ThisSystem {
-    async fn get_pref1_call_id(
+    async fn get_pref_call_id(
         &self,
-        _: Request<()>,
-    ) -> Result<Response<GetPref1CallIdReply>, Status> {
+        request: Request<GetPrefCallIdRequest>,
+    ) -> Result<Response<GetPrefCallIdReply>, Status> {
+        let req = request.into_inner();
+
         let manager = self
             .device_manager
             .lock()
             .map_err(|_| Status::internal("Lock failed"))?;
 
-        let device_id = manager.get_pref_call_id(1);
+        let device_id = manager.get_pref_call_id(req.num);
 
-        Ok(Response::new(GetPref1CallIdReply { device_id }))
-    }
-
-    async fn get_pref2_call_id(
-        &self,
-        _: Request<()>,
-    ) -> Result<Response<GetPref2CallIdReply>, Status> {
-        let manager = self
-            .device_manager
-            .lock()
-            .map_err(|_| Status::internal("Lock failed"))?;
-
-        let device_id = manager.get_pref_call_id(2);
-
-        Ok(Response::new(GetPref2CallIdReply { device_id }))
-    }
-
-    async fn get_pref3_call_id(
-        &self,
-        _: Request<()>,
-    ) -> Result<Response<GetPref3CallIdReply>, Status> {
-        let manager = self
-            .device_manager
-            .lock()
-            .map_err(|_| Status::internal("Lock failed"))?;
-
-        let device_id = manager.get_pref_call_id(3);
-
-        Ok(Response::new(GetPref3CallIdReply { device_id }))
+        Ok(Response::new(GetPrefCallIdReply { device_id }))
     }
 
     async fn set_pref_call_id(

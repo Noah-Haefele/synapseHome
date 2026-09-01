@@ -1,5 +1,6 @@
 import QtQuick 2.15
 import QtQuick.Controls 2.15
+import CallBridge
 import "../../components"
 
 Rectangle {
@@ -18,7 +19,7 @@ Rectangle {
 
         font.pixelSize: 30
 
-        text: callHandler.destinationLabel
+        text: CallBridge.destinationLabel
     }
 
     Row {
@@ -33,24 +34,24 @@ Rectangle {
         ButtonIcon {
             height: 120
             width: height
-            
-            icon: "../../../../assets/icons/call/muteMic_on.svg"
+
+            icon: "qrc:/qt/qml/UiBridge/assets/icons/call/muteMic_on.svg"
         }
 
         ButtonIcon {
             height: 120
             width: height
 
-            icon: "../../../../assets/icons/call/call_off.svg"
+            icon: "qrc:/qt/qml/UiBridge/assets/icons/call/call_off.svg"
 
-            onClicked: callHandler.endCall()
+            onClicked: CallBridge.endCall()
         }
 
         ButtonIcon {
             height: 120
             width: height
-            
-            icon: "../../../../assets/icons/call/muteMic_off.svg"
+
+            icon: "qrc:/qt/qml/UiBridge/assets/icons/call/muteMic_off.svg"
         }
     }
 }

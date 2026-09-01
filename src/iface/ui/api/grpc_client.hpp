@@ -35,9 +35,7 @@ public:
 
     std::optional<std::vector<ProtoDeviceData>> get_all_devices();
     std::optional<int> get_location_id();
-    std::optional<int> get_pref1_call_id();
-    std::optional<int> get_pref2_call_id();
-    std::optional<int> get_pref3_call_id();
+    std::optional<int> get_pref_call_id(int num);
     std::optional<std::vector<ProtoDeviceData>> get_pref_model();
     void set_location_id(int device_id);
     void set_pref_call_id(int num, int device_id);

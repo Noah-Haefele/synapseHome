@@ -1,5 +1,6 @@
 import QtQuick 2.15
 import QtQuick.Controls 2.15
+import CallBridge
 
 ApplicationWindow {
     id: mainWindow
@@ -33,13 +34,13 @@ ApplicationWindow {
 
         Loader {
             id: callOverlayLoader
-            
+
             anchors.fill: parent
         }
     }
 
     Connections {
-        target: callHandler
+        target: CallBridge
 
         function onCallStateChanged(state) {
             overlayLayer.visible = state !== "IDLE"

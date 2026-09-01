@@ -32,7 +32,6 @@ struct InternalSettingsCache {
     pref3_call_id: i32,
 }
 
-#[derive(Debug, Default)]
 pub struct DeviceManager {
     config_cache: ConfigCache,
     internal_settings_cache: InternalSettingsCache,

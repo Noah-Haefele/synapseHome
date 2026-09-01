@@ -17,7 +17,7 @@ Item {
 
     Rectangle {
         anchors.fill: parent
-        
+
         color: root.backgroundColor
 
         ColumnLayout {
@@ -46,7 +46,7 @@ Item {
                     backgroundColor: root.backgroundColor
                     textColor: "black"
                     radius: 8
-                    
+
                     text: "\u2190"
 
                     onClicked: root.backClicked()
@@ -75,7 +75,7 @@ Item {
                     backgroundColor: root.backgroundColor
                     textColor: "black"
                     radius: 8
-                    
+
                     text: "\u23FB"
                 }
             }
