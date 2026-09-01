@@ -19,7 +19,7 @@ Rectangle {
 
         font.pixelSize: 30
 
-        text: callHandler.destinationLabel
+        text: CallBridge.destinationLabel
     }
 
     ButtonIcon {

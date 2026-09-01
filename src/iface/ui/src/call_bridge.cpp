@@ -24,3 +24,14 @@ void CallBridge::endCall()
 {
     grpc_call_client_->endCall();
 }
+
+QString CallBridge::destinationLabel() const
+{
+    auto call_label = grpc_call_client_->getCallLabel();
+
+    if (call_label == std::nullopt) {
+        std::cerr << "GetCallLabel gRPC error" << std::endl;
+        return QStringLiteral("Unable to load call information");
+    }
+    return QString::fromStdString(*call_label);
+}

@@ -5,6 +5,7 @@
 
 using synapsed::api::call::CallSignals;
 using synapsed::api::call::CallActions;
+using synapsed::api::call::CallHelpers;
 
 // --- Call Signals ---
 using synapsed::api::call::Event;
@@ -13,13 +14,17 @@ using synapsed::api::call::SubscribeRequest;
 // --- Call Actions ---
 using synapsed::api::call::InitiateRequest;
 
+// --- Call Helpers ---
+using synapsed::api::call::GetCallLabelReply;
+
 GrpcCallClient::GrpcCallClient(
     std::shared_ptr<grpc::Channel> channel,
     QObject *parent
 )
     : QObject(parent),
       call_signals_stub_(CallSignals::NewStub(channel)),
-      call_actions_stub_(CallActions::NewStub(channel))
+      call_actions_stub_(CallActions::NewStub(channel)),
+      call_helpers_stub_(CallHelpers::NewStub(channel))
 {
 }
 
@@ -89,4 +94,20 @@ void GrpcCallClient::endCall() {
     grpc::ClientContext context;
 
     grpc::Status status = call_actions_stub_->End(&context, request, &reply);
+}
+
+std::optional<std::string> GrpcCallClient::getCallLabel() const
+{
+    google::protobuf::Empty request;
+    GetCallLabelReply reply;
+    grpc::ClientContext context;
+
+    grpc::Status status = call_helpers_stub_->GetCallLabel(&context, request, &reply);
+    if (!status.ok()) {
+        return std::nullopt;
+        std::cerr << "GetCallLabel gRPC error: "
+            << status.error_message()
+            << std::endl;
+    }
+    return reply.call_label();
 }
