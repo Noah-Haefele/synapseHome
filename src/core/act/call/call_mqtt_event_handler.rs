@@ -38,7 +38,7 @@ impl CallEventHandler {
                     "Device with Id: {} and Ip: {} is calling",
                     source_device_id, source_ip_address
                 );
-                call_handler.incoming_call(source_device_id, &source_ip_address);
+                call_handler.incoming_call(source_device_id, &source_ip_address)?;
             }
 
             CallEvent::Accepted {
@@ -49,7 +49,7 @@ impl CallEventHandler {
                     "Device with Id: {} and Ip: {} has accepted the call",
                     source_device_id, source_ip_address
                 );
-                call_handler.call_accepted(source_device_id, &source_ip_address);
+                call_handler.call_accepted(source_device_id, &source_ip_address)?;
             }
 
             CallEvent::End {
@@ -60,7 +60,7 @@ impl CallEventHandler {
                     "Device with Id: {} and Ip: {} has ended the call",
                     source_device_id, source_ip_address
                 );
-                call_handler.call_ended(source_device_id, &source_ip_address);
+                call_handler.call_ended(source_device_id, &source_ip_address)?;
             }
         }
 
