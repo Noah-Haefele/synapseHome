@@ -7,7 +7,6 @@ use std::sync::Mutex;
 use std::thread;
 use tonic::transport::Server;
 
-use crate::core::act::call::call_mqtt_event_handler;
 use crate::core::api::grpc_call_server::CallApi;
 use crate::core::api::grpc_call_server::LiveSignalsService;
 use crate::core::api::grpc_server::CallIcons;
@@ -34,12 +33,16 @@ use crate::core::display::brightness::DisplayManager;
 
 use crate::core::state::devices::DeviceManager;
 
+use crate::core::act::audio::audio::AudioHandler;
+
 use crate::core::act::call::call_handler::CallHandler;
 use crate::core::act::call::call_mqtt_event_handler::CallEventHandler;
 use crate::core::act::call::call_setup::CallSetup;
 
 use crate::platform::linux::display_controller::DspCtrl;
 
+use crate::networking::audio::receiver::AudioReceiver;
+use crate::networking::audio::sender::AudioSender;
 use crate::networking::mqtt::mqtt_config::MqttConfig;
 use crate::networking::mqtt::mqtt_handler::MqttHandler;
 use crate::networking::net_iface::NetIface;
@@ -47,6 +50,10 @@ use crate::networking::net_iface::NetIface;
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let (event_sender, event_receiver) = std::sync::mpsc::channel();
+
+    let audio_receiver = AudioReceiver::new("0.0.0.0", 5000)?;
+    let audio_sender = AudioSender::new("0.0.0.0", 0)?;
+    let audio_handler = Arc::new(Mutex::new(AudioHandler::new(audio_receiver, audio_sender)?));
 
     let net_iface = Arc::new(Mutex::new(NetIface::new()));
     let mqtt_config = MqttConfig::new()?;
@@ -75,6 +82,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let call_handler = Arc::new(Mutex::new(CallHandler::new(
         grpc_call_signals_server.clone(),
         mqtt_handler,
+        audio_handler,
     )));
     let mut call_mqtt_event_handler =
         CallEventHandler::new(Arc::clone(&call_handler), event_receiver);
