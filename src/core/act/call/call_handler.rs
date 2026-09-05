@@ -1,11 +1,13 @@
 use std::sync::{Arc, Mutex};
 
+use crate::core::act::audio::audio::AudioHandler;
 use crate::core::api::grpc_call_server::LiveSignalsService;
 use crate::networking::mqtt::mqtt_handler::MqttHandler;
 
 pub struct CallHandler {
     grpc_call_signal_api: LiveSignalsService,
     mqtt_handler: Arc<Mutex<MqttHandler>>,
+    audio_handler: Arc<Mutex<AudioHandler>>,
 
     call_device_id: i32,
     call_state: String,
@@ -16,10 +18,12 @@ impl CallHandler {
     pub fn new(
         grpc_call_signal_api: LiveSignalsService,
         mqtt_handler: Arc<Mutex<MqttHandler>>,
+        audio_handler: Arc<Mutex<AudioHandler>>,
     ) -> Self {
         Self {
             grpc_call_signal_api,
             mqtt_handler,
+            audio_handler,
 
             call_device_id: -1,
             call_state: "IDLE".to_string(),
@@ -97,6 +101,13 @@ impl CallHandler {
 
         self.call_device_id = -1;
 
+        let mut audio_handler = self
+            .audio_handler
+            .lock()
+            .map_err(|_| "Failed to lock AudioHandler")?;
+
+        audio_handler.pause_net_audio()?;
+
         Ok(())
     }
 
@@ -120,15 +131,32 @@ impl CallHandler {
 
 /// Methods that are called when another device acts and sends a mqtt message
 impl CallHandler {
-    pub fn incoming_call(&mut self, source_device_id: i32, source_ip_address: &str) {
+    pub fn incoming_call(
+        &mut self,
+        source_device_id: i32,
+        source_ip_address: &str,
+    ) -> Result<(), Box<dyn std::error::Error>> {
         self.call_state = "RINGING".to_string();
         self.call_device_id = source_device_id;
 
         self.grpc_call_signal_api
             .trigger_call_state_changed(&self.call_state);
+
+        let mut audio_handler = self
+            .audio_handler
+            .lock()
+            .map_err(|_| "Failed to lock AudioHandler")?;
+
+        audio_handler.start_net_audio(source_ip_address)?;
+
+        Ok(())
     }
 
-    pub fn call_accepted(&mut self, source_device_id: i32, source_ip_address: &str) {
+    pub fn call_accepted(
+        &mut self,
+        source_device_id: i32,
+        source_ip_address: &str,
+    ) -> Result<(), Box<dyn std::error::Error>> {
         if self.call_device_id != source_device_id {
             panic!(
                 "The call device id is not equal with the device id given via mqtt by the call device id"
@@ -139,9 +167,22 @@ impl CallHandler {
 
         self.grpc_call_signal_api
             .trigger_call_state_changed(&self.call_state);
+
+        let mut audio_handler = self
+            .audio_handler
+            .lock()
+            .map_err(|_| "Failed to lock AudioHandler")?;
+
+        audio_handler.start_net_audio(source_ip_address)?;
+
+        Ok(())
     }
 
-    pub fn call_ended(&mut self, source_device_id: i32, source_ip_address: &str) {
+    pub fn call_ended(
+        &mut self,
+        source_device_id: i32,
+        source_ip_address: &str,
+    ) -> Result<(), Box<dyn std::error::Error>> {
         if self.call_device_id != source_device_id {
             panic!(
                 "The call device id is not equal with the device id given via mqtt by the call device id"
@@ -152,5 +193,14 @@ impl CallHandler {
 
         self.grpc_call_signal_api
             .trigger_call_state_changed(&self.call_state);
+
+        let mut audio_handler = self
+            .audio_handler
+            .lock()
+            .map_err(|_| "Failed to lock AudioHandler")?;
+
+        audio_handler.pause_net_audio()?;
+
+        Ok(())
     }
 }
