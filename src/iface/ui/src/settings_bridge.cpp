@@ -129,6 +129,16 @@ int SettingsBridge::pref3_call_id() const
     return *device_id;
 }
 
+QString SettingsBridge::ip_address() const
+{
+    auto ip_address = client_->get_ip_address();
+    if (ip_address == std::nullopt) {
+        return "Not available";
+    }
+
+    return QString::fromStdString(*ip_address);
+}
+
 // --- Display Settings ---
 
 int SettingsBridge::brightness() const

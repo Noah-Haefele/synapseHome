@@ -41,6 +41,7 @@ public:
     std::optional<int> get_location_id();
     std::optional<int> get_pref_call_id(int num);
     std::optional<std::vector<ProtoDeviceData>> get_pref_model();
+    std::optional<std::string> get_ip_address() const;
     void set_location_id(int device_id);
     void set_pref_call_id(int num, int device_id);
 

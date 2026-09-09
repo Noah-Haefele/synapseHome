@@ -38,6 +38,7 @@ using synapsed::api::pref::GetPrefCallIdRequest;
 // System Settings
 using synapsed::api::settings::GetAllDevicesReply;
 using synapsed::api::settings::GetLocationIdReply;
+using synapsed::api::settings::GetIpAddressReply;
 // Display Settings
 using synapsed::api::settings::GetBrightnessReply;
 using synapsed::api::settings::GetDisplayTimeReply;
@@ -119,6 +120,19 @@ std::optional<std::vector<ProtoDeviceData>> Client::get_pref_model() {
     if (status.ok()) {
         // Convert repeatedfield of grpc into vec
         return std::vector<ProtoDeviceData>(reply.devices().begin(), reply.devices().end());
+    }
+    return std::nullopt;
+}
+
+std::optional<std::string> Client::get_ip_address() const
+{
+    google::protobuf::Empty request;
+    GetIpAddressReply reply;
+    grpc::ClientContext context;
+
+    grpc::Status status = system_stub_->GetIpAddress(&context, request, &reply);
+    if (status.ok()) {
+        return reply.ip_address();
     }
     return std::nullopt;
 }
