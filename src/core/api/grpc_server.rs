@@ -6,6 +6,7 @@ use crate::core::act::audio::audio_devices_handler::AudioDevicesHandler;
 use crate::core::act::call::call_setup::CallSetup;
 use crate::core::display::brightness::DisplayManager;
 use crate::core::state::devices::DeviceManager;
+use crate::networking::net_iface::NetIface;
 
 pub mod synapsed {
     pub mod api {
@@ -52,6 +53,7 @@ use synapsed::api::pref::SetPrefCallIdRequest;
 // --- Reply Messages ---
 // System
 use synapsed::api::settings::GetAllDevicesReply;
+use synapsed::api::settings::GetIpAddressReply;
 use synapsed::api::settings::GetLocationIdReply;
 // Display
 use synapsed::api::settings::GetBrightnessReply;
@@ -81,6 +83,7 @@ pub struct ThisSystem {
     display_manager: Arc<Mutex<DisplayManager>>,
     call_setup: Arc<Mutex<CallSetup>>,
     audio_devices_handler: Arc<Mutex<AudioDevicesHandler>>,
+    net_iface: Arc<Mutex<NetIface>>,
 }
 
 #[derive(Clone)]
@@ -94,12 +97,14 @@ impl ThisSystem {
         display_manager: Arc<Mutex<DisplayManager>>,
         call_setup: Arc<Mutex<CallSetup>>,
         audio_devices_handler: Arc<Mutex<AudioDevicesHandler>>,
+        net_iface: Arc<Mutex<NetIface>>,
     ) -> Self {
         Self {
             device_manager,
             display_manager,
             call_setup,
             audio_devices_handler,
+            net_iface,
         }
     }
 }
@@ -175,6 +180,19 @@ impl System for ThisSystem {
             .map_err(|e| Status::internal(e.to_string()))?;
 
         Ok(Response::new(()))
+    }
+
+    async fn get_ip_address(&self, _: Request<()>) -> Result<Response<GetIpAddressReply>, Status> {
+        let net_iface = self
+            .net_iface
+            .lock()
+            .map_err(|_| Status::internal("Failed to lock NetIface"))?;
+
+        let ip_address = net_iface
+            .get_ip_address()
+            .map_err(|e| Status::internal(e.to_string()))?;
+
+        Ok(Response::new(GetIpAddressReply { ip_address }))
     }
 }
 
