@@ -1,11 +1,11 @@
+use serde::{Deserialize, Serialize};
+use std::fs;
+use std::io::Write;
 use std::path::Path;
 use std::path::PathBuf;
-use std::io::Write;
-use std::fs;
-use tempfile::NamedTempFile;
-use serde::{Serialize, Deserialize};
 use std::sync::Arc;
 use std::sync::Mutex;
+use tempfile::NamedTempFile;
 
 use crate::platform::linux::display_controller::DspCtrl;
 
@@ -25,14 +25,12 @@ pub struct DisplayManager {
 
     internal_display_settings_path: PathBuf,
 
-    display_controller: Arc<Mutex<DspCtrl>>,
+    display_controller: DspCtrl,
 }
 
 /// Internal functions except for new for impl setup
 impl DisplayManager {
-    pub fn new(
-        display_controller: Arc<Mutex<DspCtrl>>,
-    ) -> Result<Self, Box<dyn std::error::Error>> {
+    pub fn new(display_controller: DspCtrl) -> Result<Self, Box<dyn std::error::Error>> {
         let internal_display_settings_path = setup_path()?;
 
         let mut manager = Self {
@@ -67,8 +65,10 @@ impl DisplayManager {
     /// Loads both internal and config data and stores it in runtime struct cache
     fn load(&mut self) -> Result<(), Box<dyn std::error::Error>> {
         if self.internal_display_settings_path.is_file() {
-            let internal_display_settings_json = read_from_disk(&self.internal_display_settings_path)?;
-            self.internal_display_settings_cache = serde_json::from_str(&internal_display_settings_json)?;
+            let internal_display_settings_json =
+                read_from_disk(&self.internal_display_settings_path)?;
+            self.internal_display_settings_cache =
+                serde_json::from_str(&internal_display_settings_json)?;
         }
 
         Ok(())
@@ -89,12 +89,8 @@ impl DisplayManager {
         if val > 100 {
             return Err("brightness must be between 0 and 100".into());
         }
-        let display_c = self
-            .display_controller
-            .lock()
-            .map_err(|_| "Lock failed")?;
 
-        display_c.set_display(true, val);
+        self.display_controller.set_display(true, val);
 
         self.internal_display_settings_cache.brightness = val;
         self.save_internal_display_settings()

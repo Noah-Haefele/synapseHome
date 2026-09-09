@@ -63,7 +63,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mqtt_handler = Arc::new(Mutex::new(MqttHandler::new(mqtt_config, event_sender)?));
 
     let device_manager = Arc::new(Mutex::new(DeviceManager::new()?));
-    let display_controller = Arc::new(Mutex::new(DspCtrl::new()));
+    let display_controller = DspCtrl::new();
     let display_manager = Arc::new(Mutex::new(DisplayManager::new(display_controller)?));
 
     let location_id = device_manager
