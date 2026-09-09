@@ -84,13 +84,13 @@ class SettingsBridge : public QObject
     )
 
     Q_PROPERTY(
-        QString input_device
+        int input_device
         READ input_device
         NOTIFY settings_changed
     )
 
     Q_PROPERTY(
-        QString output_device
+        int output_device
         READ output_device
         NOTIFY settings_changed
     )
@@ -121,13 +121,13 @@ public:
 
     Q_INVOKABLE void onAudioDropdownOpened();
 
-    Q_INVOKABLE void set_sink(const QString &id);
-    Q_INVOKABLE void set_source(const QString &id);
+    Q_INVOKABLE void set_sink(const int &id);
+    Q_INVOKABLE void set_source(const int &id);
 
     QVariantList input_model() const;
     QVariantList output_model() const;
-    QString input_device() const;
-    QString output_device() const;
+    int input_device() const;
+    int output_device() const;
 
 private:
     std::shared_ptr<Client> client_;

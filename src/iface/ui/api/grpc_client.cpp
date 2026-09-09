@@ -1,6 +1,7 @@
 #include <optional>
 #include <grpcpp/grpcpp.h>
 #include <google/protobuf/empty.pb.h>
+#include <vector>
 
 #include "settings_api.grpc.pb.h"
 #include "pref_api.grpc.pb.h"
@@ -9,6 +10,7 @@
 // --- Settings Api ---
 using synapsed::api::settings::System;
 using synapsed::api::settings::Display;
+using synapsed::api::settings::Audio;
 
 // --- Preference Api ---
 using synapsed::api::pref::PrefIconPaths;
@@ -18,6 +20,7 @@ using synapsed::api::pref::PrefModels;
 
 // --- Data Message ---
 using ProtoDeviceData = synapsed::api::helper::DeviceData;
+using ProtoSinkSourceData = synapsed::api::helper::SinkSourceData;
 
 // --- Request Messages ---
 // System Settings
@@ -25,6 +28,8 @@ using synapsed::api::settings::SetLocationIdRequest;
 // Display Settings
 using synapsed::api::settings::SetBrightnessRequest;
 using synapsed::api::settings::SetDisplayTimeRequest;
+// Audio Settings
+using synapsed::api::settings::SetSinkSourceRequest;
 // Pref Ids
 using synapsed::api::pref::SetPrefCallIdRequest;
 using synapsed::api::pref::GetPrefCallIdRequest;
@@ -36,6 +41,11 @@ using synapsed::api::settings::GetLocationIdReply;
 // Display Settings
 using synapsed::api::settings::GetBrightnessReply;
 using synapsed::api::settings::GetDisplayTimeReply;
+// Audio Settings
+using synapsed::api::settings::GetSinkModelReply;
+using synapsed::api::settings::GetSourceModelReply;
+using synapsed::api::settings::GetDefaultSinkIdReply;
+using synapsed::api::settings::GetDefaultSourceIdReply;
 // Pref Paths
 using synapsed::api::pref::GetPref1IconPathReply;
 using synapsed::api::pref::GetPref2IconPathReply;
@@ -53,6 +63,7 @@ Client::Client(std::shared_ptr<grpc::ChannelInterface> channel,
                const std::string& db)
     : system_stub_(System::NewStub(channel)),
       display_stub_(Display::NewStub(channel)),
+      audio_stub_(Audio::NewStub(channel)),
       pref_icon_paths_stub_(PrefIconPaths::NewStub(channel)),
       pref_call_ids_stub_(PrefCallIds::NewStub(channel)),
       pref_short_names_stub_(PrefShortNames::NewStub(channel)),
@@ -177,6 +188,78 @@ void Client::set_display_time(int val) {
     grpc::ClientContext context;
 
     grpc::Status status = display_stub_->SetDisplayTime(&context, request, &reply);
+}
+
+// --- Audio Settings ---
+
+std::optional<std::vector<ProtoSinkSourceData>> Client::get_sink_model() const
+{
+    google::protobuf::Empty request;
+    GetSinkModelReply reply;
+    grpc::ClientContext context;
+
+    grpc::Status status = audio_stub_->GetSinkModel(&context, request, &reply);
+    if (status.ok()) {
+        return std::vector<ProtoSinkSourceData>(
+            reply.sinks().begin(),
+            reply.sinks().end()
+        );
+    }
+    return std::nullopt;
+}
+
+std::optional<std::vector<ProtoSinkSourceData>> Client::get_source_model() const
+{
+    google::protobuf::Empty request;
+    GetSourceModelReply reply;
+    grpc::ClientContext context;
+
+    grpc::Status status = audio_stub_->GetSourceModel(&context, request, &reply);
+    if (status.ok()) {
+        return std::vector<ProtoSinkSourceData>(
+            reply.sources().begin(),
+            reply.sources().end()
+        );
+    }
+    return std::nullopt;
+}
+
+std::optional<int> Client::get_default_sink_id() const
+{
+    google::protobuf::Empty request;
+    GetDefaultSinkIdReply reply;
+    grpc::ClientContext context;
+
+    grpc::Status status = audio_stub_->GetDefaultSinkId(&context, request, &reply);
+    if (status.ok()) {
+        return reply.id();
+    }
+    return std::nullopt;
+}
+
+
+std::optional<int> Client::get_default_source_id() const
+{
+    google::protobuf::Empty request;
+    GetDefaultSourceIdReply reply;
+    grpc::ClientContext context;
+
+    grpc::Status status = audio_stub_->GetDefaultSourceId(&context, request, &reply);
+    if (status.ok()) {
+        return reply.id();
+    }
+    return std::nullopt;
+}
+
+void Client::set_sink_source(int id)
+{
+    SetSinkSourceRequest request;
+    request.set_id(id);
+
+    google::protobuf::Empty reply;
+    grpc::ClientContext context;
+
+    grpc::Status status = audio_stub_->SetSinkSource(&context, request, &reply);
 }
 
 // --- Control Grid ---

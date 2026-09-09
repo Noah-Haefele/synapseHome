@@ -17,6 +17,14 @@ service Display {
     rpc SetDisplayTime(SetDisplayTimeRequest) returns (google.protobuf.Empty);
 }
 
+service Audio {
+    rpc GetSinkModel(google.protobuf.Empty) returns (GetSinkModelReply);
+    rpc GetSourceModel(google.protobuf.Empty) returns (GetSourceModelReply);
+    rpc GetDefaultSinkId(google.protobuf.Empty) returns (GetDefaultSinkIdReply);
+    rpc GetDefaultSourceId(google.protobuf.Empty) returns (GetDefaultSourceIdReply);
+    rpc SetSinkSource(SetSinkSourceRequest) returns (google.protobuf.Empty);
+}
+
 // --- System Settings ---
 
 message SetLocationIdRequest {
@@ -47,4 +55,26 @@ message SetBrightnessRequest {
 
 message SetDisplayTimeRequest {
     uint32 val = 1;
+}
+
+// --- Audio Settings ---
+
+message GetSinkModelReply {
+    repeated synapsed.api.helper.SinkSourceData sinks = 1;
+}
+
+message GetSourceModelReply {
+    repeated synapsed.api.helper.SinkSourceData sources = 1;
+}
+
+message GetDefaultSinkIdReply {
+    int32 id = 1;
+}
+
+message GetDefaultSourceIdReply {
+    int32 id = 1;
+}
+
+message SetSinkSourceRequest {
+    int32 id = 1;
 }

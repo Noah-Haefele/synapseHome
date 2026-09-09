@@ -7,3 +7,8 @@ message DeviceData {
     string device_short_name = 2;
     int32 device_id = 3;
 }
+
+message SinkSourceData {
+    int32 id = 1;
+    string name = 2;
+}

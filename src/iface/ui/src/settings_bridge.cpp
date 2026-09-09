@@ -170,38 +170,76 @@ Q_INVOKABLE void SettingsBridge::onAudioDropdownOpened()
     emit settings_changed();
 }
 
-Q_INVOKABLE void SettingsBridge::set_sink(const QString &id)
+Q_INVOKABLE void SettingsBridge::set_sink(const int &id)
 {
-    //print(std::format("setSink: {}", id));
-    print("setSink");
+    client_->set_sink_source(id);
 }
 
-Q_INVOKABLE void SettingsBridge::set_source(const QString &id)
+Q_INVOKABLE void SettingsBridge::set_source(const int &id)
 {
-    //print(std::format("setSource: {}", id));
-    print("setSource");
+    client_->set_sink_source(id);
 }
 
 QVariantList SettingsBridge::input_model() const
 {
-    print("inptuModel");
-    return {};
+    QVariantList list;
+
+    if (!client_) return list;
+
+    auto sinks = client_->get_source_model();
+    if (sinks == std::nullopt) {
+        return list;
+    }
+
+    for (const auto& sink : sinks.value()) {
+        QVariantMap map;
+        map["id"] = sink.id();
+        map["name"] = QString::fromStdString(sink.name());
+        list.append(map);
+    }
+
+    return list;
 }
 
 QVariantList SettingsBridge::output_model() const
 {
-    print("outputModel");
-    return {};
+    QVariantList list;
+
+    if (!client_) return list;
+
+    auto sources = client_->get_sink_model();
+    if (sources == std::nullopt) {
+        return list;
+    }
+
+    for (const auto& source : sources.value()) {
+        QVariantMap map;
+        map["id"] = source.id();
+        map["name"] = QString::fromStdString(source.name());
+        list.append(map);
+    }
+
+    return list;
 }
 
-QString SettingsBridge::input_device() const
+int SettingsBridge::input_device() const
 {
-    print("inputDevice");
-    return "";
+    if (!client_) return -1;
+
+    auto source = client_->get_default_source_id();
+    if (source == std::nullopt) {
+        return -1;
+    }
+    return *source;
 }
 
-QString SettingsBridge::output_device() const
+int SettingsBridge::output_device() const
 {
-    print("outputDevice");
-    return "";
+    if (!client_) return -1;
+
+    auto sink = client_->get_default_sink_id();
+    if (sink == std::nullopt) {
+        return -1;
+    }
+    return *sink;
 }
