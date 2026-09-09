@@ -7,7 +7,7 @@ use crate::networking::mqtt::mqtt_handler::MqttHandler;
 pub struct CallHandler {
     grpc_call_signal_api: LiveSignalsService,
     mqtt_handler: Arc<Mutex<MqttHandler>>,
-    audio_handler: Arc<Mutex<AudioHandler>>,
+    audio_handler: AudioHandler,
 
     call_device_id: i32,
     call_state: String,
@@ -18,7 +18,7 @@ impl CallHandler {
     pub fn new(
         grpc_call_signal_api: LiveSignalsService,
         mqtt_handler: Arc<Mutex<MqttHandler>>,
-        audio_handler: Arc<Mutex<AudioHandler>>,
+        audio_handler: AudioHandler,
     ) -> Self {
         Self {
             grpc_call_signal_api,
@@ -101,12 +101,7 @@ impl CallHandler {
 
         self.call_device_id = -1;
 
-        let mut audio_handler = self
-            .audio_handler
-            .lock()
-            .map_err(|_| "Failed to lock AudioHandler")?;
-
-        audio_handler.pause_net_audio()?;
+        self.audio_handler.pause_net_audio()?;
 
         Ok(())
     }
@@ -142,12 +137,7 @@ impl CallHandler {
         self.grpc_call_signal_api
             .trigger_call_state_changed(&self.call_state);
 
-        let mut audio_handler = self
-            .audio_handler
-            .lock()
-            .map_err(|_| "Failed to lock AudioHandler")?;
-
-        audio_handler.start_net_audio(source_ip_address)?;
+        self.audio_handler.start_net_audio(source_ip_address)?;
 
         Ok(())
     }
@@ -168,12 +158,7 @@ impl CallHandler {
         self.grpc_call_signal_api
             .trigger_call_state_changed(&self.call_state);
 
-        let mut audio_handler = self
-            .audio_handler
-            .lock()
-            .map_err(|_| "Failed to lock AudioHandler")?;
-
-        audio_handler.start_net_audio(source_ip_address)?;
+        self.audio_handler.start_net_audio(source_ip_address)?;
 
         Ok(())
     }
@@ -194,12 +179,7 @@ impl CallHandler {
         self.grpc_call_signal_api
             .trigger_call_state_changed(&self.call_state);
 
-        let mut audio_handler = self
-            .audio_handler
-            .lock()
-            .map_err(|_| "Failed to lock AudioHandler")?;
-
-        audio_handler.pause_net_audio()?;
+        self.audio_handler.pause_net_audio()?;
 
         Ok(())
     }

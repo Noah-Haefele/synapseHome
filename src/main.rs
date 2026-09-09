@@ -55,7 +55,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let audio_receiver = AudioReceiver::new("0.0.0.0", 5000)?;
     let audio_sender = AudioSender::new("0.0.0.0", 0)?;
-    let audio_handler = Arc::new(Mutex::new(AudioHandler::new(audio_receiver, audio_sender)?));
+    let audio_handler = AudioHandler::new(audio_receiver, audio_sender)?;
     let audio_devices_handler = Arc::new(Mutex::new(AudioDevicesHandler::new()?));
 
     let net_iface = Arc::new(Mutex::new(NetIface::new()));
