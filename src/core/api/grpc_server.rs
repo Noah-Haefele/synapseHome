@@ -2,7 +2,6 @@ use std::sync::Arc;
 use std::sync::Mutex;
 use tonic::{Request, Response, Status};
 
-use crate::core::act::audio::audio_devices_handler;
 use crate::core::act::audio::audio_devices_handler::AudioDevicesHandler;
 use crate::core::act::call::call_setup::CallSetup;
 use crate::core::display::brightness::DisplayManager;
