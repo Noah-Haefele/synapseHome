@@ -56,6 +56,7 @@ class SettingsBridge : public QObject
     Q_PROPERTY(
         QString ip_address
         READ ip_address
+        NOTIFY ip_address_changed
     )
 
     // --- Display Settings ---
@@ -91,13 +92,13 @@ class SettingsBridge : public QObject
     Q_PROPERTY(
         int input_device
         READ input_device
-        NOTIFY settings_changed
+        NOTIFY input_device_changed
     )
 
     Q_PROPERTY(
         int output_device
         READ output_device
-        NOTIFY settings_changed
+        NOTIFY output_device_changed
     )
 
 public:
@@ -143,7 +144,9 @@ signals:
     void pref_call_id_changed();
     void brightness_changed();
     void display_time_changed();
-    void settings_changed();
     void audio_devices_changed();
     void pref_call_icon_changed();
+    void input_device_changed();
+    void output_device_changed();
+    void ip_address_changed();
 };
