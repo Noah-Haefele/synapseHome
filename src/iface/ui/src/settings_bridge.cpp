@@ -177,7 +177,8 @@ void SettingsBridge::set_display_time(int val)
 
 Q_INVOKABLE void SettingsBridge::onAudioDropdownOpened()
 {
-    emit settings_changed();
+    emit input_device_changed();
+    emit output_device_changed();
 }
 
 Q_INVOKABLE void SettingsBridge::set_sink(const int &id)
