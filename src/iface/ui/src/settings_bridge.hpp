@@ -53,6 +53,11 @@ class SettingsBridge : public QObject
         NOTIFY pref_call_id_changed
     )
 
+    Q_PROPERTY(
+        QString ip_address
+        READ ip_address
+    )
+
     // --- Display Settings ---
 
     Q_PROPERTY(
@@ -109,6 +114,7 @@ public:
     int pref1_call_id() const;
     int pref2_call_id() const;
     int pref3_call_id() const;
+    QString ip_address() const;
 
     // --- Display Settings ---
 

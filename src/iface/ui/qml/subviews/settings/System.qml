@@ -122,7 +122,7 @@ Rectangle {
             Text {
                 anchors.horizontalCenter: parent.horizontalCenter
 
-                text: networkHandler.ipAddress
+                text: SettingsBridge.ip_address
 
                 font {
                     pixelSize: 20

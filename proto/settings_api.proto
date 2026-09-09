@@ -8,6 +8,7 @@ service System {
     rpc SetLocationId(SetLocationIdRequest) returns (google.protobuf.Empty);
     rpc GetAllDevices(google.protobuf.Empty) returns (GetAllDevicesReply);
     rpc GetLocationId(google.protobuf.Empty) returns (GetLocationIdReply);
+    rpc GetIpAddress(google.protobuf.Empty) returns (GetIpAddressReply);
 }
 
 service Display {
@@ -37,6 +38,10 @@ message GetAllDevicesReply {
 
 message GetLocationIdReply {
     int32 device_id = 1;
+}
+
+message GetIpAddressReply {
+    string ip_address = 1;
 }
 
 // --- Display Settings ---
