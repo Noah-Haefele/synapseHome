@@ -3,28 +3,22 @@ use tokio::sync::{broadcast, mpsc};
 use tokio_stream::wrappers::ReceiverStream;
 use tonic::{Request, Response, Status};
 
-pub mod synapsed {
-    pub mod api {
-        pub mod call {
-            tonic::include_proto!("synapsed.api.call");
-        }
-    }
-}
+use crate::core::api::proto;
 
 use crate::core::act::call::call_handler::CallHandler;
 use crate::core::state::devices::DeviceManager;
 use crate::networking::net_iface::NetIface;
 
-use synapsed::api::call::call_actions_server::CallActions;
-use synapsed::api::call::call_helpers_server::CallHelpers;
-use synapsed::api::call::call_signals_server::CallSignals;
+use proto::synapsed::api::call::call_actions_server::CallActions;
+use proto::synapsed::api::call::call_helpers_server::CallHelpers;
+use proto::synapsed::api::call::call_signals_server::CallSignals;
 
-use synapsed::api::call::Event;
-use synapsed::api::call::SubscribeRequest;
+use proto::synapsed::api::call::Event;
+use proto::synapsed::api::call::SubscribeRequest;
 
-use synapsed::api::call::InitiateRequest;
+use proto::synapsed::api::call::InitiateRequest;
 
-use synapsed::api::call::GetCallLabelReply;
+use proto::synapsed::api::call::GetCallLabelReply;
 
 #[derive(Debug, Clone)]
 pub struct LiveSignalsService {

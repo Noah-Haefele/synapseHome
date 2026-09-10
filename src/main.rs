@@ -20,7 +20,7 @@ use proto::synapsed::api::{
     },
 };
 // --- Call gRPC services ---
-use crate::core::api::grpc_call_server::synapsed::api::call::{
+use proto::synapsed::api::call::{
     call_actions_server::CallActionsServer, call_helpers_server::CallHelpersServer,
     call_signals_server::CallSignalsServer,
 };

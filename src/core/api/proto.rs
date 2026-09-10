@@ -9,6 +9,9 @@ pub mod synapsed {
         pub mod helper {
             tonic::include_proto!("synapsed.api.helper");
         }
+        pub mod call {
+            tonic::include_proto!("synapsed.api.call");
+        }
     }
     pub mod pref {}
 }
