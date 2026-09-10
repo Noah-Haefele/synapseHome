@@ -3,13 +3,11 @@ use std::sync::Mutex;
 use tonic::{Request, Response, Status};
 
 use crate::core::act::audio::audio_devices_handler::AudioDevicesHandler;
-use crate::core::display::brightness::DisplayManager;
 use crate::core::state::devices::DeviceManager;
 use crate::networking::net_iface::NetIface;
 
 // --- Settings Api ---
 use crate::core::api::proto::synapsed::api::settings::audio_server::Audio;
-use crate::core::api::proto::synapsed::api::settings::display_server::Display;
 
 // --- Preference Api ---
 use crate::core::api::proto::synapsed::api::pref::pref_call_ids_server::PrefCallIds;
@@ -22,9 +20,6 @@ use crate::core::api::proto::synapsed::api::helper::DeviceData as ProtoDeviceDat
 use crate::core::api::proto::synapsed::api::helper::SinkSourceData as ProtoSinkSourceData;
 
 // --- Request Messages ---
-// Display
-use crate::core::api::proto::synapsed::api::settings::SetBrightnessRequest;
-use crate::core::api::proto::synapsed::api::settings::SetDisplayTimeRequest;
 // Audio
 use crate::core::api::proto::synapsed::api::settings::SetSinkSourceRequest;
 // Pref Ids
@@ -32,9 +27,6 @@ use crate::core::api::proto::synapsed::api::pref::GetPrefCallIdRequest;
 use crate::core::api::proto::synapsed::api::pref::SetPrefCallIdRequest;
 
 // --- Reply Messages ---
-// Display
-use crate::core::api::proto::synapsed::api::settings::GetBrightnessReply;
-use crate::core::api::proto::synapsed::api::settings::GetDisplayTimeReply;
 // Audio
 use crate::core::api::proto::synapsed::api::settings::GetDefaultSinkIdReply;
 use crate::core::api::proto::synapsed::api::settings::GetDefaultSourceIdReply;
@@ -57,7 +49,6 @@ use crate::core::api::proto::synapsed::api::pref::GetPrefModelReply;
 #[derive(Clone)]
 pub struct ThisSystem {
     device_manager: Arc<Mutex<DeviceManager>>,
-    display_manager: Arc<Mutex<DisplayManager>>,
     audio_devices_handler: Arc<Mutex<AudioDevicesHandler>>,
     net_iface: Arc<Mutex<NetIface>>,
 }
@@ -70,13 +61,11 @@ pub struct CallIcons {
 impl ThisSystem {
     pub fn new(
         device_manager: Arc<Mutex<DeviceManager>>,
-        display_manager: Arc<Mutex<DisplayManager>>,
         audio_devices_handler: Arc<Mutex<AudioDevicesHandler>>,
         net_iface: Arc<Mutex<NetIface>>,
     ) -> Self {
         Self {
             device_manager,
-            display_manager,
             audio_devices_handler,
             net_iface,
         }
@@ -145,72 +134,6 @@ impl PrefModels for ThisSystem {
             .collect();
 
         Ok(Response::new(GetPrefModelReply { devices }))
-    }
-}
-
-#[tonic::async_trait]
-impl Display for ThisSystem {
-    // --- Display Settings ---
-
-    async fn get_brightness(&self, _: Request<()>) -> Result<Response<GetBrightnessReply>, Status> {
-        let display_manager = self
-            .display_manager
-            .lock()
-            .map_err(|_| Status::internal("Lock failed"))?;
-
-        let val = display_manager.get_brightness();
-
-        Ok(Response::new(GetBrightnessReply { val }))
-    }
-
-    async fn get_display_time(
-        &self,
-        _: Request<()>,
-    ) -> Result<Response<GetDisplayTimeReply>, Status> {
-        let display_manager = self
-            .display_manager
-            .lock()
-            .map_err(|_| Status::internal("Lock failed"))?;
-
-        let val = display_manager.get_display_time();
-
-        Ok(Response::new(GetDisplayTimeReply { val }))
-    }
-
-    async fn set_brightness(
-        &self,
-        request: Request<SetBrightnessRequest>,
-    ) -> Result<Response<()>, Status> {
-        let req = request.into_inner();
-
-        let mut display_manager = self
-            .display_manager
-            .lock()
-            .map_err(|_| Status::internal("Lock failed"))?;
-
-        display_manager
-            .set_brightness(req.val)
-            .map_err(|e| Status::internal(e.to_string()))?;
-
-        Ok(Response::new(()))
-    }
-
-    async fn set_display_time(
-        &self,
-        request: Request<SetDisplayTimeRequest>,
-    ) -> Result<Response<()>, Status> {
-        let req = request.into_inner();
-
-        let mut display_manager = self
-            .display_manager
-            .lock()
-            .map_err(|_| Status::internal("Lock failed"))?;
-
-        display_manager
-            .set_display_time(req.val)
-            .map_err(|e| Status::internal(e.to_string()))?;
-
-        Ok(Response::new(()))
     }
 }
 
