@@ -3,7 +3,6 @@ use std::sync::Mutex;
 use tonic::{Request, Response, Status};
 
 use crate::core::state::devices::DeviceManager;
-use crate::networking::net_iface::NetIface;
 
 // --- Preference Api ---
 use crate::core::api::proto::synapsed::api::pref::pref_icon_paths_server::PrefIconPaths;
