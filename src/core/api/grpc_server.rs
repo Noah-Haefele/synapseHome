@@ -6,11 +6,7 @@ use crate::core::state::devices::DeviceManager;
 
 // --- Preference Api ---
 use crate::core::api::proto::synapsed::api::pref::pref_icon_paths_server::PrefIconPaths;
-use crate::core::api::proto::synapsed::api::pref::pref_models_server::PrefModels;
 use crate::core::api::proto::synapsed::api::pref::pref_short_names_server::PrefShortNames;
-
-// --- Helper (data formats) ---
-use crate::core::api::proto::synapsed::api::helper::DeviceData as ProtoDeviceData;
 
 // --- Reply Messages ---
 // Pref Paths
@@ -21,51 +17,15 @@ use crate::core::api::proto::synapsed::api::pref::GetPref3IconPathReply;
 use crate::core::api::proto::synapsed::api::pref::GetPref1ShortNameReply;
 use crate::core::api::proto::synapsed::api::pref::GetPref2ShortNameReply;
 use crate::core::api::proto::synapsed::api::pref::GetPref3ShortNameReply;
-// Pref Models
-use crate::core::api::proto::synapsed::api::pref::GetPrefModelReply;
-
-/// Handles frontend gRPC requests and forwards them to the device manager.
-#[derive(Clone)]
-pub struct ThisSystem {
-    device_manager: Arc<Mutex<DeviceManager>>,
-}
 
 #[derive(Clone)]
 pub struct CallIcons {
     device_manager: Arc<Mutex<DeviceManager>>,
 }
 
-impl ThisSystem {
-    pub fn new(device_manager: Arc<Mutex<DeviceManager>>) -> Self {
-        Self { device_manager }
-    }
-}
-
 impl CallIcons {
     pub fn new(device_manager: Arc<Mutex<DeviceManager>>) -> Self {
         Self { device_manager }
-    }
-}
-
-#[tonic::async_trait]
-impl PrefModels for ThisSystem {
-    async fn get_pref_model(&self, _: Request<()>) -> Result<Response<GetPrefModelReply>, Status> {
-        let manager = self
-            .device_manager
-            .lock()
-            .map_err(|_| Status::internal("Lock failed"))?;
-
-        let devices = manager
-            .get_pref_model()
-            .into_iter()
-            .map(|device| ProtoDeviceData {
-                device_name: device.device_name,
-                device_short_name: device.device_short_name,
-                device_id: device.device_id,
-            })
-            .collect();
-
-        Ok(Response::new(GetPrefModelReply { devices }))
     }
 }
 
