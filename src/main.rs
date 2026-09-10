@@ -2,52 +2,56 @@ mod core;
 mod networking;
 mod platform;
 
-use std::sync::Arc;
-use std::sync::Mutex;
-use std::thread;
+use std::{
+    sync::{Arc, Mutex},
+    thread,
+};
 use tonic::transport::Server;
 
-use crate::core::api::grpc_call_server::CallApi;
-use crate::core::api::grpc_call_server::LiveSignalsService;
-use crate::core::api::grpc_server::CallIcons;
-use crate::core::api::grpc_server::ThisSystem;
+// --- gRPC services ---
+use crate::core::api::grpc_server::synapsed::api::{
+    pref::{
+        pref_call_ids_server::PrefCallIdsServer, pref_icon_paths_server::PrefIconPathsServer,
+        pref_models_server::PrefModelsServer, pref_short_names_server::PrefShortNamesServer,
+    },
+    settings::{
+        audio_server::AudioServer, display_server::DisplayServer, system_server::SystemServer,
+    },
+};
+// --- Call gRPC services ---
+use crate::core::api::grpc_call_server::synapsed::api::call::{
+    call_actions_server::CallActionsServer, call_helpers_server::CallHelpersServer,
+    call_signals_server::CallSignalsServer,
+};
 
-// --- Preference Api ---
-use crate::core::api::grpc_server::synapsed::api::pref::pref_call_ids_server::PrefCallIdsServer;
-use crate::core::api::grpc_server::synapsed::api::pref::pref_icon_paths_server::PrefIconPathsServer;
-use crate::core::api::grpc_server::synapsed::api::pref::pref_models_server::PrefModelsServer;
-use crate::core::api::grpc_server::synapsed::api::pref::pref_short_names_server::PrefShortNamesServer;
+// --- gRPC servers ---
+use crate::core::api::{
+    grpc_call_server::{CallApi, LiveSignalsService},
+    grpc_server::{CallIcons, ThisSystem},
+};
 
-// --- Settings Api ---
-use crate::core::api::grpc_server::synapsed::api::settings::audio_server::AudioServer;
-use crate::core::api::grpc_server::synapsed::api::settings::display_server::DisplayServer;
-use crate::core::api::grpc_server::synapsed::api::settings::system_server::SystemServer;
+// --- Core ---
+use crate::core::{
+    act::{
+        audio::{audio::AudioHandler, audio_devices_handler::AudioDevicesHandler},
+        call::{
+            call_handler::CallHandler, call_mqtt_event_handler::CallEventHandler,
+            call_setup::CallSetup,
+        },
+    },
+    display::brightness::DisplayManager,
+    state::devices::DeviceManager,
+};
 
-// --- Signals Api ---
-use crate::core::api::grpc_call_server::synapsed::api::call::call_signals_server::CallSignalsServer;
-
-// --- Call Api ---
-use crate::core::api::grpc_call_server::synapsed::api::call::call_actions_server::CallActionsServer;
-use crate::core::api::grpc_call_server::synapsed::api::call::call_helpers_server::CallHelpersServer;
-
-use crate::core::display::brightness::DisplayManager;
-
-use crate::core::state::devices::DeviceManager;
-
-use crate::core::act::audio::audio::AudioHandler;
-use crate::core::act::audio::audio_devices_handler::AudioDevicesHandler;
-
-use crate::core::act::call::call_handler::CallHandler;
-use crate::core::act::call::call_mqtt_event_handler::CallEventHandler;
-use crate::core::act::call::call_setup::CallSetup;
-
+// --- Linux ---
 use crate::platform::linux::display_controller::DspCtrl;
 
-use crate::networking::audio::receiver::AudioReceiver;
-use crate::networking::audio::sender::AudioSender;
-use crate::networking::mqtt::mqtt_config::MqttConfig;
-use crate::networking::mqtt::mqtt_handler::MqttHandler;
-use crate::networking::net_iface::NetIface;
+// --- Networking ---
+use crate::networking::{
+    audio::{receiver::AudioReceiver, sender::AudioSender},
+    mqtt::{mqtt_config::MqttConfig, mqtt_handler::MqttHandler},
+    net_iface::NetIface,
+};
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
