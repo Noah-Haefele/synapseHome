@@ -29,7 +29,6 @@ use crate::core::api::proto::synapsed::api::pref::GetPrefModelReply;
 #[derive(Clone)]
 pub struct ThisSystem {
     device_manager: Arc<Mutex<DeviceManager>>,
-    net_iface: Arc<Mutex<NetIface>>,
 }
 
 #[derive(Clone)]
@@ -38,11 +37,8 @@ pub struct CallIcons {
 }
 
 impl ThisSystem {
-    pub fn new(device_manager: Arc<Mutex<DeviceManager>>, net_iface: Arc<Mutex<NetIface>>) -> Self {
-        Self {
-            device_manager,
-            net_iface,
-        }
+    pub fn new(device_manager: Arc<Mutex<DeviceManager>>) -> Self {
+        Self { device_manager }
     }
 }
 

@@ -97,7 +97,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let audio_settings_service = AudioSettingsService::new(audio_devices_handler);
     let pref_call_ids_service = PrefCallIdsService::new(Arc::clone(&device_manager));
 
-    let grpc_server = ThisSystem::new(Arc::clone(&device_manager), Arc::clone(&net_iface));
+    let grpc_server = ThisSystem::new(Arc::clone(&device_manager));
     let grpc_server_call_icon = CallIcons::new(Arc::clone(&device_manager));
     let grpc_call_signals_server = LiveSignalsService::new();
 
