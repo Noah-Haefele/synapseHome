@@ -9,7 +9,8 @@ use std::{
 use tonic::transport::Server;
 
 // --- gRPC services ---
-use crate::core::api::grpc_server::synapsed::api::{
+use crate::core::api::proto;
+use proto::synapsed::api::{
     pref::{
         pref_call_ids_server::PrefCallIdsServer, pref_icon_paths_server::PrefIconPathsServer,
         pref_models_server::PrefModelsServer, pref_short_names_server::PrefShortNamesServer,
@@ -43,6 +44,9 @@ use crate::core::{
     state::devices::DeviceManager,
 };
 
+// --- gRPC Servers ---
+use crate::core::api::system_settings_server::SystemSettingsServer;
+
 // --- Linux ---
 use crate::platform::linux::display_controller::DspCtrl;
 
@@ -75,17 +79,19 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .map_err(|_| "Device manager lock failed")?
         .get_location_id();
 
-    let call_setup = Arc::new(Mutex::new(CallSetup::new(
-        Arc::clone(&mqtt_handler),
-        location_id,
-    )?));
+    let call_setup = Mutex::new(CallSetup::new(Arc::clone(&mqtt_handler), location_id)?);
 
     let addr = "0.0.0.0:50051".parse()?;
+
+    let system_settings_server = SystemSettingsServer::new(
+        Arc::clone(&device_manager),
+        call_setup,
+        Arc::clone(&net_iface),
+    );
 
     let grpc_server = ThisSystem::new(
         Arc::clone(&device_manager),
         display_manager,
-        call_setup,
         audio_devices_handler,
         Arc::clone(&net_iface),
     );
@@ -108,7 +114,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let grpc_call_actions_server = CallApi::new(call_handler, device_manager, net_iface);
 
-    let system_service = SystemServer::new(grpc_server.clone());
+    let system_service = SystemServer::new(system_settings_server);
     let display_service = DisplayServer::new(grpc_server.clone());
     let audio_service = AudioServer::new(grpc_server.clone());
     let pref_call_ids_server = PrefCallIdsServer::new(grpc_server.clone());

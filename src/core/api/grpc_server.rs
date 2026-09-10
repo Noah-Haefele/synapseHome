@@ -3,85 +3,61 @@ use std::sync::Mutex;
 use tonic::{Request, Response, Status};
 
 use crate::core::act::audio::audio_devices_handler::AudioDevicesHandler;
-use crate::core::act::call::call_setup::CallSetup;
 use crate::core::display::brightness::DisplayManager;
 use crate::core::state::devices::DeviceManager;
 use crate::networking::net_iface::NetIface;
 
-pub mod synapsed {
-    pub mod api {
-        pub mod settings {
-            tonic::include_proto!("synapsed.api.settings");
-        }
-        pub mod pref {
-            tonic::include_proto!("synapsed.api.pref");
-        }
-        pub mod helper {
-            tonic::include_proto!("synapsed.api.helper");
-        }
-    }
-    pub mod pref {}
-}
-
 // --- Settings Api ---
-use synapsed::api::settings::audio_server::Audio;
-use synapsed::api::settings::display_server::Display;
-use synapsed::api::settings::system_server::System;
+use crate::core::api::proto::synapsed::api::settings::audio_server::Audio;
+use crate::core::api::proto::synapsed::api::settings::display_server::Display;
 
 // --- Preference Api ---
-use synapsed::api::pref::pref_call_ids_server::PrefCallIds;
-use synapsed::api::pref::pref_icon_paths_server::PrefIconPaths;
-use synapsed::api::pref::pref_models_server::PrefModels;
-use synapsed::api::pref::pref_short_names_server::PrefShortNames;
+use crate::core::api::proto::synapsed::api::pref::pref_call_ids_server::PrefCallIds;
+use crate::core::api::proto::synapsed::api::pref::pref_icon_paths_server::PrefIconPaths;
+use crate::core::api::proto::synapsed::api::pref::pref_models_server::PrefModels;
+use crate::core::api::proto::synapsed::api::pref::pref_short_names_server::PrefShortNames;
 
 // --- Helper (data formats) ---
-use synapsed::api::helper::DeviceData as ProtoDeviceData;
-use synapsed::api::helper::SinkSourceData as ProtoSinkSourceData;
+use crate::core::api::proto::synapsed::api::helper::DeviceData as ProtoDeviceData;
+use crate::core::api::proto::synapsed::api::helper::SinkSourceData as ProtoSinkSourceData;
 
 // --- Request Messages ---
-// System
-use synapsed::api::settings::SetLocationIdRequest;
 // Display
-use synapsed::api::settings::SetBrightnessRequest;
-use synapsed::api::settings::SetDisplayTimeRequest;
+use crate::core::api::proto::synapsed::api::settings::SetBrightnessRequest;
+use crate::core::api::proto::synapsed::api::settings::SetDisplayTimeRequest;
 // Audio
-use synapsed::api::settings::SetSinkSourceRequest;
+use crate::core::api::proto::synapsed::api::settings::SetSinkSourceRequest;
 // Pref Ids
-use synapsed::api::pref::GetPrefCallIdRequest;
-use synapsed::api::pref::SetPrefCallIdRequest;
+use crate::core::api::proto::synapsed::api::pref::GetPrefCallIdRequest;
+use crate::core::api::proto::synapsed::api::pref::SetPrefCallIdRequest;
 
 // --- Reply Messages ---
-// System
-use synapsed::api::settings::GetAllDevicesReply;
-use synapsed::api::settings::GetIpAddressReply;
-use synapsed::api::settings::GetLocationIdReply;
 // Display
-use synapsed::api::settings::GetBrightnessReply;
-use synapsed::api::settings::GetDisplayTimeReply;
+use crate::core::api::proto::synapsed::api::settings::GetBrightnessReply;
+use crate::core::api::proto::synapsed::api::settings::GetDisplayTimeReply;
 // Audio
-use synapsed::api::settings::GetDefaultSinkIdReply;
-use synapsed::api::settings::GetDefaultSourceIdReply;
-use synapsed::api::settings::GetSinkModelReply;
-use synapsed::api::settings::GetSourceModelReply;
+use crate::core::api::proto::synapsed::api::settings::GetDefaultSinkIdReply;
+use crate::core::api::proto::synapsed::api::settings::GetDefaultSourceIdReply;
+use crate::core::api::proto::synapsed::api::settings::GetSinkModelReply;
+use crate::core::api::proto::synapsed::api::settings::GetSourceModelReply;
 // Pref Paths
-use synapsed::api::pref::GetPref1IconPathReply;
-use synapsed::api::pref::GetPref2IconPathReply;
-use synapsed::api::pref::GetPref3IconPathReply;
+use crate::core::api::proto::synapsed::api::pref::GetPref1IconPathReply;
+use crate::core::api::proto::synapsed::api::pref::GetPref2IconPathReply;
+use crate::core::api::proto::synapsed::api::pref::GetPref3IconPathReply;
 // Pref Ids
-use synapsed::api::pref::GetPrefCallIdReply;
+use crate::core::api::proto::synapsed::api::pref::GetPrefCallIdReply;
 // Pref short Labels
-use synapsed::api::pref::GetPref1ShortNameReply;
-use synapsed::api::pref::GetPref2ShortNameReply;
-use synapsed::api::pref::GetPref3ShortNameReply;
+use crate::core::api::proto::synapsed::api::pref::GetPref1ShortNameReply;
+use crate::core::api::proto::synapsed::api::pref::GetPref2ShortNameReply;
+use crate::core::api::proto::synapsed::api::pref::GetPref3ShortNameReply;
 // Pref Models
-use synapsed::api::pref::GetPrefModelReply;
+use crate::core::api::proto::synapsed::api::pref::GetPrefModelReply;
 
 /// Handles frontend gRPC requests and forwards them to the device manager.
 #[derive(Clone)]
 pub struct ThisSystem {
     device_manager: Arc<Mutex<DeviceManager>>,
     display_manager: Arc<Mutex<DisplayManager>>,
-    call_setup: Arc<Mutex<CallSetup>>,
     audio_devices_handler: Arc<Mutex<AudioDevicesHandler>>,
     net_iface: Arc<Mutex<NetIface>>,
 }
@@ -95,14 +71,12 @@ impl ThisSystem {
     pub fn new(
         device_manager: Arc<Mutex<DeviceManager>>,
         display_manager: Arc<Mutex<DisplayManager>>,
-        call_setup: Arc<Mutex<CallSetup>>,
         audio_devices_handler: Arc<Mutex<AudioDevicesHandler>>,
         net_iface: Arc<Mutex<NetIface>>,
     ) -> Self {
         Self {
             device_manager,
             display_manager,
-            call_setup,
             audio_devices_handler,
             net_iface,
         }
@@ -112,87 +86,6 @@ impl ThisSystem {
 impl CallIcons {
     pub fn new(device_manager: Arc<Mutex<DeviceManager>>) -> Self {
         Self { device_manager }
-    }
-}
-
-#[tonic::async_trait]
-impl System for ThisSystem {
-    // --- System Settings ---
-
-    async fn get_all_devices(
-        &self,
-        _: Request<()>,
-    ) -> Result<Response<GetAllDevicesReply>, Status> {
-        let manager = self
-            .device_manager
-            .lock()
-            .map_err(|_| Status::internal("Lock failed"))?;
-
-        let devices = manager
-            .get_all_devices()
-            .into_iter()
-            .map(|device| ProtoDeviceData {
-                device_name: device.device_name,
-                device_short_name: device.device_short_name,
-                device_id: device.device_id,
-            })
-            .collect();
-
-        Ok(Response::new(GetAllDevicesReply { devices }))
-    }
-
-    async fn get_location_id(
-        &self,
-        _: Request<()>,
-    ) -> Result<Response<GetLocationIdReply>, Status> {
-        let manager = self
-            .device_manager
-            .lock()
-            .map_err(|_| Status::internal("Lock failed"))?;
-
-        let device_id = manager.get_location_id();
-
-        Ok(Response::new(GetLocationIdReply { device_id }))
-    }
-
-    async fn set_location_id(
-        &self,
-        request: Request<SetLocationIdRequest>,
-    ) -> Result<Response<()>, Status> {
-        let req = request.into_inner();
-
-        let mut manager = self
-            .device_manager
-            .lock()
-            .map_err(|_| Status::internal("Lock failed"))?;
-
-        let mut call_setup = self
-            .call_setup
-            .lock()
-            .map_err(|_| Status::internal("Lock failed"))?;
-
-        manager
-            .set_location_id(req.device_id)
-            .map_err(|e| Status::internal(e.to_string()))?;
-
-        call_setup
-            .subscribe_to_call_message(req.device_id)
-            .map_err(|e| Status::internal(e.to_string()))?;
-
-        Ok(Response::new(()))
-    }
-
-    async fn get_ip_address(&self, _: Request<()>) -> Result<Response<GetIpAddressReply>, Status> {
-        let net_iface = self
-            .net_iface
-            .lock()
-            .map_err(|_| Status::internal("Failed to lock NetIface"))?;
-
-        let ip_address = net_iface
-            .get_ip_address()
-            .map_err(|e| Status::internal(e.to_string()))?;
-
-        Ok(Response::new(GetIpAddressReply { ip_address }))
     }
 }
 
