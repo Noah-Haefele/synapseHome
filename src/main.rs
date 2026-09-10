@@ -10,8 +10,8 @@ use tonic::transport::Server;
 
 // --- gRPC services ---
 use crate::core::api::{
-    audio_settings_service, display_settings_service, pref_call_ids_service, pref_model_service,
-    proto,
+    audio_settings_service, display_settings_service, pref_call_ids_service,
+    pref_icon_paths_service, pref_model_service, proto,
 };
 use proto::synapsed::api::{
     pref::{
@@ -50,8 +50,8 @@ use crate::core::{
 // --- gRPC Servers ---
 use crate::core::api::{
     audio_settings_service::AudioSettingsService, display_settings_service::DisplaySettingsService,
-    pref_call_ids_service::PrefCallIdsService, pref_model_service::PrefModelService,
-    system_settings_service::SystemSettingsService,
+    pref_call_ids_service::PrefCallIdsService, pref_icon_paths_service::PrefIconPathsService,
+    pref_model_service::PrefModelService, system_settings_service::SystemSettingsService,
 };
 
 // --- Linux ---
@@ -99,6 +99,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let audio_settings_service = AudioSettingsService::new(audio_devices_handler);
     let pref_call_ids_service = PrefCallIdsService::new(Arc::clone(&device_manager));
     let pref_model_service = PrefModelService::new(Arc::clone(&device_manager));
+    let pref_icon_paths_service = PrefIconPathsService::new(Arc::clone(&device_manager));
 
     let grpc_server_call_icon = CallIcons::new(Arc::clone(&device_manager));
     let grpc_call_signals_server = LiveSignalsService::new();
@@ -125,7 +126,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let pref_call_ids_server = PrefCallIdsServer::new(pref_call_ids_service);
     let pref_models_server = PrefModelsServer::new(pref_model_service);
 
-    let pref_icon_paths = PrefIconPathsServer::new(grpc_server_call_icon.clone());
+    let pref_icon_paths_server = PrefIconPathsServer::new(pref_icon_paths_service);
     let pref_short_names = PrefShortNamesServer::new(grpc_server_call_icon);
 
     let call_signals_service = CallSignalsServer::new(grpc_call_signals_server);
@@ -138,7 +139,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .add_service(audio_server)
         .add_service(pref_call_ids_server)
         .add_service(pref_models_server)
-        .add_service(pref_icon_paths)
+        .add_service(pref_icon_paths_server)
         .add_service(pref_short_names)
         .add_service(call_signals_service)
         .add_service(call_actions_service)
