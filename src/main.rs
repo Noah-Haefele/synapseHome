@@ -9,7 +9,9 @@ use std::{
 use tonic::transport::Server;
 
 // --- gRPC services ---
-use crate::core::api::{audio_settings_service, display_settings_service, proto};
+use crate::core::api::{
+    audio_settings_service, display_settings_service, pref_call_ids_service, proto,
+};
 use proto::synapsed::api::{
     pref::{
         pref_call_ids_server::PrefCallIdsServer, pref_icon_paths_server::PrefIconPathsServer,
@@ -47,7 +49,7 @@ use crate::core::{
 // --- gRPC Servers ---
 use crate::core::api::{
     audio_settings_service::AudioSettingsService, display_settings_service::DisplaySettingsService,
-    system_settings_service::SystemSettingsService,
+    pref_call_ids_service::PrefCallIdsService, system_settings_service::SystemSettingsService,
 };
 
 // --- Linux ---
@@ -93,6 +95,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     );
     let display_settings_service = DisplaySettingsService::new(display_manager);
     let audio_settings_service = AudioSettingsService::new(audio_devices_handler);
+    let pref_call_ids_service = PrefCallIdsService::new(Arc::clone(&device_manager));
 
     let grpc_server = ThisSystem::new(Arc::clone(&device_manager), Arc::clone(&net_iface));
     let grpc_server_call_icon = CallIcons::new(Arc::clone(&device_manager));
@@ -117,7 +120,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let system_server = SystemServer::new(system_settings_service);
     let display_server = DisplayServer::new(display_settings_service);
     let audio_server = AudioServer::new(audio_settings_service);
-    let pref_call_ids_server = PrefCallIdsServer::new(grpc_server.clone());
+    let pref_call_ids_server = PrefCallIdsServer::new(pref_call_ids_service);
     let pref_models_server = PrefModelsServer::new(grpc_server);
 
     let pref_icon_paths = PrefIconPathsServer::new(grpc_server_call_icon.clone());

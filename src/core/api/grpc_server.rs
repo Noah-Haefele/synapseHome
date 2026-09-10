@@ -6,25 +6,18 @@ use crate::core::state::devices::DeviceManager;
 use crate::networking::net_iface::NetIface;
 
 // --- Preference Api ---
-use crate::core::api::proto::synapsed::api::pref::pref_call_ids_server::PrefCallIds;
 use crate::core::api::proto::synapsed::api::pref::pref_icon_paths_server::PrefIconPaths;
 use crate::core::api::proto::synapsed::api::pref::pref_models_server::PrefModels;
 use crate::core::api::proto::synapsed::api::pref::pref_short_names_server::PrefShortNames;
 
 // --- Helper (data formats) ---
 use crate::core::api::proto::synapsed::api::helper::DeviceData as ProtoDeviceData;
-// --- Request Messages ---
-// Pref Ids
-use crate::core::api::proto::synapsed::api::pref::GetPrefCallIdRequest;
-use crate::core::api::proto::synapsed::api::pref::SetPrefCallIdRequest;
 
 // --- Reply Messages ---
 // Pref Paths
 use crate::core::api::proto::synapsed::api::pref::GetPref1IconPathReply;
 use crate::core::api::proto::synapsed::api::pref::GetPref2IconPathReply;
 use crate::core::api::proto::synapsed::api::pref::GetPref3IconPathReply;
-// Pref Ids
-use crate::core::api::proto::synapsed::api::pref::GetPrefCallIdReply;
 // Pref short Labels
 use crate::core::api::proto::synapsed::api::pref::GetPref1ShortNameReply;
 use crate::core::api::proto::synapsed::api::pref::GetPref2ShortNameReply;
@@ -56,43 +49,6 @@ impl ThisSystem {
 impl CallIcons {
     pub fn new(device_manager: Arc<Mutex<DeviceManager>>) -> Self {
         Self { device_manager }
-    }
-}
-
-#[tonic::async_trait]
-impl PrefCallIds for ThisSystem {
-    async fn get_pref_call_id(
-        &self,
-        request: Request<GetPrefCallIdRequest>,
-    ) -> Result<Response<GetPrefCallIdReply>, Status> {
-        let req = request.into_inner();
-
-        let manager = self
-            .device_manager
-            .lock()
-            .map_err(|_| Status::internal("Lock failed"))?;
-
-        let device_id = manager.get_pref_call_id(req.num);
-
-        Ok(Response::new(GetPrefCallIdReply { device_id }))
-    }
-
-    async fn set_pref_call_id(
-        &self,
-        request: Request<SetPrefCallIdRequest>,
-    ) -> Result<Response<()>, Status> {
-        let req = request.into_inner();
-
-        let mut manager = self
-            .device_manager
-            .lock()
-            .map_err(|_| Status::internal("Lock failed"))?;
-
-        manager
-            .set_pref_call_id(req.num, req.device_id)
-            .map_err(|e| Status::internal(e.to_string()))?;
-
-        Ok(Response::new(()))
     }
 }
 
