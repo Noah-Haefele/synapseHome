@@ -9,7 +9,7 @@ use std::{
 use tonic::transport::Server;
 
 // --- gRPC services ---
-use crate::core::api::{display_settings_server, proto};
+use crate::core::api::{audio_settings_service, display_settings_service, proto};
 use proto::synapsed::api::{
     pref::{
         pref_call_ids_server::PrefCallIdsServer, pref_icon_paths_server::PrefIconPathsServer,
@@ -45,8 +45,10 @@ use crate::core::{
 };
 
 // --- gRPC Servers ---
-use crate::core::api::display_settings_server::DisplaySettingsServer;
-use crate::core::api::system_settings_server::SystemSettingsServer;
+use crate::core::api::{
+    audio_settings_service::AudioSettingsService, display_settings_service::DisplaySettingsService,
+    system_settings_service::SystemSettingsService,
+};
 
 // --- Linux ---
 use crate::platform::linux::display_controller::DspCtrl;
@@ -65,7 +67,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let audio_receiver = AudioReceiver::new("0.0.0.0", 5000)?;
     let audio_sender = AudioSender::new("0.0.0.0", 0)?;
     let audio_handler = AudioHandler::new(audio_receiver, audio_sender)?;
-    let audio_devices_handler = Arc::new(Mutex::new(AudioDevicesHandler::new()?));
+    let audio_devices_handler = Mutex::new(AudioDevicesHandler::new()?);
 
     let net_iface = Arc::new(Mutex::new(NetIface::new()));
     let mqtt_config = MqttConfig::new()?;
@@ -84,18 +86,15 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let addr = "0.0.0.0:50051".parse()?;
 
-    let system_settings_server = SystemSettingsServer::new(
+    let system_settings_service = SystemSettingsService::new(
         Arc::clone(&device_manager),
         call_setup,
         Arc::clone(&net_iface),
     );
-    let display_settings_server = DisplaySettingsServer::new(display_manager);
+    let display_settings_service = DisplaySettingsService::new(display_manager);
+    let audio_settings_service = AudioSettingsService::new(audio_devices_handler);
 
-    let grpc_server = ThisSystem::new(
-        Arc::clone(&device_manager),
-        audio_devices_handler,
-        Arc::clone(&net_iface),
-    );
+    let grpc_server = ThisSystem::new(Arc::clone(&device_manager), Arc::clone(&net_iface));
     let grpc_server_call_icon = CallIcons::new(Arc::clone(&device_manager));
     let grpc_call_signals_server = LiveSignalsService::new();
 
@@ -115,9 +114,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let grpc_call_actions_server = CallApi::new(call_handler, device_manager, net_iface);
 
-    let system_service = SystemServer::new(system_settings_server);
-    let display_service = DisplayServer::new(display_settings_server);
-    let audio_service = AudioServer::new(grpc_server.clone());
+    let system_server = SystemServer::new(system_settings_service);
+    let display_server = DisplayServer::new(display_settings_service);
+    let audio_server = AudioServer::new(audio_settings_service);
     let pref_call_ids_server = PrefCallIdsServer::new(grpc_server.clone());
     let pref_models_server = PrefModelsServer::new(grpc_server);
 
@@ -129,9 +128,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let call_helpers_service = CallHelpersServer::new(grpc_call_actions_server);
 
     Server::builder()
-        .add_service(system_service)
-        .add_service(display_service)
-        .add_service(audio_service)
+        .add_service(system_server)
+        .add_service(display_server)
+        .add_service(audio_server)
         .add_service(pref_call_ids_server)
         .add_service(pref_models_server)
         .add_service(pref_icon_paths)

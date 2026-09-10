@@ -19,13 +19,13 @@ use proto::synapsed::api::settings::GetAllDevicesReply;
 use proto::synapsed::api::settings::GetIpAddressReply;
 use proto::synapsed::api::settings::GetLocationIdReply;
 
-pub struct SystemSettingsServer {
+pub struct SystemSettingsService {
     device_manager: Arc<Mutex<DeviceManager>>,
     call_setup: Mutex<CallSetup>,
     net_iface: Arc<Mutex<NetIface>>,
 }
 
-impl SystemSettingsServer {
+impl SystemSettingsService {
     pub fn new(
         device_manager: Arc<Mutex<DeviceManager>>,
         call_setup: Mutex<CallSetup>,
@@ -40,7 +40,7 @@ impl SystemSettingsServer {
 }
 
 #[tonic::async_trait]
-impl System for SystemSettingsServer {
+impl System for SystemSettingsService {
     async fn get_all_devices(
         &self,
         _: Request<()>,

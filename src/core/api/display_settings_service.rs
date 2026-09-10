@@ -14,18 +14,18 @@ use proto::synapsed::api::settings::SetDisplayTimeRequest;
 use proto::synapsed::api::settings::GetBrightnessReply;
 use proto::synapsed::api::settings::GetDisplayTimeReply;
 
-pub struct DisplaySettingsServer {
+pub struct DisplaySettingsService {
     display_manager: Mutex<DisplayManager>,
 }
 
-impl DisplaySettingsServer {
+impl DisplaySettingsService {
     pub fn new(display_manager: Mutex<DisplayManager>) -> Self {
         Self { display_manager }
     }
 }
 
 #[tonic::async_trait]
-impl Display for DisplaySettingsServer {
+impl Display for DisplaySettingsService {
     async fn get_brightness(&self, _: Request<()>) -> Result<Response<GetBrightnessReply>, Status> {
         let display_manager = self
             .display_manager
