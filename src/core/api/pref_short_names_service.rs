@@ -1,31 +1,29 @@
-use std::sync::Arc;
-use std::sync::Mutex;
+use std::sync::{Arc, Mutex};
 use tonic::{Request, Response, Status};
 
+use crate::core::api::proto;
 use crate::core::state::devices::DeviceManager;
 
-// --- Preference Api ---
-use crate::core::api::proto::synapsed::api::pref::pref_short_names_server::PrefShortNames;
+use proto::synapsed::api::pref::pref_short_names_server::PrefShortNames;
 
-// --- Reply Messages ---
-// Pref short Labels
-use crate::core::api::proto::synapsed::api::pref::GetPref1ShortNameReply;
-use crate::core::api::proto::synapsed::api::pref::GetPref2ShortNameReply;
-use crate::core::api::proto::synapsed::api::pref::GetPref3ShortNameReply;
+// --- Replies ---
+use proto::synapsed::api::pref::GetPref1ShortNameReply;
+use proto::synapsed::api::pref::GetPref2ShortNameReply;
+use proto::synapsed::api::pref::GetPref3ShortNameReply;
 
-#[derive(Clone)]
-pub struct CallIcons {
+/// Provides the short names displayed on top of each call icons.
+pub struct PrefShortNamesService {
     device_manager: Arc<Mutex<DeviceManager>>,
 }
 
-impl CallIcons {
+impl PrefShortNamesService {
     pub fn new(device_manager: Arc<Mutex<DeviceManager>>) -> Self {
         Self { device_manager }
     }
 }
 
 #[tonic::async_trait]
-impl PrefShortNames for CallIcons {
+impl PrefShortNames for PrefShortNamesService {
     async fn get_pref1_short_name(
         &self,
         _: Request<()>,

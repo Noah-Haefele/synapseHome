@@ -9,10 +9,7 @@ use std::{
 use tonic::transport::Server;
 
 // --- gRPC services ---
-use crate::core::api::{
-    audio_settings_service, display_settings_service, pref_call_ids_service,
-    pref_icon_paths_service, pref_model_service, proto,
-};
+use crate::core::api::proto;
 use proto::synapsed::api::{
     pref::{
         pref_call_ids_server::PrefCallIdsServer, pref_icon_paths_server::PrefIconPathsServer,
@@ -29,10 +26,7 @@ use crate::core::api::grpc_call_server::synapsed::api::call::{
 };
 
 // --- gRPC servers ---
-use crate::core::api::{
-    grpc_call_server::{CallApi, LiveSignalsService},
-    grpc_server::CallIcons,
-};
+use crate::core::api::grpc_call_server::{CallApi, LiveSignalsService};
 
 // --- Core ---
 use crate::core::{
@@ -51,7 +45,8 @@ use crate::core::{
 use crate::core::api::{
     audio_settings_service::AudioSettingsService, display_settings_service::DisplaySettingsService,
     pref_call_ids_service::PrefCallIdsService, pref_icon_paths_service::PrefIconPathsService,
-    pref_model_service::PrefModelService, system_settings_service::SystemSettingsService,
+    pref_model_service::PrefModelService, pref_short_names_service::PrefShortNamesService,
+    system_settings_service::SystemSettingsService,
 };
 
 // --- Linux ---
@@ -100,8 +95,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let pref_call_ids_service = PrefCallIdsService::new(Arc::clone(&device_manager));
     let pref_model_service = PrefModelService::new(Arc::clone(&device_manager));
     let pref_icon_paths_service = PrefIconPathsService::new(Arc::clone(&device_manager));
+    let pref_short_names_service = PrefShortNamesService::new(Arc::clone(&device_manager));
 
-    let grpc_server_call_icon = CallIcons::new(Arc::clone(&device_manager));
     let grpc_call_signals_server = LiveSignalsService::new();
 
     let call_handler = Arc::new(Mutex::new(CallHandler::new(
@@ -125,9 +120,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let audio_server = AudioServer::new(audio_settings_service);
     let pref_call_ids_server = PrefCallIdsServer::new(pref_call_ids_service);
     let pref_models_server = PrefModelsServer::new(pref_model_service);
-
     let pref_icon_paths_server = PrefIconPathsServer::new(pref_icon_paths_service);
-    let pref_short_names = PrefShortNamesServer::new(grpc_server_call_icon);
+    let pref_short_names_server = PrefShortNamesServer::new(pref_short_names_service);
 
     let call_signals_service = CallSignalsServer::new(grpc_call_signals_server);
     let call_actions_service = CallActionsServer::new(grpc_call_actions_server.clone());
@@ -140,7 +134,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .add_service(pref_call_ids_server)
         .add_service(pref_models_server)
         .add_service(pref_icon_paths_server)
-        .add_service(pref_short_names)
+        .add_service(pref_short_names_server)
         .add_service(call_signals_service)
         .add_service(call_actions_service)
         .add_service(call_helpers_service)
