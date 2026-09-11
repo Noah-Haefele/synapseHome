@@ -1,13 +1,13 @@
 use std::sync::{Arc, Mutex};
 
 use crate::core::act::audio::audio::AudioHandler;
-use crate::core::api::grpc_call_server::LiveSignalsService;
+use crate::core::api::call_signals_service::CallSignalsService;
 use crate::networking::mqtt::mqtt_handler::MqttHandler;
 
 pub struct CallHandler {
-    grpc_call_signal_api: LiveSignalsService,
+    call_signals_service: CallSignalsService,
     mqtt_handler: Arc<Mutex<MqttHandler>>,
-    audio_handler: Arc<Mutex<AudioHandler>>,
+    audio_handler: AudioHandler,
 
     call_device_id: i32,
     call_state: String,
@@ -16,12 +16,12 @@ pub struct CallHandler {
 /// Methods that are called local meaning in this software by this device
 impl CallHandler {
     pub fn new(
-        grpc_call_signal_api: LiveSignalsService,
+        call_signals_service: CallSignalsService,
         mqtt_handler: Arc<Mutex<MqttHandler>>,
-        audio_handler: Arc<Mutex<AudioHandler>>,
+        audio_handler: AudioHandler,
     ) -> Self {
         Self {
-            grpc_call_signal_api,
+            call_signals_service,
             mqtt_handler,
             audio_handler,
 
@@ -40,7 +40,7 @@ impl CallHandler {
         self.call_device_id = target_device_id;
         self.call_state = "CALLING".to_string();
 
-        self.grpc_call_signal_api
+        self.call_signals_service
             .trigger_call_state_changed(&self.call_state);
 
         let mqtt_handler = self
@@ -63,7 +63,7 @@ impl CallHandler {
     ) -> Result<(), Box<dyn std::error::Error>> {
         self.call_state = "CONNECTED".to_string();
 
-        self.grpc_call_signal_api
+        self.call_signals_service
             .trigger_call_state_changed(&self.call_state);
 
         let mqtt_handler = self
@@ -86,7 +86,7 @@ impl CallHandler {
     ) -> Result<(), Box<dyn std::error::Error>> {
         self.call_state = "IDLE".to_string();
 
-        self.grpc_call_signal_api
+        self.call_signals_service
             .trigger_call_state_changed(&self.call_state);
 
         let mqtt_handler = self
@@ -101,12 +101,7 @@ impl CallHandler {
 
         self.call_device_id = -1;
 
-        let mut audio_handler = self
-            .audio_handler
-            .lock()
-            .map_err(|_| "Failed to lock AudioHandler")?;
-
-        audio_handler.pause_net_audio()?;
+        self.audio_handler.pause_net_audio()?;
 
         Ok(())
     }
@@ -139,15 +134,10 @@ impl CallHandler {
         self.call_state = "RINGING".to_string();
         self.call_device_id = source_device_id;
 
-        self.grpc_call_signal_api
+        self.call_signals_service
             .trigger_call_state_changed(&self.call_state);
 
-        let mut audio_handler = self
-            .audio_handler
-            .lock()
-            .map_err(|_| "Failed to lock AudioHandler")?;
-
-        audio_handler.start_net_audio(source_ip_address)?;
+        self.audio_handler.start_net_audio(source_ip_address)?;
 
         Ok(())
     }
@@ -165,15 +155,10 @@ impl CallHandler {
 
         self.call_state = "CONNECTED".to_string();
 
-        self.grpc_call_signal_api
+        self.call_signals_service
             .trigger_call_state_changed(&self.call_state);
 
-        let mut audio_handler = self
-            .audio_handler
-            .lock()
-            .map_err(|_| "Failed to lock AudioHandler")?;
-
-        audio_handler.start_net_audio(source_ip_address)?;
+        self.audio_handler.start_net_audio(source_ip_address)?;
 
         Ok(())
     }
@@ -191,15 +176,10 @@ impl CallHandler {
 
         self.call_state = "IDLE".to_string();
 
-        self.grpc_call_signal_api
+        self.call_signals_service
             .trigger_call_state_changed(&self.call_state);
 
-        let mut audio_handler = self
-            .audio_handler
-            .lock()
-            .map_err(|_| "Failed to lock AudioHandler")?;
-
-        audio_handler.pause_net_audio()?;
+        self.audio_handler.pause_net_audio()?;
 
         Ok(())
     }
