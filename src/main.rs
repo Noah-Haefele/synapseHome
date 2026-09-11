@@ -25,9 +25,6 @@ use proto::synapsed::api::call::{
     call_signals_server::CallSignalsServer,
 };
 
-// --- gRPC servers ---
-use crate::core::api::grpc_call_server::CallApi;
-
 // --- Core ---
 use crate::core::{
     act::{
@@ -44,9 +41,10 @@ use crate::core::{
 // --- gRPC Servers ---
 use crate::core::api::{
     audio_settings_service::AudioSettingsService, call_actions_service::CallActionsService,
-    call_signals_service::CallSignalsService, display_settings_service::DisplaySettingsService,
-    pref_call_ids_service::PrefCallIdsService, pref_icon_paths_service::PrefIconPathsService,
-    pref_model_service::PrefModelService, pref_short_names_service::PrefShortNamesService,
+    call_helpers_service::CallHelpersService, call_signals_service::CallSignalsService,
+    display_settings_service::DisplaySettingsService, pref_call_ids_service::PrefCallIdsService,
+    pref_icon_paths_service::PrefIconPathsService, pref_model_service::PrefModelService,
+    pref_short_names_service::PrefShortNamesService,
     system_settings_service::SystemSettingsService,
 };
 
@@ -112,6 +110,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         Arc::clone(&device_manager),
         net_iface,
     );
+    let call_helpers_service =
+        CallHelpersService::new(Arc::clone(&call_handler), Arc::clone(&device_manager));
 
     let mut call_mqtt_event_handler =
         CallEventHandler::new(Arc::clone(&call_handler), event_receiver);
@@ -122,8 +122,6 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         }
     });
 
-    let grpc_call_actions_server = CallApi::new(call_handler, device_manager);
-
     let system_server = SystemServer::new(system_settings_service);
     let display_server = DisplayServer::new(display_settings_service);
     let audio_server = AudioServer::new(audio_settings_service);
@@ -133,7 +131,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let pref_short_names_server = PrefShortNamesServer::new(pref_short_names_service);
     let call_signals_server = CallSignalsServer::new(call_signals_service);
     let call_actions_server = CallActionsServer::new(call_actions_service);
-    let call_helpers_service = CallHelpersServer::new(grpc_call_actions_server);
+    let call_helpers_server = CallHelpersServer::new(call_helpers_service);
 
     Server::builder()
         .add_service(system_server)
@@ -145,7 +143,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .add_service(pref_short_names_server)
         .add_service(call_signals_server)
         .add_service(call_actions_server)
-        .add_service(call_helpers_service)
+        .add_service(call_helpers_server)
         .serve(addr)
         .await?;
 
