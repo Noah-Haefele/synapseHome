@@ -1,4 +1,5 @@
 pub mod audio_settings_service;
+pub mod call_signals_service;
 pub mod display_settings_service;
 pub mod grpc_call_server;
 pub mod pref_call_ids_service;

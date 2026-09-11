@@ -9,7 +9,7 @@ use std::{
 use tonic::transport::Server;
 
 // --- gRPC services ---
-use crate::core::api::proto;
+use crate::core::api::{call_signals_service, proto};
 use proto::synapsed::api::{
     pref::{
         pref_call_ids_server::PrefCallIdsServer, pref_icon_paths_server::PrefIconPathsServer,
@@ -26,7 +26,7 @@ use proto::synapsed::api::call::{
 };
 
 // --- gRPC servers ---
-use crate::core::api::grpc_call_server::{CallApi, LiveSignalsService};
+use crate::core::api::grpc_call_server::CallApi;
 
 // --- Core ---
 use crate::core::{
@@ -43,9 +43,10 @@ use crate::core::{
 
 // --- gRPC Servers ---
 use crate::core::api::{
-    audio_settings_service::AudioSettingsService, display_settings_service::DisplaySettingsService,
-    pref_call_ids_service::PrefCallIdsService, pref_icon_paths_service::PrefIconPathsService,
-    pref_model_service::PrefModelService, pref_short_names_service::PrefShortNamesService,
+    audio_settings_service::AudioSettingsService, call_signals_service::CallSignalsService,
+    display_settings_service::DisplaySettingsService, pref_call_ids_service::PrefCallIdsService,
+    pref_icon_paths_service::PrefIconPathsService, pref_model_service::PrefModelService,
+    pref_short_names_service::PrefShortNamesService,
     system_settings_service::SystemSettingsService,
 };
 
@@ -96,11 +97,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let pref_model_service = PrefModelService::new(Arc::clone(&device_manager));
     let pref_icon_paths_service = PrefIconPathsService::new(Arc::clone(&device_manager));
     let pref_short_names_service = PrefShortNamesService::new(Arc::clone(&device_manager));
-
-    let grpc_call_signals_server = LiveSignalsService::new();
+    let call_signals_service = CallSignalsService::new();
 
     let call_handler = Arc::new(Mutex::new(CallHandler::new(
-        grpc_call_signals_server.clone(),
+        call_signals_service.clone(),
         mqtt_handler,
         audio_handler,
     )));
@@ -122,8 +122,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let pref_models_server = PrefModelsServer::new(pref_model_service);
     let pref_icon_paths_server = PrefIconPathsServer::new(pref_icon_paths_service);
     let pref_short_names_server = PrefShortNamesServer::new(pref_short_names_service);
-
-    let call_signals_service = CallSignalsServer::new(grpc_call_signals_server);
+    let call_signals_server = CallSignalsServer::new(call_signals_service);
     let call_actions_service = CallActionsServer::new(grpc_call_actions_server.clone());
     let call_helpers_service = CallHelpersServer::new(grpc_call_actions_server);
 
@@ -135,7 +134,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .add_service(pref_models_server)
         .add_service(pref_icon_paths_server)
         .add_service(pref_short_names_server)
-        .add_service(call_signals_service)
+        .add_service(call_signals_server)
         .add_service(call_actions_service)
         .add_service(call_helpers_service)
         .serve(addr)
