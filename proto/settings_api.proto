@@ -1,0 +1,85 @@
+syntax = "proto3";
+package synapsed.api.settings;
+
+import "google/protobuf/empty.proto";
+import "helper.proto";
+
+service System {
+    rpc SetLocationId(SetLocationIdRequest) returns (google.protobuf.Empty);
+    rpc GetAllDevices(google.protobuf.Empty) returns (GetAllDevicesReply);
+    rpc GetLocationId(google.protobuf.Empty) returns (GetLocationIdReply);
+    rpc GetIpAddress(google.protobuf.Empty) returns (GetIpAddressReply);
+}
+
+service Display {
+    rpc GetBrightness(google.protobuf.Empty) returns (GetBrightnessReply);
+    rpc GetDisplayTime(google.protobuf.Empty) returns (GetDisplayTimeReply);
+    rpc SetBrightness(SetBrightnessRequest) returns (google.protobuf.Empty);
+    rpc SetDisplayTime(SetDisplayTimeRequest) returns (google.protobuf.Empty);
+}
+
+service Audio {
+    rpc GetSinkModel(google.protobuf.Empty) returns (GetSinkModelReply);
+    rpc GetSourceModel(google.protobuf.Empty) returns (GetSourceModelReply);
+    rpc GetDefaultSinkId(google.protobuf.Empty) returns (GetDefaultSinkIdReply);
+    rpc GetDefaultSourceId(google.protobuf.Empty) returns (GetDefaultSourceIdReply);
+    rpc SetSinkSource(SetSinkSourceRequest) returns (google.protobuf.Empty);
+}
+
+// --- System Settings ---
+
+message SetLocationIdRequest {
+    int32 device_id = 1;
+}
+
+message GetAllDevicesReply {
+    repeated synapsed.api.helper.DeviceData devices = 1;
+}
+
+message GetLocationIdReply {
+    int32 device_id = 1;
+}
+
+message GetIpAddressReply {
+    string ip_address = 1;
+}
+
+// --- Display Settings ---
+
+message GetBrightnessReply {
+    uint32 val = 1;
+}
+
+message GetDisplayTimeReply {
+    uint32 val = 1;
+}
+
+message SetBrightnessRequest {
+    uint32 val = 1;
+}
+
+message SetDisplayTimeRequest {
+    uint32 val = 1;
+}
+
+// --- Audio Settings ---
+
+message GetSinkModelReply {
+    repeated synapsed.api.helper.SinkSourceData sinks = 1;
+}
+
+message GetSourceModelReply {
+    repeated synapsed.api.helper.SinkSourceData sources = 1;
+}
+
+message GetDefaultSinkIdReply {
+    int32 id = 1;
+}
+
+message GetDefaultSourceIdReply {
+    int32 id = 1;
+}
+
+message SetSinkSourceRequest {
+    int32 id = 1;
+}
