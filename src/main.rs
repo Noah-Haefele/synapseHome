@@ -9,7 +9,7 @@ use std::{
 use tonic::transport::Server;
 
 // --- gRPC services ---
-use crate::core::api::{call_signals_service, proto};
+use crate::core::api::proto;
 use proto::synapsed::api::{
     pref::{
         pref_call_ids_server::PrefCallIdsServer, pref_icon_paths_server::PrefIconPathsServer,
@@ -43,10 +43,10 @@ use crate::core::{
 
 // --- gRPC Servers ---
 use crate::core::api::{
-    audio_settings_service::AudioSettingsService, call_signals_service::CallSignalsService,
-    display_settings_service::DisplaySettingsService, pref_call_ids_service::PrefCallIdsService,
-    pref_icon_paths_service::PrefIconPathsService, pref_model_service::PrefModelService,
-    pref_short_names_service::PrefShortNamesService,
+    audio_settings_service::AudioSettingsService, call_actions_service::CallActionsService,
+    call_signals_service::CallSignalsService, display_settings_service::DisplaySettingsService,
+    pref_call_ids_service::PrefCallIdsService, pref_icon_paths_service::PrefIconPathsService,
+    pref_model_service::PrefModelService, pref_short_names_service::PrefShortNamesService,
     system_settings_service::SystemSettingsService,
 };
 
@@ -98,12 +98,21 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let pref_icon_paths_service = PrefIconPathsService::new(Arc::clone(&device_manager));
     let pref_short_names_service = PrefShortNamesService::new(Arc::clone(&device_manager));
     let call_signals_service = CallSignalsService::new();
-
+    // Important:
+    // CallHandler between call_signals_service and call_actions_service
+    // because call_handler uses call_signals_service
+    // and is used by the call_actions_service.
     let call_handler = Arc::new(Mutex::new(CallHandler::new(
         call_signals_service.clone(),
         mqtt_handler,
         audio_handler,
     )));
+    let call_actions_service = CallActionsService::new(
+        Arc::clone(&call_handler),
+        Arc::clone(&device_manager),
+        net_iface,
+    );
+
     let mut call_mqtt_event_handler =
         CallEventHandler::new(Arc::clone(&call_handler), event_receiver);
     // Start call_event_handler to listen to events from mqtt_handler
@@ -113,7 +122,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         }
     });
 
-    let grpc_call_actions_server = CallApi::new(call_handler, device_manager, net_iface);
+    let grpc_call_actions_server = CallApi::new(call_handler, device_manager);
 
     let system_server = SystemServer::new(system_settings_service);
     let display_server = DisplayServer::new(display_settings_service);
@@ -123,7 +132,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let pref_icon_paths_server = PrefIconPathsServer::new(pref_icon_paths_service);
     let pref_short_names_server = PrefShortNamesServer::new(pref_short_names_service);
     let call_signals_server = CallSignalsServer::new(call_signals_service);
-    let call_actions_service = CallActionsServer::new(grpc_call_actions_server.clone());
+    let call_actions_server = CallActionsServer::new(call_actions_service);
     let call_helpers_service = CallHelpersServer::new(grpc_call_actions_server);
 
     Server::builder()
@@ -135,7 +144,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .add_service(pref_icon_paths_server)
         .add_service(pref_short_names_server)
         .add_service(call_signals_server)
-        .add_service(call_actions_service)
+        .add_service(call_actions_server)
         .add_service(call_helpers_service)
         .serve(addr)
         .await?;
