@@ -43,6 +43,9 @@ Item {
                         case "settings":
                             stackView.push("Settings.qml")
                             break
+                        // Call all available floors
+                        case "floorA":
+                            CallBridge.initiateCallAll()
                     }
                 }
             }

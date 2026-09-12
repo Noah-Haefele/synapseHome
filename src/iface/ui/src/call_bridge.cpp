@@ -15,6 +15,11 @@ void CallBridge::initiateCall(int device_id)
     grpc_call_client_->initiateCall(device_id);
 }
 
+void CallBridge::initiateCallAll()
+{
+    grpc_call_client_->initiateCallAll();
+}
+
 void CallBridge::acceptCall()
 {
     grpc_call_client_->acceptCall();

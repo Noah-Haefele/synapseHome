@@ -115,10 +115,12 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         Arc::clone(&device_manager),
         net_iface,
     );
-    let call_helpers_service = CallHelpersService::new(Arc::clone(&call_handler), device_manager);
+    let call_helpers_service =
+        CallHelpersService::new(Arc::clone(&call_handler), Arc::clone(&device_manager));
 
     // --- Start MQTT event handler ---
-    let mut call_mqtt_event_handler = CallEventHandler::new(call_handler, event_receiver);
+    let mut call_mqtt_event_handler =
+        CallEventHandler::new(call_handler, device_manager, event_receiver);
     // Start call_event_handler to listen to events from mqtt_handler
     thread::spawn(move || {
         if let Err(e) = call_mqtt_event_handler.run() {

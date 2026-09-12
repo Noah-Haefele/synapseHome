@@ -75,6 +75,22 @@ impl CallActions for CallActionsService {
         Ok(Response::new(()))
     }
 
+    async fn all(&self, _: Request<()>) -> Result<Response<()>, Status> {
+        let (location_id, ip_address) = self.get_call_context()?;
+
+        let mut handler = self
+            .call_handler
+            .lock()
+            .map_err(|_| Status::internal("Failed to lock CallHandler"))?;
+
+        handler
+            .initiate_call_all(location_id, &ip_address)
+            .map_err(|e| Status::internal(e.to_string()))?;
+
+        println!("Call to everyone");
+        Ok(Response::new(()))
+    }
+
     async fn accept(&self, _: Request<()>) -> Result<Response<()>, Status> {
         let (location_id, ip_address) = self.get_call_context()?;
 

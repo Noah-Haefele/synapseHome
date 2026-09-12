@@ -56,6 +56,29 @@ impl CallHandler {
         Ok(())
     }
 
+    pub fn initiate_call_all(
+        &mut self,
+        location_id: i32,
+        this_ip_address: &str,
+    ) -> Result<(), Box<dyn std::error::Error>> {
+        self.call_state = "CALLING".to_string();
+
+        self.call_signals_service
+            .trigger_call_state_changed(&self.call_state);
+
+        let mqtt_handler = self
+            .mqtt_handler
+            .lock()
+            .map_err(|_| "Failed to lock MqttHandler")?;
+
+        let subtopic = "call/all";
+        let topic = format!("CALLING:{}:{}", location_id, this_ip_address);
+
+        mqtt_handler.publish(subtopic, topic)?;
+
+        Ok(())
+    }
+
     pub fn accept_call(
         &mut self,
         location_id: i32,

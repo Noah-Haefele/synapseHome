@@ -34,9 +34,11 @@ impl CallSetup {
         }
 
         // Make subtopic and subscribe
-        let subtopic = format!("call/{}", location_id);
+        let call_subtopic = format!("call/{}", location_id);
+        let call_all_subtopic = "call/all".to_string();
 
-        mqtt_handler.subscribe(subtopic)?;
+        mqtt_handler.subscribe(call_subtopic)?;
+        mqtt_handler.subscribe(call_all_subtopic)?;
 
         Ok(())
     }
