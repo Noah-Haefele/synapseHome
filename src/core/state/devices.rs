@@ -157,7 +157,7 @@ impl DeviceManager {
     pub fn get_device_name(&self, device_id: i32) -> String {
         self.get_device_config(device_id)
             .map(|device| device.device_name.clone())
-            .unwrap_or_else(|| "Unknown...".to_string())
+            .unwrap_or_else(|| "Unknown".to_string())
     }
 
     // Used for little label on each call icon
