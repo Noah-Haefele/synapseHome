@@ -81,7 +81,7 @@ impl CallHandler {
             .lock()
             .map_err(|_| "Failed to lock MqttHandler")?;
 
-        let subtopic = format!("call/{}", target_device_id);
+        let subtopic = format!("call/device/{}", target_device_id);
         let topic = format!("CALLING:{}:{}", location_id, this_ip_address);
 
         mqtt_handler.publish(&subtopic, topic)?;
@@ -121,7 +121,7 @@ impl CallHandler {
             .lock()
             .map_err(|_| "Failed to lock MqttHandler")?;
 
-        let subtopic = format!("call/{}", self.call_device_id);
+        let subtopic = format!("call/device/{}", self.call_device_id);
         let topic = format!("ACCEPTED:{}:{}", location_id, this_ip_address);
 
         mqtt_handler.publish(&subtopic, topic)?;
@@ -141,7 +141,7 @@ impl CallHandler {
             .lock()
             .map_err(|_| "Failed to lock MqttHandler")?;
 
-        let subtopic = format!("call/{}", self.call_device_id);
+        let subtopic = format!("call/device/{}", self.call_device_id);
         let topic = format!("END:{}:{}", location_id, this_ip_address);
 
         mqtt_handler.publish(&subtopic, topic)?;
