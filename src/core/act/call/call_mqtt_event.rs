@@ -1,14 +1,26 @@
-pub enum CallEvent {
-    Calling {
-        source_device_id: i32,
-        source_ip_address: String,
+use serde::{Deserialize, Serialize};
+
+#[derive(Debug, Serialize, Deserialize)]
+pub enum CallType {
+    Direct { callee_id: i32 }, // Id of target device
+    Group,                     // No target device id neccessairy because everyone is target
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub enum CallMessage {
+    Started {
+        caller_id: i32,      // Id of device initiating call
+        caller_ip: String,   // IP of device initiating call
+        call_type: CallType, // CallType: either Direct (Two devices) or Group (Multiple intended targets)
     },
     Accepted {
-        source_device_id: i32,
-        source_ip_address: String,
+        caller_id: i32,
+        callee_id: i32,
+        callee_ip: String,
     },
-    End {
-        source_device_id: i32,
-        source_ip_address: String,
+    Ended {
+        caller_id: i32,
+        callee_id: i32,
+        callee_ip: String,
     },
 }

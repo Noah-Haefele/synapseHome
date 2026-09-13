@@ -1,20 +1,20 @@
 use std::sync::{Arc, Mutex, mpsc::Receiver};
 
 use crate::core::act::call::call_handler::CallHandler;
-use crate::core::act::call::call_mqtt_event::CallEvent;
+use crate::core::act::call::call_mqtt_event::CallMessage;
 use crate::core::state::devices::DeviceManager;
 
 pub struct CallEventHandler {
     call_handler: Arc<Mutex<CallHandler>>,
     device_manager: Arc<Mutex<DeviceManager>>,
-    event_receiver: Receiver<CallEvent>,
+    event_receiver: Receiver<CallMessage>,
 }
 
 impl CallEventHandler {
     pub fn new(
         call_handler: Arc<Mutex<CallHandler>>,
         device_manager: Arc<Mutex<DeviceManager>>,
-        event_receiver: Receiver<CallEvent>,
+        event_receiver: Receiver<CallMessage>,
     ) -> Self {
         Self {
             call_handler,
@@ -25,6 +25,7 @@ impl CallEventHandler {
 
     pub fn run(&mut self) -> Result<(), Box<dyn std::error::Error>> {
         while let Ok(event) = self.event_receiver.recv() {
+            println!("{:?}", event);
             self.handle_event(event)?;
         }
         Ok(())
@@ -39,7 +40,7 @@ impl CallEventHandler {
         Ok(device_manager.get_location_id())
     }
 
-    fn handle_event(&self, event: CallEvent) -> Result<(), Box<dyn std::error::Error>> {
+    fn handle_event(&self, event: CallMessage) -> Result<(), Box<dyn std::error::Error>> {
         let mut call_handler = self
             .call_handler
             .lock()
@@ -50,46 +51,49 @@ impl CallEventHandler {
         let location_id = self.get_location_id()?;
         if matches!(
             event,
-            CallEvent::Calling { source_device_id, .. }
-            | CallEvent::Accepted { source_device_id, .. }
-            | CallEvent::End { source_device_id, .. }
-            if source_device_id == location_id
+            CallMessage::Started { caller_id, ..}
+            | CallMessage::Accepted { caller_id, .. }
+            | CallMessage::Ended { caller_id, .. }
+            if caller_id == location_id
         ) {
             return Ok(());
         }
 
         match event {
-            CallEvent::Calling {
-                source_device_id,
-                source_ip_address,
+            CallMessage::Started {
+                caller_id,
+                caller_ip,
+                call_type,
             } => {
                 println!(
                     "Device with Id: {} and Ip: {} is calling",
-                    source_device_id, source_ip_address
+                    caller_id, caller_ip
                 );
-                call_handler.incoming_call(source_device_id, &source_ip_address)?;
+                call_handler.incoming_call(caller_id, &caller_ip)?;
             }
 
-            CallEvent::Accepted {
-                source_device_id,
-                source_ip_address,
+            CallMessage::Accepted {
+                caller_id,
+                callee_id,
+                callee_ip,
             } => {
                 println!(
                     "Device with Id: {} and Ip: {} has accepted the call",
-                    source_device_id, source_ip_address
+                    caller_id, callee_ip
                 );
-                call_handler.call_accepted(source_device_id, &source_ip_address)?;
+                call_handler.call_accepted(caller_id, &callee_ip)?;
             }
 
-            CallEvent::End {
-                source_device_id,
-                source_ip_address,
+            CallMessage::Ended {
+                caller_id,
+                callee_id,
+                callee_ip,
             } => {
                 println!(
                     "Device with Id: {} and Ip: {} has ended the call",
-                    source_device_id, source_ip_address
+                    caller_id, callee_ip
                 );
-                call_handler.call_ended(source_device_id, &source_ip_address)?;
+                call_handler.call_ended(caller_id, &callee_ip)?;
             }
         }
 

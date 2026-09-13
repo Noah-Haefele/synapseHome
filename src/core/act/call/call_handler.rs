@@ -1,5 +1,8 @@
 use std::sync::{Arc, Mutex};
 
+use crate::core::act::call::call_mqtt_event::CallMessage;
+use crate::core::act::call::call_mqtt_event::CallType;
+
 use crate::core::act::audio::audio::AudioHandler;
 use crate::core::api::call_signals_service::CallSignalsService;
 use crate::networking::mqtt::mqtt_handler::MqttHandler;
@@ -82,9 +85,17 @@ impl CallHandler {
             .map_err(|_| "Failed to lock MqttHandler")?;
 
         let subtopic = format!("call/device/{}", target_device_id);
-        let topic = format!("CALLING:{}:{}", location_id, this_ip_address);
+        //let topic = format!("CALLING:{}:{}", location_id, this_ip_address);
+        let payload = CallMessage::Started {
+            caller_id: location_id,
+            caller_ip: this_ip_address.to_string(),
+            call_type: (CallType::Direct {
+                callee_id: target_device_id,
+            }),
+        };
+        let payload_str = serde_json::to_string(&payload)?;
 
-        mqtt_handler.publish(&subtopic, topic)?;
+        mqtt_handler.publish(&subtopic, payload_str)?;
 
         Ok(())
     }
@@ -102,9 +113,15 @@ impl CallHandler {
             .map_err(|_| "Failed to lock MqttHandler")?;
 
         let subtopic = "call/all";
-        let topic = format!("CALLING:{}:{}", location_id, this_ip_address);
+        //let topic = format!("CALLING:{}:{}", location_id, this_ip_address);
+        let payload = CallMessage::Started {
+            caller_id: location_id,
+            caller_ip: this_ip_address.to_string(),
+            call_type: (CallType::Group),
+        };
+        let payload_str = serde_json::to_string(&payload)?;
 
-        mqtt_handler.publish(subtopic, topic)?;
+        mqtt_handler.publish(subtopic, payload_str)?;
 
         Ok(())
     }
@@ -122,9 +139,15 @@ impl CallHandler {
             .map_err(|_| "Failed to lock MqttHandler")?;
 
         let subtopic = format!("call/device/{}", self.call_device_id);
-        let topic = format!("ACCEPTED:{}:{}", location_id, this_ip_address);
+        //let topic = format!("ACCEPTED:{}:{}", location_id, this_ip_address);
+        let payload = CallMessage::Accepted {
+            caller_id: self.call_device_id,
+            callee_id: location_id,
+            callee_ip: this_ip_address.to_string(),
+        };
+        let payload_str = serde_json::to_string(&payload)?;
 
-        mqtt_handler.publish(&subtopic, topic)?;
+        mqtt_handler.publish(&subtopic, payload_str)?;
 
         Ok(())
     }
@@ -142,9 +165,15 @@ impl CallHandler {
             .map_err(|_| "Failed to lock MqttHandler")?;
 
         let subtopic = format!("call/device/{}", self.call_device_id);
-        let topic = format!("END:{}:{}", location_id, this_ip_address);
+        //let topic = format!("END:{}:{}", location_id, this_ip_address);
+        let payload = CallMessage::Ended {
+            caller_id: self.call_device_id,
+            callee_id: location_id,
+            callee_ip: this_ip_address.to_string(),
+        };
+        let payload_str = serde_json::to_string(&payload)?;
 
-        mqtt_handler.publish(&subtopic, topic)?;
+        mqtt_handler.publish(&subtopic, payload_str)?;
 
         self.call_device_id = -1;
 
