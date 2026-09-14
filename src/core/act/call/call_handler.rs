@@ -27,6 +27,7 @@ pub struct CallHandler {
     audio_handler: AudioHandler,
 
     call_device_id: i32,
+    is_caller: bool,
     call_type: Option<CallType>,
     call_state: CallState,
 }
@@ -43,6 +44,7 @@ impl CallHandler {
             audio_handler,
 
             call_device_id: -1,
+            is_caller: false,
             call_type: None,
             call_state: CallState::Idle,
         }
@@ -71,17 +73,16 @@ impl CallHandler {
 
 /// Methods that are called locally by this device
 impl CallHandler {
-    // Target_device_id is the id of the call target. Location_id is location id set in the settings
+    // callee_id is the id of the call target device. caller_id is location_id of this device.
     pub fn initiate_call(
         &mut self,
-        target_device_id: i32,
-        location_id: i32,
-        this_ip_address: &str,
+        callee_id: i32,
+        caller_id: i32,
+        caller_ip: &str,
     ) -> Result<(), Box<dyn std::error::Error>> {
-        self.call_device_id = target_device_id;
-        self.call_type = Some(CallType::Direct {
-            callee_id: target_device_id,
-        });
+        self.call_device_id = callee_id;
+        self.is_caller = true;
+        self.call_type = Some(CallType::Direct { callee_id });
         self.set_call_state(CallState::InternalCall(InternalCall::Calling));
 
         let mqtt_handler = self
@@ -89,13 +90,11 @@ impl CallHandler {
             .lock()
             .map_err(|_| "Failed to lock MqttHandler")?;
 
-        let subtopic = format!("call/device/{}", target_device_id);
+        let subtopic = format!("call/device/{}", callee_id);
         let payload = CallMessage::Started {
-            caller_id: location_id,
-            caller_ip: this_ip_address.to_string(),
-            call_type: CallType::Direct {
-                callee_id: target_device_id,
-            },
+            caller_id,
+            caller_ip: caller_ip.to_string(),
+            call_type: CallType::Direct { callee_id },
         };
         let payload_str = serde_json::to_string(&payload)?;
 
@@ -106,10 +105,11 @@ impl CallHandler {
 
     pub fn initiate_call_all(
         &mut self,
-        location_id: i32,
-        this_ip_address: &str,
+        caller_id: i32,
+        caller_ip: &str,
     ) -> Result<(), Box<dyn std::error::Error>> {
         self.call_device_id = -1;
+        self.is_caller = true;
         self.call_type = Some(CallType::Group);
         self.set_call_state(CallState::RequestAll);
 
@@ -120,8 +120,8 @@ impl CallHandler {
 
         let subtopic = "broadcast";
         let payload = CallMessage::Started {
-            caller_id: location_id,
-            caller_ip: this_ip_address.to_string(),
+            caller_id,
+            caller_ip: caller_ip.to_string(),
             call_type: CallType::Group,
         };
         let payload_str = serde_json::to_string(&payload)?;
@@ -133,8 +133,8 @@ impl CallHandler {
 
     pub fn accept_call(
         &mut self,
-        location_id: i32,
-        this_ip_address: &str,
+        callee_id: i32,
+        callee_ip: &str,
     ) -> Result<(), Box<dyn std::error::Error>> {
         self.set_call_state(CallState::InternalCall(InternalCall::Connected));
 
@@ -150,8 +150,8 @@ impl CallHandler {
 
         let payload = CallMessage::Accepted {
             caller_id: self.call_device_id,
-            callee_id: location_id,
-            callee_ip: this_ip_address.to_string(),
+            callee_id,
+            callee_ip: callee_ip.to_string(),
         };
         let payload_str = serde_json::to_string(&payload)?;
 
@@ -162,14 +162,10 @@ impl CallHandler {
 
     pub fn end_call(
         &mut self,
-        location_id: i32,
-        this_ip_address: &str,
+        my_location_id: i32,
+        my_ip: &str,
     ) -> Result<(), Box<dyn std::error::Error>> {
         let is_request_all = matches!(self.call_state, CallState::RequestAll);
-        let is_calling = matches!(
-            self.call_state,
-            CallState::InternalCall(InternalCall::Calling)
-        );
 
         self.set_call_state(CallState::Idle);
 
@@ -184,35 +180,35 @@ impl CallHandler {
             format!("call/device/{}", self.call_device_id)
         };
 
-        // Checks if the caller is this device by checking if this devices is making a request (either to everyone or to one device)
-        let caller_id = if is_request_all || is_calling {
-            location_id
+        // Case 1: This device started a group call -> No calle_id
+        // Case 2: This device started a normal call
+        // Case 3: This device is being called
+        let (caller_id, callee_id) = if is_request_all {
+            (my_location_id, None)
+        } else if self.is_caller {
+            (
+                my_location_id,
+                if self.call_device_id != -1 {
+                    Some(self.call_device_id)
+                } else {
+                    None
+                },
+            )
         } else {
-            // caller_id will be the device, this device is calling
-            self.call_device_id
-        };
-
-        // Checks if the device is making a reqeust to everyone meaning there is no target (no callee)
-        let callee_id: Option<i32> = if is_request_all {
-            None
-        } else if is_calling {
-            // Checks if the device is calling some device -> Its ID will be the callee_id
-            Some(self.call_device_id)
-        } else {
-            // callee_id will be the device itself -> Location ID
-            Some(location_id)
+            (self.call_device_id, Some(my_location_id))
         };
 
         let payload = CallMessage::Ended {
             caller_id,
             callee_id,
-            my_ip: this_ip_address.to_string(),
+            sender_ip: my_ip.to_string(),
         };
         let payload_str = serde_json::to_string(&payload)?;
 
         mqtt_handler.publish(&subtopic, payload_str)?;
 
         self.call_device_id = -1;
+        self.is_caller = false;
         self.call_type = None;
 
         self.audio_handler.pause_net_audio()?;
@@ -235,23 +231,25 @@ impl CallHandler {
     }
 }
 
-/// Methods that are called when another device acts and sends a mqtt message
+/// Methods that are called when another device acts and sends an MQTT message
 impl CallHandler {
     pub fn incoming_call(
         &mut self,
-        source_device_id: i32,
-        source_ip_address: &str,
+        caller_id: i32,
+        caller_ip: &str,
         call_type: CallType,
     ) -> Result<(), Box<dyn std::error::Error>> {
         self.set_call_state(CallState::InternalCall(InternalCall::Ringing));
-        self.call_device_id = source_device_id;
+        self.call_device_id = caller_id;
+        self.is_caller = false;
         self.call_type = Some(call_type);
 
-        self.audio_handler.start_net_audio(source_ip_address)?;
+        self.audio_handler.start_net_audio(caller_ip)?;
 
         Ok(())
     }
 
+    /// Should be triggered when a group call was started but another device already accepted the call
     pub fn cancel_ringing_if_matching(
         &mut self,
         caller_id: i32,
@@ -267,6 +265,7 @@ impl CallHandler {
             );
             self.set_call_state(CallState::Idle);
             self.call_device_id = -1;
+            self.is_caller = false;
             self.call_type = None;
             self.audio_handler.pause_net_audio()?;
         }
@@ -275,27 +274,27 @@ impl CallHandler {
 
     pub fn call_accepted(
         &mut self,
-        source_device_id: i32,
+        caller_id: i32,
         callee_id: i32,
-        source_ip_address: &str,
+        callee_ip: &str,
     ) -> Result<(), Box<dyn std::error::Error>> {
-        // Group call got accepted from another device
+        // Group call got accepted from another device while we were waiting in RequestAll
         if matches!(self.call_state, CallState::RequestAll) {
             self.call_device_id = callee_id;
             self.call_type = Some(CallType::Group);
             self.set_call_state(CallState::InternalCall(InternalCall::Connected));
-            self.audio_handler.start_net_audio(source_ip_address)?;
+            self.audio_handler.start_net_audio(callee_ip)?;
             return Ok(());
         }
 
-        // Normal device call got accepted
-        if self.call_device_id == source_device_id || self.call_device_id == callee_id {
+        // Direct call got accepted
+        if self.call_device_id == callee_id || self.call_device_id == caller_id {
             self.set_call_state(CallState::InternalCall(InternalCall::Connected));
-            self.audio_handler.start_net_audio(source_ip_address)?;
+            self.audio_handler.start_net_audio(callee_ip)?;
         } else {
             eprintln!(
-                "Received call_accepted from device {}/{} but current call_device_id is {}",
-                source_device_id, callee_id, self.call_device_id
+                "Received call_accepted for caller {} / callee {} but current call_device_id is {}",
+                caller_id, callee_id, self.call_device_id
             );
         }
 
@@ -304,23 +303,29 @@ impl CallHandler {
 
     pub fn call_ended(
         &mut self,
-        source_device_id: i32,
-        _source_ip_address: &str,
+        caller_id: i32,
+        callee_id: Option<i32>,
+        _sender_ip: &str,
     ) -> Result<(), Box<dyn std::error::Error>> {
-        if self.call_device_id == source_device_id
-            || matches!(
-                self.call_state,
-                CallState::InternalCall(InternalCall::Ringing)
-            )
-        {
+        // True if device is in some state of a call (whether call_device_id is equal with caller_id or callee_id)
+        let is_active_call_participant = self.call_device_id != -1
+            && (self.call_device_id == caller_id
+                || callee_id.map_or(false, |id| id == self.call_device_id));
+
+        if is_active_call_participant {
+            println!(
+                "Call ended between caller {} and callee {:?}",
+                caller_id, callee_id
+            );
             self.set_call_state(CallState::Idle);
             self.call_device_id = -1;
+            self.is_caller = false;
             self.call_type = None;
             self.audio_handler.pause_net_audio()?;
         } else {
-            eprintln!(
-                "Received call_ended from device {} but current call_device_id is {}",
-                source_device_id, self.call_device_id
+            println!(
+                "Ignoring call_ended for caller {} and callee {:?} (current call_device_id is {})",
+                caller_id, callee_id, self.call_device_id
             );
         }
 

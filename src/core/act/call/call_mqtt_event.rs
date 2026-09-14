@@ -30,8 +30,8 @@ pub enum CallMessage {
         #[serde(rename = "callerId")]
         caller_id: i32,
         #[serde(rename = "calleeId")]
-        callee_id: Option<i32>, // Can be none (e.g group-call -> No target callee_id)
-        #[serde(rename = "myIp")]
-        my_ip: String,
+        callee_id: Option<i32>, // Can be None (e.g. unanswered group-call)
+        #[serde(rename = "senderIp")]
+        sender_ip: String,
     },
 }
