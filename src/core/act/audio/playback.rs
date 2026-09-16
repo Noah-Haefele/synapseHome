@@ -53,7 +53,7 @@ pub fn playback(
                 let frame_idx = phase.floor() as usize;
                 let frac = (phase - frame_idx as f64) as f32;
 
-                let has_samples = (frame_idx + 1) * input_channels < window.len();
+                let has_samples = (frame_idx + 2) * input_channels <= window.len();
 
                 if has_samples {
                     for ch in 0..out_channels {
