@@ -20,7 +20,11 @@ pub struct Device {
 // Data for the user to set in a json
 #[derive(Serialize, Deserialize, Debug, Default)]
 struct ConfigCache {
+    // Normal device e.g in each floor one
     devices: Vec<Device>,
+
+    // Doorstation equiped with buzzer
+    door_devices: Vec<Device>,
 }
 
 // Internal data set by the UI
@@ -91,6 +95,7 @@ impl DeviceManager {
                         device_id: 3,
                     },
                 ],
+                door_devices: Vec::new(),
             },
             InternalSettingsCache {
                 location_id: 1,
@@ -130,6 +135,7 @@ impl DeviceManager {
 
 /// External functions called e.g by the grpc_server
 impl DeviceManager {
+    /// Returns all devices without the door devices
     pub fn get_all_devices(&self) -> Vec<Device> {
         self.config_cache
             .devices
@@ -146,29 +152,36 @@ impl DeviceManager {
         self.internal_settings_cache.location_id
     }
 
+    /// Finds a device configuration by `device_id` across normal and door devices
     fn get_device_config(&self, device_id: i32) -> Option<&Device> {
         self.config_cache
             .devices
             .iter()
+            .chain(self.config_cache.door_devices.iter())
             .find(|device| device.device_id == device_id)
     }
 
-    // Used to display device_name when incoming or outgoing call
+    /// Used to display device_name when incoming or outgoing call
     pub fn get_device_name(&self, device_id: i32) -> String {
         self.get_device_config(device_id)
             .map(|device| device.device_name.clone())
             .unwrap_or_else(|| "Unknown".to_string())
     }
 
-    // Used for little label on each call icon
-    pub fn get_device_short_name(&self, num: i32) -> String {
+    /// Returns a short label for pref_devices
+    pub fn get_pref_device_short_name(&self, num: i32) -> String {
         let pref_call_id = self.get_pref_call_id(num);
 
         if pref_call_id == -1 {
             return String::new();
         }
 
-        self.get_device_config(pref_call_id)
+        self.get_device_short_name(pref_call_id)
+    }
+
+    /// Returns a short label for devices
+    pub fn get_device_short_name(&self, device_id: i32) -> String {
+        self.get_device_config(device_id)
             .map(|device| device.device_short_name.clone())
             .unwrap_or_else(|| "?".to_string())
     }
