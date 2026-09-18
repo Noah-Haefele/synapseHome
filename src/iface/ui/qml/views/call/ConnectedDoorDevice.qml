@@ -51,6 +51,8 @@ Rectangle {
             height: 120
             width: height
 
+            onClicked: CallBridge.openDoor()
+
             icon: "qrc:/qt/qml/UiBridge/assets/icons/call/openDoor.svg"
         }
 

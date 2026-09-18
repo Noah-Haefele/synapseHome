@@ -104,6 +104,19 @@ void GrpcCallClient::endCall() {
     grpc::Status status = call_actions_stub_->End(&context, request, &reply);
 }
 
+void GrpcCallClient::openDoor()
+{
+    google::protobuf::Empty request;
+    google::protobuf::Empty reply;
+    grpc::ClientContext context;
+
+    grpc::Status status = call_actions_stub_->OpenDoor(&context, request, &reply);
+
+    if (!status.ok()) {
+        std::cerr << "OpenDoor gRPC error: " << status.error_message() << std::endl;
+    }
+}
+
 std::optional<std::string> GrpcCallClient::getCallLabel() const
 {
     google::protobuf::Empty request;

@@ -22,6 +22,7 @@ public:
     void initiateCallAll();
     void acceptCall();
     void endCall();
+    void openDoor();
 
     std::optional<std::string> getCallLabel() const;
 

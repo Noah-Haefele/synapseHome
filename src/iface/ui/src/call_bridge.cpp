@@ -30,6 +30,11 @@ void CallBridge::endCall()
     grpc_call_client_->endCall();
 }
 
+void CallBridge::openDoor()
+{
+    grpc_call_client_->openDoor();
+}
+
 QString CallBridge::destinationLabel() const
 {
     auto call_label = grpc_call_client_->getCallLabel();
