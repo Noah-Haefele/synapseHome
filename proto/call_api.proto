@@ -12,6 +12,7 @@ service CallActions {
     rpc All(google.protobuf.Empty) returns (google.protobuf.Empty);
     rpc Accept(google.protobuf.Empty) returns (google.protobuf.Empty);
     rpc End(google.protobuf.Empty) returns (google.protobuf.Empty);
+    rpc OpenDoor(google.protobuf.Empty) returns (google.protobuf.Empty);
 }
 
 service CallHelpers {

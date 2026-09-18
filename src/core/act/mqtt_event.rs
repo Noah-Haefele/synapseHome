@@ -43,4 +43,5 @@ pub enum MqttEvent {
         #[serde(rename = "senderIp")]
         sender_ip: String,
     },
+    OpenDoor,
 }

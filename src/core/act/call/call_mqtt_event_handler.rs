@@ -126,6 +126,9 @@ impl CallEventHandler {
                 );
                 call_handler.call_ended(caller_id, callee_id, &sender_ip)?;
             }
+
+            // Note: Temporary solution only!!!
+            _ => return Ok(()),
         }
 
         Ok(())

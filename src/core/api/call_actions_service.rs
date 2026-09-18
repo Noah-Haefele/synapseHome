@@ -2,6 +2,7 @@ use std::sync::{Arc, Mutex};
 use tonic::{Request, Response, Status};
 
 use crate::core::act::call::call_handler::CallHandler;
+use crate::core::act::commands_handler::{self, CommandsHandler};
 use crate::core::api::proto;
 use crate::core::state::devices::DeviceManager;
 use crate::networking::net_iface::NetIface;
@@ -15,6 +16,7 @@ pub struct CallActionsService {
     call_handler: Arc<Mutex<CallHandler>>,
     device_manager: Arc<Mutex<DeviceManager>>,
     net_iface: Arc<Mutex<NetIface>>,
+    commands_handler: CommandsHandler,
 }
 
 impl CallActionsService {
@@ -22,11 +24,13 @@ impl CallActionsService {
         call_handler: Arc<Mutex<CallHandler>>,
         device_manager: Arc<Mutex<DeviceManager>>,
         net_iface: Arc<Mutex<NetIface>>,
+        commands_handler: CommandsHandler,
     ) -> Self {
         Self {
             call_handler,
             device_manager,
             net_iface,
+            commands_handler,
         }
     }
 
@@ -120,6 +124,19 @@ impl CallActions for CallActionsService {
             .map_err(|e| Status::internal(e.to_string()))?;
 
         println!("End");
+        Ok(Response::new(()))
+    }
+
+    async fn open_door(&self, _: Request<()>) -> Result<Response<()>, Status> {
+        let call_device_id = {
+            self.call_handler
+                .lock()
+                .map_err(|_| Status::internal("Failed to lock CallHandler"))?
+                .get_call_device_id()
+        };
+
+        self.commands_handler.open_door(call_device_id);
+
         Ok(Response::new(()))
     }
 }
