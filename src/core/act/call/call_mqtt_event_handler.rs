@@ -25,7 +25,7 @@ impl CallEventHandler {
 
     pub fn run(&mut self) -> Result<(), Box<dyn std::error::Error>> {
         while let Ok(event) = self.event_receiver.recv() {
-            println!("{:?}", event);
+            println!("Incomming event: {:?}", event);
             self.handle_event(event)?;
         }
         Ok(())
@@ -65,6 +65,20 @@ impl CallEventHandler {
                     if callee_id != location_id {
                         return Ok(());
                     }
+                }
+
+                // Checks if caller_device_type matches the device_type written in the devices.json
+                let config_device_type = {
+                    self.device_manager
+                        .lock()
+                        .map_err(|e| e.to_string())?
+                        .get_device_type(caller_id)
+                };
+                if config_device_type != Some(caller_device_type) {
+                    eprintln!(
+                        "The callers device_type is not matching its device_type written in the devices.json"
+                    );
+                    return Ok(());
                 }
 
                 println!(

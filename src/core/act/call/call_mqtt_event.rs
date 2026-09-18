@@ -7,7 +7,7 @@ pub enum CallType {
     Group,                     // No target device id necessary because everyone is target
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+#[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq)]
 #[serde(tag = "deviceType", rename_all = "snake_case")]
 pub enum DeviceType {
     Device,     // Normal device (with display)
