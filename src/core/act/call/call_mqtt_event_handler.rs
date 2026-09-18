@@ -1,66 +1,115 @@
 use std::sync::{Arc, Mutex, mpsc::Receiver};
 
 use crate::core::act::call::call_handler::CallHandler;
-use crate::core::act::call::call_mqtt_event::CallEvent;
+use crate::core::act::call::call_mqtt_event::{CallMessage, CallType};
+use crate::core::state::devices::DeviceManager;
 
 pub struct CallEventHandler {
     call_handler: Arc<Mutex<CallHandler>>,
-    event_receiver: Receiver<CallEvent>,
+    device_manager: Arc<Mutex<DeviceManager>>,
+    event_receiver: Receiver<CallMessage>,
 }
 
 impl CallEventHandler {
-    pub fn new(call_handler: Arc<Mutex<CallHandler>>, event_receiver: Receiver<CallEvent>) -> Self {
+    pub fn new(
+        call_handler: Arc<Mutex<CallHandler>>,
+        device_manager: Arc<Mutex<DeviceManager>>,
+        event_receiver: Receiver<CallMessage>,
+    ) -> Self {
         Self {
             call_handler,
+            device_manager,
             event_receiver,
         }
     }
 
     pub fn run(&mut self) -> Result<(), Box<dyn std::error::Error>> {
         while let Ok(event) = self.event_receiver.recv() {
+            println!("{:?}", event);
             self.handle_event(event)?;
         }
         Ok(())
     }
 
-    fn handle_event(&self, event: CallEvent) -> Result<(), Box<dyn std::error::Error>> {
+    fn get_location_id(&self) -> Result<i32, Box<dyn std::error::Error>> {
+        let device_manager = self
+            .device_manager
+            .lock()
+            .map_err(|_| "Failed to lock DeviceManager")?;
+
+        Ok(device_manager.get_location_id())
+    }
+
+    fn handle_event(&self, event: CallMessage) -> Result<(), Box<dyn std::error::Error>> {
         let mut call_handler = self
             .call_handler
             .lock()
             .map_err(|_| "Failed to lock CallHandler")?;
 
+        let location_id = self.get_location_id()?;
+
         match event {
-            CallEvent::Calling {
-                source_device_id,
-                source_ip_address,
+            CallMessage::Started {
+                caller_id,
+                caller_ip,
+                call_type,
             } => {
+                // Ignore own call started message
+                if caller_id == location_id {
+                    return Ok(());
+                }
+
+                // If direct call A -> B, ensure this device is the target callee
+                if let CallType::Direct { callee_id } = call_type {
+                    if callee_id != location_id {
+                        return Ok(());
+                    }
+                }
+
                 println!(
-                    "Device with Id: {} and Ip: {} is calling",
-                    source_device_id, source_ip_address
+                    "Device with Id: {} and Ip: {} is calling (type: {:?})",
+                    caller_id, caller_ip, call_type
                 );
-                call_handler.incoming_call(source_device_id, &source_ip_address)?;
+                call_handler.incoming_call(caller_id, &caller_ip, call_type)?;
             }
 
-            CallEvent::Accepted {
-                source_device_id,
-                source_ip_address,
+            CallMessage::Accepted {
+                caller_id,
+                callee_id,
+                callee_ip,
             } => {
-                println!(
-                    "Device with Id: {} and Ip: {} has accepted the call",
-                    source_device_id, source_ip_address
-                );
-                call_handler.call_accepted(source_device_id, &source_ip_address)?;
+                if caller_id == location_id {
+                    println!(
+                        "Device with Id: {} has accepted our call from Ip: {}",
+                        callee_id, callee_ip
+                    );
+                    call_handler.call_accepted(caller_id, callee_id, &callee_ip)?;
+                } else if callee_id == location_id {
+                    // Accepted locally by this device, ignore echo
+                    return Ok(());
+                } else {
+                    // Another device in broadcast channel accepted the call
+                    println!(
+                        "Device {} accepted group call from caller {}. Dismissing ringing if active.",
+                        callee_id, caller_id
+                    );
+                    call_handler.cancel_ringing_if_matching(caller_id)?;
+                }
             }
 
-            CallEvent::End {
-                source_device_id,
-                source_ip_address,
+            CallMessage::Ended {
+                caller_id,
+                callee_id,
+                sender_ip,
             } => {
+                if caller_id == location_id && callee_id.unwrap_or(-1) == location_id {
+                    return Ok(());
+                }
                 println!(
-                    "Device with Id: {} and Ip: {} has ended the call",
-                    source_device_id, source_ip_address
+                    "Call ended message received (caller: {}, callee: {:?}, sender_ip: {})",
+                    caller_id, callee_id, sender_ip
                 );
-                call_handler.call_ended(source_device_id, &source_ip_address)?;
+                call_handler.call_ended(caller_id, callee_id, &sender_ip)?;
             }
         }
 

@@ -1,51 +1,16 @@
-use crate::core::act::call::call_mqtt_event::CallEvent;
+use crate::core::act::call::call_mqtt_event::CallMessage;
 
-pub fn parse(topic: &str, payload: &str) -> Option<CallEvent> {
-    let Some(event) = topic.split('/').nth(1) else {
-        eprintln!("Invalid MQTT topic: {}", topic);
+pub fn parse(topic: &str, payload: &str) -> Option<CallMessage> {
+    if !topic.contains("call") && !topic.contains("broadcast") {
+        eprintln!("Unhandled MQTT topic: {}", topic);
         return None;
-    };
-
-    match event {
-        "call" => parse_call(payload),
-        _ => None,
     }
-}
 
-fn parse_call(payload: &str) -> Option<CallEvent> {
-    let mut call_event = payload.split(':');
-
-    match call_event.next()? {
-        "CALLING" => {
-            let source_device_id = call_event.next()?.parse::<i32>().ok()?;
-            let source_ip_address = call_event.next()?.to_string();
-
-            Some(CallEvent::Calling {
-                source_device_id,
-                source_ip_address,
-            })
+    match serde_json::from_str::<CallMessage>(payload) {
+        Ok(call_message) => Some(call_message),
+        Err(e) => {
+            eprintln!("Invalid MQTT payload for topic {}: {} ({})", topic, payload, e);
+            None
         }
-
-        "ACCEPTED" => {
-            let source_device_id = call_event.next()?.parse::<i32>().ok()?;
-            let source_ip_address = call_event.next()?.to_string();
-
-            Some(CallEvent::Accepted {
-                source_device_id,
-                source_ip_address,
-            })
-        }
-
-        "END" => {
-            let source_device_id = call_event.next()?.parse::<i32>().ok()?;
-            let source_ip_address = call_event.next()?.to_string();
-
-            Some(CallEvent::End {
-                source_device_id,
-                source_ip_address,
-            })
-        }
-
-        _ => None,
     }
 }

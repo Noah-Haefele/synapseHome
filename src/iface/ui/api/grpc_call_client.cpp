@@ -80,6 +80,14 @@ void GrpcCallClient::initiateCall(int device_id) {
     grpc::Status status = call_actions_stub_->Initiate(&context, request, &reply);
 }
 
+void GrpcCallClient::initiateCallAll() {
+    google::protobuf::Empty request;
+    google::protobuf::Empty reply;
+    grpc::ClientContext context;
+
+    grpc::Status status = call_actions_stub_->All(&context, request, &reply);
+}
+
 void GrpcCallClient::acceptCall() {
     google::protobuf::Empty request;
     google::protobuf::Empty reply;

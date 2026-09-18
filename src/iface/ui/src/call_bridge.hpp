@@ -20,6 +20,7 @@ public:
     explicit CallBridge(GrpcCallClient *grpc_call_client, QObject *parent = nullptr);
 
     Q_INVOKABLE void initiateCall(int device_id);
+    Q_INVOKABLE void initiateCallAll();
     Q_INVOKABLE void acceptCall();
     Q_INVOKABLE void endCall();
     QString destinationLabel() const;

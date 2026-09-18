@@ -33,7 +33,7 @@ impl PrefShortNames for PrefShortNamesService {
             .lock()
             .map_err(|_| Status::internal("Lock failed"))?;
 
-        let name = manager.get_device_short_name(1);
+        let name = manager.get_pref_device_short_name(1);
 
         Ok(Response::new(GetPref1ShortNameReply { name }))
     }
@@ -47,7 +47,7 @@ impl PrefShortNames for PrefShortNamesService {
             .lock()
             .map_err(|_| Status::internal("Lock failed"))?;
 
-        let name = manager.get_device_short_name(2);
+        let name = manager.get_pref_device_short_name(2);
 
         Ok(Response::new(GetPref2ShortNameReply { name }))
     }
@@ -61,7 +61,7 @@ impl PrefShortNames for PrefShortNamesService {
             .lock()
             .map_err(|_| Status::internal("Lock failed"))?;
 
-        let name = manager.get_device_short_name(3);
+        let name = manager.get_pref_device_short_name(3);
 
         Ok(Response::new(GetPref3ShortNameReply { name }))
     }

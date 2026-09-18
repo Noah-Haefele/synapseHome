@@ -19,6 +19,7 @@ public:
     void stop();
 
     void initiateCall(int device_id);
+    void initiateCallAll();
     void acceptCall();
     void endCall();
 

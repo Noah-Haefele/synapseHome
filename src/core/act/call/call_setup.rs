@@ -33,10 +33,12 @@ impl CallSetup {
             mqtt_handler.unsubscribe(topic)?;
         }
 
-        // Make subtopic and subscribe
-        let subtopic = format!("call/{}", location_id);
+        // Make subtopics and subscribe
+        let call_subtopic = format!("call/device/{}", location_id);
+        let broadcast_subtopic = "broadcast".to_string();
 
-        mqtt_handler.subscribe(subtopic)?;
+        mqtt_handler.subscribe(call_subtopic)?;
+        mqtt_handler.subscribe(broadcast_subtopic)?;
 
         Ok(())
     }
