@@ -2,9 +2,11 @@ use std::sync::{Arc, Mutex};
 
 use crate::core::act::call::call_mqtt_event::CallMessage;
 use crate::core::act::call::call_mqtt_event::CallType;
+use crate::core::act::call::call_mqtt_event::DeviceType;
 
 use crate::core::act::audio::audio::AudioHandler;
 use crate::core::api::call_signals_service::CallSignalsService;
+use crate::core::state::devices::Device;
 use crate::networking::mqtt::mqtt_handler::MqttHandler;
 
 /// States of internal call (indoor stations)
@@ -30,6 +32,7 @@ pub struct CallHandler {
     is_caller: bool,
     call_type: Option<CallType>,
     call_state: CallState,
+    caller_device_type: Option<DeviceType>,
 }
 
 impl CallHandler {
@@ -47,6 +50,7 @@ impl CallHandler {
             is_caller: false,
             call_type: None,
             call_state: CallState::Idle,
+            caller_device_type: None,
         }
     }
 
@@ -66,7 +70,14 @@ impl CallHandler {
             CallState::RequestAll => "CALLING",
             CallState::InternalCall(InternalCall::Calling) => "CALLING",
             CallState::InternalCall(InternalCall::Ringing) => "RINGING",
-            CallState::InternalCall(InternalCall::Connected) => "CONNECTED",
+            CallState::InternalCall(InternalCall::Connected) => match self.caller_device_type {
+                Some(DeviceType::Device) => "CONNECTED:DEVICE",
+                Some(DeviceType::DoorDevice) => "CONNECTED:DOOR_DEVICE",
+                None => {
+                    eprintln!("No caller_device_type available");
+                    "CONNECTED:UNKNOWN"
+                }
+            },
         }
     }
 }
@@ -83,6 +94,7 @@ impl CallHandler {
         self.call_device_id = callee_id;
         self.is_caller = true;
         self.call_type = Some(CallType::Direct { callee_id });
+        self.caller_device_type = Some(DeviceType::Device);
         self.set_call_state(CallState::InternalCall(InternalCall::Calling));
 
         let mqtt_handler = self
@@ -95,6 +107,7 @@ impl CallHandler {
             caller_id,
             caller_ip: caller_ip.to_string(),
             call_type: CallType::Direct { callee_id },
+            caller_device_type: DeviceType::Device,
         };
         let payload_str = serde_json::to_string(&payload)?;
 
@@ -111,6 +124,7 @@ impl CallHandler {
         self.call_device_id = -1;
         self.is_caller = true;
         self.call_type = Some(CallType::Group);
+        self.caller_device_type = Some(DeviceType::Device);
         self.set_call_state(CallState::RequestAll);
 
         let mqtt_handler = self
@@ -123,6 +137,7 @@ impl CallHandler {
             caller_id,
             caller_ip: caller_ip.to_string(),
             call_type: CallType::Group,
+            caller_device_type: DeviceType::Device,
         };
         let payload_str = serde_json::to_string(&payload)?;
 
@@ -210,6 +225,7 @@ impl CallHandler {
         self.call_device_id = -1;
         self.is_caller = false;
         self.call_type = None;
+        self.caller_device_type = None;
 
         self.audio_handler.pause_net_audio()?;
 
@@ -238,11 +254,13 @@ impl CallHandler {
         caller_id: i32,
         caller_ip: &str,
         call_type: CallType,
+        caller_device_type: DeviceType,
     ) -> Result<(), Box<dyn std::error::Error>> {
         self.set_call_state(CallState::InternalCall(InternalCall::Ringing));
         self.call_device_id = caller_id;
         self.is_caller = false;
         self.call_type = Some(call_type);
+        self.caller_device_type = Some(caller_device_type);
 
         self.audio_handler.start_net_audio(caller_ip)?;
 
@@ -267,6 +285,7 @@ impl CallHandler {
             self.call_device_id = -1;
             self.is_caller = false;
             self.call_type = None;
+            self.caller_device_type = None;
             self.audio_handler.pause_net_audio()?;
         }
         Ok(())
@@ -321,6 +340,7 @@ impl CallHandler {
             self.call_device_id = -1;
             self.is_caller = false;
             self.call_type = None;
+            self.caller_device_type = None;
             self.audio_handler.pause_net_audio()?;
         } else {
             println!(

@@ -53,6 +53,7 @@ impl CallEventHandler {
                 caller_id,
                 caller_ip,
                 call_type,
+                caller_device_type,
             } => {
                 // Ignore own call started message
                 if caller_id == location_id {
@@ -70,7 +71,7 @@ impl CallEventHandler {
                     "Device with Id: {} and Ip: {} is calling (type: {:?})",
                     caller_id, caller_ip, call_type
                 );
-                call_handler.incoming_call(caller_id, &caller_ip, call_type)?;
+                call_handler.incoming_call(caller_id, &caller_ip, call_type, caller_device_type)?;
             }
 
             CallMessage::Accepted {

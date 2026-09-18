@@ -1,10 +1,17 @@
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
-#[serde(tag = "type", rename_all = "snake_case")]
+#[serde(tag = "callType", rename_all = "snake_case")]
 pub enum CallType {
     Direct { callee_id: i32 }, // Id of target device
     Group,                     // No target device id necessary because everyone is target
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+#[serde(tag = "deviceType", rename_all = "snake_case")]
+pub enum DeviceType {
+    Device,     // Normal device (with display)
+    DoorDevice, // Door device (with door and buzzer)
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
@@ -17,6 +24,8 @@ pub enum CallMessage {
         caller_ip: String, // IP of device initiating call
         #[serde(rename = "callType")]
         call_type: CallType, // CallType: either Direct (Two devices) or Group (Multiple intended targets)
+        #[serde(rename = "deviceType")]
+        caller_device_type: DeviceType, // => Tells the device_type of the caller
     },
     Accepted {
         #[serde(rename = "callerId")]
