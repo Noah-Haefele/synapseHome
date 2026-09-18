@@ -16,7 +16,7 @@ pub enum DeviceType {
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 #[serde(tag = "action", rename_all = "snake_case")]
-pub enum CallMessage {
+pub enum MqttEvent {
     Started {
         #[serde(rename = "callerId")]
         caller_id: i32, // Id of device initiating call

@@ -1,20 +1,20 @@
 use std::sync::{Arc, Mutex, mpsc::Receiver};
 
 use crate::core::act::call::call_handler::CallHandler;
-use crate::core::act::call::call_mqtt_event::{CallMessage, CallType};
+use crate::core::act::mqtt_event::{CallType, MqttEvent};
 use crate::core::state::devices::DeviceManager;
 
 pub struct CallEventHandler {
     call_handler: Arc<Mutex<CallHandler>>,
     device_manager: Arc<Mutex<DeviceManager>>,
-    event_receiver: Receiver<CallMessage>,
+    event_receiver: Receiver<MqttEvent>,
 }
 
 impl CallEventHandler {
     pub fn new(
         call_handler: Arc<Mutex<CallHandler>>,
         device_manager: Arc<Mutex<DeviceManager>>,
-        event_receiver: Receiver<CallMessage>,
+        event_receiver: Receiver<MqttEvent>,
     ) -> Self {
         Self {
             call_handler,
@@ -40,7 +40,7 @@ impl CallEventHandler {
         Ok(device_manager.get_location_id())
     }
 
-    fn handle_event(&self, event: CallMessage) -> Result<(), Box<dyn std::error::Error>> {
+    fn handle_event(&self, event: MqttEvent) -> Result<(), Box<dyn std::error::Error>> {
         let mut call_handler = self
             .call_handler
             .lock()
@@ -49,7 +49,7 @@ impl CallEventHandler {
         let location_id = self.get_location_id()?;
 
         match event {
-            CallMessage::Started {
+            MqttEvent::Started {
                 caller_id,
                 caller_ip,
                 call_type,
@@ -88,7 +88,7 @@ impl CallEventHandler {
                 call_handler.incoming_call(caller_id, &caller_ip, call_type, caller_device_type)?;
             }
 
-            CallMessage::Accepted {
+            MqttEvent::Accepted {
                 caller_id,
                 callee_id,
                 callee_ip,
@@ -112,7 +112,7 @@ impl CallEventHandler {
                 }
             }
 
-            CallMessage::Ended {
+            MqttEvent::Ended {
                 caller_id,
                 callee_id,
                 sender_ip,

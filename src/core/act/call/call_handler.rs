@@ -1,12 +1,11 @@
 use std::sync::{Arc, Mutex};
 
-use crate::core::act::call::call_mqtt_event::CallMessage;
-use crate::core::act::call::call_mqtt_event::CallType;
-use crate::core::act::call::call_mqtt_event::DeviceType;
+use crate::core::act::mqtt_event::CallType;
+use crate::core::act::mqtt_event::DeviceType;
+use crate::core::act::mqtt_event::MqttEvent;
 
 use crate::core::act::audio::audio::AudioHandler;
 use crate::core::api::call_signals_service::CallSignalsService;
-use crate::core::state::devices::Device;
 use crate::networking::mqtt::mqtt_handler::MqttHandler;
 
 /// States of internal call (indoor stations)
@@ -103,7 +102,7 @@ impl CallHandler {
             .map_err(|_| "Failed to lock MqttHandler")?;
 
         let subtopic = format!("call/device/{}", callee_id);
-        let payload = CallMessage::Started {
+        let payload = MqttEvent::Started {
             caller_id,
             caller_ip: caller_ip.to_string(),
             call_type: CallType::Direct { callee_id },
@@ -133,7 +132,7 @@ impl CallHandler {
             .map_err(|_| "Failed to lock MqttHandler")?;
 
         let subtopic = "broadcast";
-        let payload = CallMessage::Started {
+        let payload = MqttEvent::Started {
             caller_id,
             caller_ip: caller_ip.to_string(),
             call_type: CallType::Group,
@@ -163,7 +162,7 @@ impl CallHandler {
             _ => format!("call/device/{}", self.call_device_id),
         };
 
-        let payload = CallMessage::Accepted {
+        let payload = MqttEvent::Accepted {
             caller_id: self.call_device_id,
             callee_id,
             callee_ip: callee_ip.to_string(),
@@ -213,7 +212,7 @@ impl CallHandler {
             (self.call_device_id, Some(my_location_id))
         };
 
-        let payload = CallMessage::Ended {
+        let payload = MqttEvent::Ended {
             caller_id,
             callee_id,
             sender_ip: my_ip.to_string(),

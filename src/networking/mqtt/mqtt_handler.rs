@@ -11,7 +11,7 @@ use std::{
 };
 
 use crate::networking::mqtt::mqtt_config::MqttConfig;
-use crate::{core::act::call::call_mqtt_event::CallMessage, networking::mqtt::mqtt_parser};
+use crate::{core::act::mqtt_event::MqttEvent, networking::mqtt::mqtt_parser};
 
 pub struct MqttHandler {
     mqtt_config: MqttConfig,
@@ -19,13 +19,13 @@ pub struct MqttHandler {
     connection: Option<Connection>,
     running: Arc<AtomicBool>,
     subtopics: HashSet<String>,
-    event_sender: Sender<CallMessage>,
+    event_sender: Sender<MqttEvent>,
 }
 
 impl MqttHandler {
     pub fn new(
         mqtt_config: MqttConfig,
-        event_sender: Sender<CallMessage>,
+        event_sender: Sender<MqttEvent>,
     ) -> Result<Self, Box<dyn std::error::Error>> {
         let client_id = &mqtt_config.mqtt_config_cache.client_id;
         let broker_ip = &mqtt_config.mqtt_config_cache.broker_ip;

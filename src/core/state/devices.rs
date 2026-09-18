@@ -5,7 +5,7 @@ use std::path::Path;
 use std::path::PathBuf;
 use tempfile::NamedTempFile;
 
-use crate::core::act::call::call_mqtt_event::DeviceType;
+use crate::core::act::mqtt_event::DeviceType;
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Device {
