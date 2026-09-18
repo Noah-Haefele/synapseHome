@@ -128,14 +128,26 @@ impl CallActions for CallActionsService {
     }
 
     async fn open_door(&self, _: Request<()>) -> Result<Response<()>, Status> {
-        let call_device_id = {
-            self.call_handler
-                .lock()
-                .map_err(|_| Status::internal("Failed to lock CallHandler"))?
-                .get_call_device_id()
-        };
+        let (location_id, ip_address) = self.get_call_context()?;
 
-        self.commands_handler.open_door(call_device_id);
+        let call_device_id: i32;
+
+        {
+            let mut call_handler = self
+                .call_handler
+                .lock()
+                .map_err(|_| Status::internal("Failed to lock CallHandler"))?;
+
+            call_device_id = call_handler.get_call_device_id();
+
+            call_handler
+                .end_call(location_id, &ip_address)
+                .map_err(|e| Status::internal(e.to_string()))?;
+        }
+
+        self.commands_handler
+            .open_door(call_device_id)
+            .map_err(|e| Status::internal(e.to_string()))?;
 
         Ok(Response::new(()))
     }
