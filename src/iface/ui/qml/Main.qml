@@ -55,8 +55,7 @@ ApplicationWindow {
                 callOverlayLoader.source = "views/call/ConnectedDevice.qml"
             }
             else if (state === "CONNECTED:DOOR_DEVICE") {
-                // !!! Temporary solution
-                callOverlayLoader.source = "views/call/ConnectedDevice.qml"
+                callOverlayLoader.source = "views/call/ConnectedDoorDevice.qml"
             }
         }
     }
