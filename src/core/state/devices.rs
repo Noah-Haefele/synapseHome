@@ -5,6 +5,8 @@ use std::path::Path;
 use std::path::PathBuf;
 use tempfile::NamedTempFile;
 
+use crate::core::act::mqtt_event::DeviceType;
+
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Device {
     #[serde(rename = "deviceName")]
@@ -184,6 +186,27 @@ impl DeviceManager {
         self.get_device_config(device_id)
             .map(|device| device.device_short_name.clone())
             .unwrap_or_else(|| "?".to_string())
+    }
+
+    /// Returns the type of the device
+    pub fn get_device_type(&self, device_id: i32) -> Option<DeviceType> {
+        if self
+            .config_cache
+            .devices
+            .iter()
+            .any(|d| d.device_id == device_id)
+        {
+            Some(DeviceType::Device)
+        } else if self
+            .config_cache
+            .door_devices
+            .iter()
+            .any(|d| d.device_id == device_id)
+        {
+            Some(DeviceType::DoorDevice)
+        } else {
+            None
+        }
     }
 
     pub fn get_pref_call_id(&self, num: i32) -> i32 {

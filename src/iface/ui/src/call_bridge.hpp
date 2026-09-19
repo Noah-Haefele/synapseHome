@@ -23,6 +23,7 @@ public:
     Q_INVOKABLE void initiateCallAll();
     Q_INVOKABLE void acceptCall();
     Q_INVOKABLE void endCall();
+    Q_INVOKABLE void openDoor();
     QString destinationLabel() const;
 
 private:

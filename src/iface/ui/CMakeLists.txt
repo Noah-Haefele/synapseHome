@@ -115,7 +115,8 @@ set(QML_FILES
 
     qml/views/Home.qml
     qml/views/Settings.qml
-    qml/views/call/Accepted.qml
+    qml/views/call/ConnectedDevice.qml
+    qml/views/call/ConnectedDoorDevice.qml
     qml/views/call/Incoming.qml
     qml/views/call/Outgoing.qml
 

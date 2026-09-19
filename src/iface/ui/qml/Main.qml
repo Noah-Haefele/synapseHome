@@ -51,8 +51,11 @@ ApplicationWindow {
             else if (state === "RINGING") {
                 callOverlayLoader.source = "views/call/Incoming.qml"
             }
-            else if (state === "CONNECTED") {
-                callOverlayLoader.source = "views/call/Accepted.qml"
+            else if (state === "CONNECTED:DEVICE") {
+                callOverlayLoader.source = "views/call/ConnectedDevice.qml"
+            }
+            else if (state === "CONNECTED:DOOR_DEVICE") {
+                callOverlayLoader.source = "views/call/ConnectedDoorDevice.qml"
             }
         }
     }

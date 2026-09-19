@@ -10,7 +10,7 @@ use std::{
 use tonic::transport::Server;
 
 // --- gRPC services ---
-use crate::core::api::proto;
+use crate::core::{act::commands_handler, api::proto};
 use proto::synapsed::api::{
     call::{
         call_actions_server::CallActionsServer, call_helpers_server::CallHelpersServer,
@@ -43,6 +43,7 @@ use crate::core::{
             call_handler::CallHandler, call_mqtt_event_handler::CallEventHandler,
             call_setup::CallSetup,
         },
+        commands_handler::CommandsHandler,
     },
     display::brightness::DisplayManager,
     state::devices::DeviceManager,
@@ -89,6 +90,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let call_setup = Mutex::new(CallSetup::new(Arc::clone(&mqtt_handler), location_id)?);
 
+    let commands_handler = CommandsHandler::new(Arc::clone(&mqtt_handler));
+
     // --- Initialize gRPC services ---
     let system_settings_service = SystemSettingsService::new(
         Arc::clone(&device_manager),
@@ -114,6 +117,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         Arc::clone(&call_handler),
         Arc::clone(&device_manager),
         net_iface,
+        commands_handler,
     );
     let call_helpers_service =
         CallHelpersService::new(Arc::clone(&call_handler), Arc::clone(&device_manager));
