@@ -13,16 +13,43 @@ Rectangle {
 
     color: "#f8f9fa"
 
+    Component.onCompleted: {
+        SettingsBridge.refresh_ringtones()
+    }
+
+    // Reload button positioned at the top-right corner
+    SimpleButton {
+        id: reloadButton
+        anchors {
+            top: parent.top
+            right: parent.right
+            topMargin: 9.5
+            rightMargin: 9.5
+        }
+
+        height: 40
+        width: height
+
+        backgroundColor: root.color
+        textColor: "black"
+        radius: 8
+
+        text: "\u21bb" // Reload / refresh unicode symbol
+
+        // Reload ringtones
+        // Required when user uploads ringtones and dont wants to restart the entire application
+        onClicked: SettingsBridge.refresh_ringtones()
+    }
+
     // Main content
     Column {
         anchors {
             top: parent.top
             horizontalCenter: parent.horizontalCenter
-            topMargin: 30
+            topMargin: 80 // Offset to prevent overlapping with the reload button
         }
 
         width: parent.width * 0.8
-
         spacing: 45
 
         // Ringtone

@@ -2,6 +2,7 @@
 #include <optional>
 #include <grpcpp/grpcpp.h>
 #include <google/protobuf/empty.pb.h>
+#include <regex>
 #include <string>
 #include <vector>
 
@@ -315,6 +316,19 @@ std::optional<int> Client::get_ringtone_id() const
         return reply.id();
     }
     return std::nullopt;
+}
+
+void Client::refresh_ringtones() const
+{
+    google::protobuf::Empty request;
+    google::protobuf::Empty reply;
+    grpc::ClientContext context;
+
+    grpc::Status status = ringtone_stub_->RefreshRingtones(&context, request, &reply);
+
+    if (!status.ok()) {
+        std::cerr << "RefreshRingtones gRPC error: " << status.error_message() << std::endl;
+    }
 }
 
 void Client::set_ringtone_id(int id)

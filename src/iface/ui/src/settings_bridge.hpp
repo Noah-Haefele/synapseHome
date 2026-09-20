@@ -153,6 +153,7 @@ public:
     // --- Ringtone Settings ---
 
     Q_INVOKABLE void set_ringtone_id(int id);
+    Q_INVOKABLE void refresh_ringtones();
 
     QVariantList ringtone_model() const;
     int ringtone_id() const;

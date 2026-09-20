@@ -291,6 +291,14 @@ int SettingsBridge::ringtone_id() const
     return *ringtone_id;
 }
 
+void SettingsBridge::refresh_ringtones()
+{
+    if (client_) {
+        client_->refresh_ringtones();
+        emit ringtone_settings_changed();
+    }
+}
+
 void SettingsBridge::set_ringtone_id(int id)
 {
     if (client_) {

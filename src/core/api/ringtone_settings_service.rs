@@ -64,6 +64,19 @@ impl Ringtone for RingtoneSettingsService {
         Ok(Response::new(GetRingtoneIdReply { id }))
     }
 
+    async fn refresh_ringtones(&self, _: Request<()>) -> Result<Response<()>, Status> {
+        let mut ringtone_manager = self
+            .ringtone_manager
+            .lock()
+            .map_err(|_| Status::internal("Failed to lock RingtoneManager"))?;
+
+        ringtone_manager
+            .refresh_ringtones()
+            .map_err(|e| Status::internal(e.to_string()))?;
+
+        Ok(Response::new(()))
+    }
+
     async fn set_ringtone_id(
         &self,
         request: Request<SetRingtoneIdRequest>,

@@ -63,6 +63,7 @@ public:
     // --- Ringtone Settings ---
     std::optional<std::vector<ProtoRingtoneData>> get_ringtone_model() const;
     std::optional<int> get_ringtone_id() const;
+    void refresh_ringtones() const;
     void set_ringtone_id(int id);
 
     // --- Control Grid ---

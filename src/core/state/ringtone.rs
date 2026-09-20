@@ -1,5 +1,7 @@
 use serde::{Deserialize, Serialize};
+use std::collections::hash_map::DefaultHasher;
 use std::fs;
+use std::hash::{Hash, Hasher};
 use std::io::Write;
 use std::path::{Path, PathBuf};
 use tempfile::NamedTempFile;
@@ -76,7 +78,6 @@ impl RingtoneManager {
                 .collect();
             entries.sort_by_key(|e| e.path());
 
-            let mut next_id = 1;
             for entry in entries {
                 let path = entry.path();
                 if path
@@ -91,12 +92,12 @@ impl RingtoneManager {
                             Some(first) => first.to_uppercase().chain(chars).collect::<String>(),
                         };
 
+                        let ringtone_id = calculate_stable_id(&path);
                         self.ringtones.push(RingtoneItem {
-                            ringtone_id: next_id,
+                            ringtone_id,
                             ringtone_name: formatted_name,
                             ringtone_path: path,
                         });
-                        next_id += 1;
                     }
                 }
             }
@@ -148,6 +149,8 @@ impl RingtoneManager {
     }
 
     pub fn set_ringtone_id(&mut self, id: i32) -> Result<(), Box<dyn std::error::Error>> {
+        self.fetch_ringtone_files()?;
+
         if id == -1 {
             self.internal_audio_config.ringtone_path = None;
         } else {
@@ -159,6 +162,7 @@ impl RingtoneManager {
             self.internal_audio_config.ringtone_path = Some(item.ringtone_path.clone());
         }
 
+        self.validate_internal_audio_config();
         self.save_internal_audio_config()?;
 
         Ok(())
@@ -196,4 +200,11 @@ fn save_to_disk(data: &str, file_path: &Path) -> Result<(), Box<dyn std::error::
 
 fn read_from_disk(file_path: &Path) -> Result<String, Box<dyn std::error::Error>> {
     Ok(fs::read_to_string(file_path)?)
+}
+
+fn calculate_stable_id(path: &Path) -> i32 {
+    let mut hasher = DefaultHasher::new();
+    path.hash(&mut hasher);
+    // map to i32 positive
+    (hasher.finish() & 0x7FFFFFFF) as i32
 }

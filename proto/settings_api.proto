@@ -29,6 +29,7 @@ service Audio {
 service Ringtone {
     rpc GetRingtoneModel(google.protobuf.Empty) returns (GetRingtoneModelReply);
     rpc GetRingtoneId(google.protobuf.Empty) returns (GetRingtoneIdReply);
+    rpc RefreshRingtones(google.protobuf.Empty) returns (google.protobuf.Empty);
     rpc SetRingtoneId(SetRingtoneIdRequest) returns (google.protobuf.Empty);
 }
 
