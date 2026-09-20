@@ -60,6 +60,9 @@ Rectangle {
             label: "Ringtone"
 
             width: parent.width * 0.8
+            height: 60
+
+            pixelsize: height * 0.25
 
             model: SettingsBridge.ringtone_model
             textRole: "formatted_name"
