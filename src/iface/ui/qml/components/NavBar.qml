@@ -48,6 +48,7 @@ Item {
                     radius: 8
 
                     text: "\u2190"
+                    pixelsize: height * 0.45
 
                     onClicked: root.backClicked()
                 }
@@ -59,7 +60,7 @@ Item {
                     text: "Settings"
 
                     font {
-                        pixelSize: 15
+                        pixelSize: parent.height * 0.3
                         weight: Font.DemiBold
                     }
                 }
@@ -77,6 +78,7 @@ Item {
                     radius: 8
 
                     text: "\u23FB"
+                    pixelsize: height * 0.45
                 }
             }
 
