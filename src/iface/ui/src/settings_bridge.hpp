@@ -101,6 +101,20 @@ class SettingsBridge : public QObject
         NOTIFY output_device_changed
     )
 
+    // --- Ringtone Settings ---
+
+    Q_PROPERTY(
+        QVariantList ringtone_model
+        READ ringtone_model
+        NOTIFY ringtone_settings_changed
+    )
+
+    Q_PROPERTY(
+        int ringtone_id
+        READ ringtone_id
+        NOTIFY ringtone_settings_changed
+    )
+
 public:
     explicit SettingsBridge(std::shared_ptr<Client> client, QObject *parent = nullptr);
 
@@ -136,6 +150,13 @@ public:
     int input_device() const;
     int output_device() const;
 
+    // --- Ringtone Settings ---
+
+    Q_INVOKABLE void set_ringtone_id(int id);
+
+    QVariantList ringtone_model() const;
+    int ringtone_id() const;
+
 private:
     std::shared_ptr<Client> client_;
 
@@ -149,4 +170,5 @@ signals:
     void input_device_changed();
     void output_device_changed();
     void ip_address_changed();
+    void ringtone_settings_changed();
 };

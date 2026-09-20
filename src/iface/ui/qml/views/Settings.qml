@@ -62,8 +62,14 @@ Item {
                 Layout.fillHeight: true
             }
 
+            Ringtone {
+                visible: leftViewState === 2
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+            }
+
             Rectangle {
-                visible: leftViewState !== 3 && leftViewState !== 0 && leftViewState !== 1
+                visible: leftViewState !== 3 && leftViewState !== 0 && leftViewState !== 1 && leftViewState !== 2
                 Layout.fillHeight: true
                 Layout.fillWidth: true
                 color: "white"
