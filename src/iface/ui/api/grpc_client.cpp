@@ -1,6 +1,9 @@
+#include <iostream>
 #include <optional>
 #include <grpcpp/grpcpp.h>
 #include <google/protobuf/empty.pb.h>
+#include <regex>
+#include <string>
 #include <vector>
 
 #include "settings_api.grpc.pb.h"
@@ -11,6 +14,7 @@
 using synapsed::api::settings::System;
 using synapsed::api::settings::Display;
 using synapsed::api::settings::Audio;
+using synapsed::api::settings::Ringtone;
 
 // --- Preference Api ---
 using synapsed::api::pref::PrefIconPaths;
@@ -21,6 +25,7 @@ using synapsed::api::pref::PrefModels;
 // --- Data Message ---
 using ProtoDeviceData = synapsed::api::helper::DeviceData;
 using ProtoSinkSourceData = synapsed::api::helper::SinkSourceData;
+using ProtoRingtoneData = synapsed::api::helper::RingtoneData;
 
 // --- Request Messages ---
 // System Settings
@@ -30,6 +35,8 @@ using synapsed::api::settings::SetBrightnessRequest;
 using synapsed::api::settings::SetDisplayTimeRequest;
 // Audio Settings
 using synapsed::api::settings::SetSinkSourceRequest;
+// Ringtone Settings
+using synapsed::api::settings::SetRingtoneIdRequest;
 // Pref Ids
 using synapsed::api::pref::SetPrefCallIdRequest;
 using synapsed::api::pref::GetPrefCallIdRequest;
@@ -47,6 +54,9 @@ using synapsed::api::settings::GetSinkModelReply;
 using synapsed::api::settings::GetSourceModelReply;
 using synapsed::api::settings::GetDefaultSinkIdReply;
 using synapsed::api::settings::GetDefaultSourceIdReply;
+// Ringtone Settings
+using synapsed::api::settings::GetRingtoneModelReply;
+using synapsed::api::settings::GetRingtoneIdReply;
 // Pref Paths
 using synapsed::api::pref::GetPref1IconPathReply;
 using synapsed::api::pref::GetPref2IconPathReply;
@@ -65,6 +75,7 @@ Client::Client(std::shared_ptr<grpc::ChannelInterface> channel,
     : system_stub_(System::NewStub(channel)),
       display_stub_(Display::NewStub(channel)),
       audio_stub_(Audio::NewStub(channel)),
+      ringtone_stub_(Ringtone::NewStub(channel)),
       pref_icon_paths_stub_(PrefIconPaths::NewStub(channel)),
       pref_call_ids_stub_(PrefCallIds::NewStub(channel)),
       pref_short_names_stub_(PrefShortNames::NewStub(channel)),
@@ -274,6 +285,65 @@ void Client::set_sink_source(int id)
     grpc::ClientContext context;
 
     grpc::Status status = audio_stub_->SetSinkSource(&context, request, &reply);
+}
+
+// --- Ringtone Settings ---
+
+std::optional<std::vector<ProtoRingtoneData>> Client::get_ringtone_model() const
+{
+    google::protobuf::Empty request;
+    GetRingtoneModelReply reply;
+    grpc::ClientContext context;
+
+    grpc::Status status = ringtone_stub_->GetRingtoneModel(&context, request, &reply);
+    if (status.ok()) {
+        return std::vector<ProtoRingtoneData>(
+            reply.ringtones().begin(),
+            reply.ringtones().end()
+        );
+    }
+    return std::nullopt;
+}
+
+std::optional<int> Client::get_ringtone_id() const
+{
+    google::protobuf::Empty request;
+    GetRingtoneIdReply reply;
+    grpc::ClientContext context;
+
+    grpc::Status status = ringtone_stub_->GetRingtoneId(&context, request, &reply);
+    if (status.ok()) {
+        return reply.id();
+    }
+    return std::nullopt;
+}
+
+void Client::refresh_ringtones() const
+{
+    google::protobuf::Empty request;
+    google::protobuf::Empty reply;
+    grpc::ClientContext context;
+
+    grpc::Status status = ringtone_stub_->RefreshRingtones(&context, request, &reply);
+
+    if (!status.ok()) {
+        std::cerr << "RefreshRingtones gRPC error: " << status.error_message() << std::endl;
+    }
+}
+
+void Client::set_ringtone_id(int id)
+{
+    SetRingtoneIdRequest request;
+    request.set_id(id);
+
+    google::protobuf::Empty reply;
+    grpc::ClientContext context;
+
+    grpc::Status status = ringtone_stub_->SetRingtoneId(&context, request, &reply);
+
+    if (!status.ok()) {
+        std::cerr << "SetRingtoneId gRPC error: " << status.error_message() << std::endl;
+    }
 }
 
 // --- Control Grid ---

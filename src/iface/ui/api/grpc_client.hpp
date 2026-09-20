@@ -13,6 +13,7 @@
 using synapsed::api::settings::System;
 using synapsed::api::settings::Display;
 using synapsed::api::settings::Audio;
+using synapsed::api::settings::Ringtone;
 
 // --- Preference Api ---
 using synapsed::api::pref::PrefIconPaths;
@@ -23,6 +24,7 @@ using synapsed::api::pref::PrefModels;
 // --- Data Message ---
 using ProtoDeviceData = synapsed::api::helper::DeviceData;
 using ProtoSinkSourceData = synapsed::api::helper::SinkSourceData;
+using ProtoRingtoneData = synapsed::api::helper::RingtoneData;
 
 /**
  * @brief Client for communicating with the backend via gRPC.
@@ -58,6 +60,12 @@ public:
     std::optional<int> get_default_source_id() const;
     void set_sink_source(int id);
 
+    // --- Ringtone Settings ---
+    std::optional<std::vector<ProtoRingtoneData>> get_ringtone_model() const;
+    std::optional<int> get_ringtone_id() const;
+    void refresh_ringtones() const;
+    void set_ringtone_id(int id);
+
     // --- Control Grid ---
     std::optional<std::string> get_pref1_icon_path();
     std::optional<std::string> get_pref2_icon_path();
@@ -70,6 +78,7 @@ private:
     std::unique_ptr<System::Stub> system_stub_;
     std::unique_ptr<Display::Stub> display_stub_;
     std::unique_ptr<Audio::Stub> audio_stub_;
+    std::unique_ptr<Ringtone::Stub> ringtone_stub_;
     std::unique_ptr<PrefIconPaths::Stub> pref_icon_paths_stub_;
     std::unique_ptr<PrefCallIds::Stub> pref_call_ids_stub_;
     std::unique_ptr<PrefShortNames::Stub> pref_short_names_stub_;

@@ -254,3 +254,55 @@ int SettingsBridge::output_device() const
     }
     return *sink;
 }
+
+// --- Ringtone Settings
+
+QVariantList SettingsBridge::ringtone_model() const
+{
+    QVariantList list;
+
+    if (!client_) return list;
+
+    auto ringtones = client_->get_ringtone_model();
+    if (ringtones == std::nullopt) {
+        return list;
+    }
+
+    for (const auto& ringtone : ringtones.value()) {
+        QVariantMap map;
+        map["id"] = ringtone.id();
+        map["formatted_name"] = QString::fromStdString(ringtone.formatted_name());
+        map["path"] = QString::fromStdString(ringtone.path());
+        list.append(map);
+    }
+
+    return list;
+}
+
+int SettingsBridge::ringtone_id() const
+{
+    if (!client_) return -1;
+
+    auto ringtone_id = client_->get_ringtone_id();
+    if (ringtone_id == std::nullopt) {
+        return -1;
+    }
+
+    return *ringtone_id;
+}
+
+void SettingsBridge::refresh_ringtones()
+{
+    if (client_) {
+        client_->refresh_ringtones();
+        emit ringtone_settings_changed();
+    }
+}
+
+void SettingsBridge::set_ringtone_id(int id)
+{
+    if (client_) {
+        client_->set_ringtone_id(id);
+    }
+    emit ringtone_settings_changed();
+}

@@ -124,6 +124,7 @@ set(QML_FILES
     qml/subviews/settings/Audio.qml
     qml/subviews/settings/Display.qml
     qml/subviews/settings/System.qml
+    qml/subviews/settings/Ringtone.qml
 
     qml/models/SettingsOptions.qml
 

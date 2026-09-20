@@ -1,3 +1,4 @@
+use std::path::Path;
 use std::sync::{Arc, Mutex};
 
 use crate::core::act::mqtt_event::CallType;
@@ -5,7 +6,9 @@ use crate::core::act::mqtt_event::DeviceType;
 use crate::core::act::mqtt_event::MqttEvent;
 
 use crate::core::act::audio::audio::AudioHandler;
+use crate::core::act::audio::ringtone_player;
 use crate::core::api::call_signals_service::CallSignalsService;
+use crate::core::state::ringtone::RingtoneManager;
 use crate::networking::mqtt::mqtt_handler::MqttHandler;
 
 /// States of internal call (indoor stations)
@@ -26,6 +29,7 @@ pub struct CallHandler {
     call_signals_service: CallSignalsService,
     mqtt_handler: Arc<Mutex<MqttHandler>>,
     audio_handler: AudioHandler,
+    ringtone_manager: Arc<Mutex<RingtoneManager>>,
 
     call_device_id: i32,
     is_caller: bool,
@@ -39,11 +43,13 @@ impl CallHandler {
         call_signals_service: CallSignalsService,
         mqtt_handler: Arc<Mutex<MqttHandler>>,
         audio_handler: AudioHandler,
+        ringtone_manager: Arc<Mutex<RingtoneManager>>,
     ) -> Self {
         Self {
             call_signals_service,
             mqtt_handler,
             audio_handler,
+            ringtone_manager,
 
             call_device_id: -1,
             is_caller: false,
@@ -171,6 +177,8 @@ impl CallHandler {
 
         mqtt_handler.publish(&subtopic, payload_str)?;
 
+        ringtone_player::stop_ringtone();
+
         Ok(())
     }
 
@@ -226,6 +234,7 @@ impl CallHandler {
         self.call_type = None;
         self.caller_device_type = None;
 
+        ringtone_player::stop_ringtone();
         self.audio_handler.pause_net_audio()?;
 
         Ok(())
@@ -260,6 +269,17 @@ impl CallHandler {
         self.is_caller = false;
         self.call_type = Some(call_type);
         self.caller_device_type = Some(caller_device_type);
+
+        let ringtone_path = self
+            .ringtone_manager
+            .lock()
+            .map_err(|_| "Failed to lock RingtoneManager")?
+            .get_ringtone_path()
+            .map(Path::to_path_buf);
+
+        if let Some(path) = ringtone_path {
+            ringtone_player::play_ringtone(&path)?;
+        }
 
         self.audio_handler.start_net_audio(caller_ip)?;
 
@@ -340,6 +360,8 @@ impl CallHandler {
             self.is_caller = false;
             self.call_type = None;
             self.caller_device_type = None;
+
+            ringtone_player::stop_ringtone();
             self.audio_handler.pause_net_audio()?;
         } else {
             println!(
