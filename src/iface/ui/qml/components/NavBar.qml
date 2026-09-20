@@ -100,7 +100,7 @@ Item {
                     id: wrapper
 
                     width: ListView.view.width
-                    height: 45
+                    height: ListView.view.height * 0.11
 
                     readonly property bool isCurrent: ListView.isCurrentItem
 
@@ -124,6 +124,8 @@ Item {
                         text: name
 
                         color: "black"
+
+                        font.pixelSize: parent.height * 0.38
                     }
 
                     MouseArea {
