@@ -78,7 +78,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mqtt_handler = Arc::new(Mutex::new(MqttHandler::new(mqtt_config, event_sender)?));
 
     let device_manager = Arc::new(Mutex::new(DeviceManager::new()?));
-    let ringtone_manager = Mutex::new(RingtoneManager::new()?);
+    let ringtone_manager = Arc::new(Mutex::new(RingtoneManager::new()?));
 
     let display_controller = DspCtrl::new();
     let display_manager = Mutex::new(DisplayManager::new(display_controller)?);
@@ -103,7 +103,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     );
     let display_settings_service = DisplaySettingsService::new(display_manager);
     let audio_settings_service = AudioSettingsService::new(audio_devices_handler);
-    let ringtone_service = RingtoneSettingsService::new(ringtone_manager);
+    let ringtone_service = RingtoneSettingsService::new(Arc::clone(&ringtone_manager));
     let pref_call_ids_service = PrefCallIdsService::new(Arc::clone(&device_manager));
     let pref_model_service = PrefModelService::new(Arc::clone(&device_manager));
     let pref_icon_paths_service = PrefIconPathsService::new(Arc::clone(&device_manager));
@@ -116,6 +116,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         call_signals_service.clone(),
         mqtt_handler,
         audio_handler,
+        ringtone_manager,
     )));
     let call_actions_service = CallActionsService::new(
         Arc::clone(&call_handler),

@@ -1,4 +1,4 @@
-use std::sync::Mutex;
+use std::sync::{Arc, Mutex};
 use tonic::{Request, Response, Status};
 
 use crate::core::api::proto;
@@ -17,11 +17,11 @@ use proto::synapsed::api::settings::GetRingtoneIdReply;
 use proto::synapsed::api::settings::GetRingtoneModelReply;
 
 pub struct RingtoneSettingsService {
-    ringtone_manager: Mutex<RingtoneManager>,
+    ringtone_manager: Arc<Mutex<RingtoneManager>>,
 }
 
 impl RingtoneSettingsService {
-    pub fn new(ringtone_manager: Mutex<RingtoneManager>) -> Self {
+    pub fn new(ringtone_manager: Arc<Mutex<RingtoneManager>>) -> Self {
         Self { ringtone_manager }
     }
 }
