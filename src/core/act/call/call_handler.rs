@@ -278,7 +278,7 @@ impl CallHandler {
             .map(Path::to_path_buf);
 
         if let Some(path) = ringtone_path {
-            ringtone_player::play_ringtone(&path);
+            ringtone_player::play_ringtone(&path)?;
         }
 
         self.audio_handler.start_net_audio(caller_ip)?;
@@ -360,6 +360,8 @@ impl CallHandler {
             self.is_caller = false;
             self.call_type = None;
             self.caller_device_type = None;
+
+            ringtone_player::stop_ringtone();
             self.audio_handler.pause_net_audio()?;
         } else {
             println!(
