@@ -33,7 +33,7 @@ Item {
             // Header
             Item {
                 Layout.fillWidth: true
-                Layout.preferredHeight: 45
+                Layout.preferredHeight: parent.height * 0.11
 
                 // Back button
                 SimpleButton {
