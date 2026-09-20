@@ -26,6 +26,12 @@ service Audio {
     rpc SetSinkSource(SetSinkSourceRequest) returns (google.protobuf.Empty);
 }
 
+service Ringtone {
+    rpc GetRingtoneModel(google.protobuf.Empty) returns (GetRingtoneModelReply);
+    rpc GetRingtoneId(google.protobuf.Empty) returns (GetRingtoneIdReply);
+    rpc SetRingtoneId(SetRingtoneIdRequest) returns (google.protobuf.Empty);
+}
+
 // --- System Settings ---
 
 message SetLocationIdRequest {
@@ -81,5 +87,19 @@ message GetDefaultSourceIdReply {
 }
 
 message SetSinkSourceRequest {
+    int32 id = 1;
+}
+
+// --- Ringtone Settings ---
+
+message GetRingtoneModelReply {
+    repeated synapsed.api.helper.RingtoneData ringtones = 1;
+}
+
+message GetRingtoneIdReply {
+    int32 id = 1;
+}
+
+message SetRingtoneIdRequest {
     int32 id = 1;
 }
