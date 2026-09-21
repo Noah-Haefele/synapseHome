@@ -15,6 +15,7 @@ Column {
     property alias textRole: combo.textRole
     property alias count: combo.count
     property alias label: label.text
+    property int pixelsize: 12
 
     // Model key used to extract the option's unique identifier/ID
     property alias valueRole: combo.valueRole
@@ -30,6 +31,7 @@ Column {
     signal dropdownOpened()
 
     width: 350
+    height: 60
     spacing: 1
 
     /**
@@ -57,7 +59,7 @@ Column {
         visible: text.length > 0
         text: ""
 
-        font.pixelSize: 11
+        font.pixelSize: root.pixelsize
 
         color: "#6b7280"
     }
@@ -65,7 +67,7 @@ Column {
     ComboBox {
         id: combo
 
-        height: 60
+        height: root.height
         width: root.width
 
         font.pixelSize: 24

@@ -35,7 +35,7 @@ Rectangle {
 
             anchors.horizontalCenter: parent.horizontalCenter
 
-            spacing: 16
+            spacing: 30
 
             // Which available device (in devices.json) the device is
             Dropdown {
@@ -43,6 +43,9 @@ Rectangle {
                 label: "Device Identification"
 
                 width: parent.width * 0.8
+                height: 60
+
+                pixelsize: height * 0.25
 
                 model: SettingsBridge.all_devices
                 textRole: "device_name"
@@ -58,6 +61,9 @@ Rectangle {
                 label: "Primary Call Preference"
 
                 width: parent.width * 0.8
+                height: 60
+
+                pixelsize: height * 0.25
 
                 model: SettingsBridge.pref_model
                 textRole: "device_name"
@@ -73,6 +79,9 @@ Rectangle {
                 label: "Secondary Call Preference"
 
                 width: parent.width * 0.8
+                height: 60
+
+                pixelsize: height * 0.25
 
                 model: SettingsBridge.pref_model
                 textRole: "device_name"
@@ -88,6 +97,9 @@ Rectangle {
                 label: "Tertiary Call Preference"
 
                 width: parent.width * 0.8
+                height: 60
+
+                pixelsize: height * 0.25
 
                 model: SettingsBridge.pref_model
                 textRole: "device_name"

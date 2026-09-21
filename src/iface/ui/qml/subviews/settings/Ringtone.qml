@@ -27,7 +27,8 @@ Rectangle {
             rightMargin: 9.5
         }
 
-        height: 40
+        // should align the control buttons in the navbar
+        height: parent.height * 0.11 * 0.8
         width: height
 
         backgroundColor: root.color
@@ -35,6 +36,7 @@ Rectangle {
         radius: 8
 
         text: "\u21bb" // Reload / refresh unicode symbol
+        pixelsize: height * 0.45
 
         // Reload ringtones
         // Required when user uploads ringtones and dont wants to restart the entire application
@@ -58,6 +60,9 @@ Rectangle {
             label: "Ringtone"
 
             width: parent.width * 0.8
+            height: 60
+
+            pixelsize: height * 0.25
 
             model: SettingsBridge.ringtone_model
             textRole: "formatted_name"

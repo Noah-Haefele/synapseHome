@@ -33,7 +33,7 @@ Item {
             // Header
             Item {
                 Layout.fillWidth: true
-                Layout.preferredHeight: 45
+                Layout.preferredHeight: parent.height * 0.11
 
                 // Back button
                 SimpleButton {
@@ -48,6 +48,7 @@ Item {
                     radius: 8
 
                     text: "\u2190"
+                    pixelsize: height * 0.45
 
                     onClicked: root.backClicked()
                 }
@@ -59,7 +60,7 @@ Item {
                     text: "Settings"
 
                     font {
-                        pixelSize: 15
+                        pixelSize: parent.height * 0.3
                         weight: Font.DemiBold
                     }
                 }
@@ -77,6 +78,7 @@ Item {
                     radius: 8
 
                     text: "\u23FB"
+                    pixelsize: height * 0.45
                 }
             }
 
@@ -100,7 +102,7 @@ Item {
                     id: wrapper
 
                     width: ListView.view.width
-                    height: 45
+                    height: ListView.view.height * 0.11
 
                     readonly property bool isCurrent: ListView.isCurrentItem
 
@@ -124,6 +126,8 @@ Item {
                         text: name
 
                         color: "black"
+
+                        font.pixelSize: parent.height * 0.38
                     }
 
                     MouseArea {

@@ -7,6 +7,7 @@ Button {
     property color backgroundColor: "transparent"
     property color textColor: "black"
     property int radius: 0
+    property int pixelsize: 12
 
     background: Rectangle {
         radius: button.radius
@@ -17,7 +18,7 @@ Button {
         text: button.text
 
         color: button.textColor
-        font.pixelSize: 12
+        font.pixelSize: button.pixelsize
 
         horizontalAlignment: Text.AlignHCenter
         verticalAlignment: Text.AlignVCenter

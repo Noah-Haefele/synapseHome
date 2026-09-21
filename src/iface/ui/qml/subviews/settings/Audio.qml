@@ -24,7 +24,7 @@ Rectangle {
 
         width: parent.width * 0.8
 
-        spacing: 45
+        spacing: 30
 
         // Sink (audio output)
         Dropdown {
@@ -32,6 +32,9 @@ Rectangle {
             label: "Output"
 
             width: parent.width * 0.8
+            height: 60
+
+            pixelsize: height * 0.25
 
             model: SettingsBridge.output_model
             textRole: "name"
@@ -53,6 +56,9 @@ Rectangle {
             label: "Input"
 
             width: parent.width * 0.8
+            height: 60
+
+            pixelsize: height * 0.25
 
             model: SettingsBridge.input_model
             textRole: "name"
