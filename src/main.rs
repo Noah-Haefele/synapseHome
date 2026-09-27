@@ -40,7 +40,7 @@ use crate::core::api::{
 // --- Core ---
 use crate::core::{
     act::{
-        audio::{audio::AudioHandler, audio_devices_handler::AudioDevicesHandler},
+        audio::{aec::AecHandler, audio::AudioHandler, audio_devices_handler::AudioDevicesHandler},
         call::{
             call_handler::CallHandler, call_mqtt_event_handler::CallEventHandler,
             call_setup::CallSetup,
@@ -67,9 +67,11 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     // --- Initialize components ---
 
+    let aec_handler = Arc::new(Mutex::new(AecHandler::new()?));
+
     let audio_receiver = AudioReceiver::new("0.0.0.0", 5000)?;
     let audio_sender = AudioSender::new("0.0.0.0", 0)?;
-    let audio_handler = AudioHandler::new(audio_receiver, audio_sender)?;
+    let audio_handler = AudioHandler::new(audio_receiver, audio_sender, aec_handler)?;
     let audio_devices_handler = Mutex::new(AudioDevicesHandler::new()?);
 
     let net_iface = Arc::new(Mutex::new(NetIface::new()));
