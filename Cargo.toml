@@ -18,6 +18,8 @@ local-ip-address = "0.6.13"
 cpal = "0.18.2"
 ringbuf = "0.5.1"
 rodio = "0.22.2"
+sonora = "*"
+webrtc-audio-processing = { version = "2.1.0", features = ["bundled"] }
 
 [build-dependencies]
 tonic-prost-build = "*"
