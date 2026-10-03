@@ -7,7 +7,10 @@ use std::{
 use synapsed::core::{
     act::{
         audio::{aec::AecHandler, audio::AudioHandler},
-        call::{call_handler::CallHandler, doorstation_handler::DoorstationHandler},
+        call::{
+            call_handler::CallHandler, call_setup::CallSetup,
+            doorstation_handler::DoorstationHandler,
+        },
         mqtt_event::DeviceType,
     },
     state::{devices::DeviceManager, ringtone::RingtoneManager},
@@ -66,6 +69,15 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mqtt_config = MqttConfig::new()?;
     let mqtt_handler = Arc::new(Mutex::new(MqttHandler::new(mqtt_config, event_sender)?));
 
+    let location_id = {
+        let device_manager = device_manager
+            .lock()
+            .map_err(|_| "Failed to lock DeviceManager")?;
+        device_manager.get_location_id()
+    };
+
+    let _call_setup = CallSetup::new(Arc::clone(&mqtt_handler), location_id)?;
+
     let ringtone_manager = Arc::new(Mutex::new(RingtoneManager::new()?));
 
     let call_handler = Arc::new(Mutex::new(CallHandler::new(
@@ -89,7 +101,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             println!("[Hardware] Ring button pressed! Initiating ALL CALL...");
             if let Ok(mut ch) = ch_for_ring.lock() {
                 // Initiate a group call as a doordevice
-                if let Err(e) = ch.initiate_call_all(loc_id_ring, &ip_for_ring, DeviceType::DoorDevice) {
+                if let Err(e) =
+                    ch.initiate_call_all(loc_id_ring, &ip_for_ring, DeviceType::DoorDevice)
+                {
                     eprintln!("[Doorstation] Failed to initiate ALL CALL: {}", e);
                 }
             }
