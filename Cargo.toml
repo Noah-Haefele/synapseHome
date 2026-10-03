@@ -18,16 +18,18 @@ ringbuf = "0.5.1"
 rodio = "0.22.2"
 webrtc-audio-processing = { version = "2.1.0", features = ["bundled"] }
 
-# Optional dependencies used ONLY by touch_device (gRPC / UI interface):
+# Optional dependencies:
 tonic = { version = "*", optional = true }
 prost = { version = "0.14", optional = true }
 tonic-prost = { version = "*", optional = true }
 sonora = { version = "*", optional = true }
+rppal = { version = "0.20", optional = true }
 
 [features]
 default = ["touch_device"]
 touch_device = ["dep:tonic", "dep:prost", "dep:tonic-prost", "dep:sonora"]
-door_device = []
+door_device = ["dep:rppal"]
+
 
 [build-dependencies]
 tonic-prost-build = "*"

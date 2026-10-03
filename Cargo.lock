@@ -1675,6 +1675,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "rppal"
+version = "0.20.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "302b549c5e3fe53ec00d2fa473da106f9effc8176a5206373d92b3c44e8b06db"
+dependencies = [
+ "libc",
+]
+
+[[package]]
 name = "rtrb"
 version = "0.3.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2232,6 +2241,7 @@ dependencies = [
  "prost",
  "ringbuf",
  "rodio",
+ "rppal",
  "rumqttc",
  "serde",
  "serde_json",
