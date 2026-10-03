@@ -9,7 +9,3 @@ target/
 
 # Misc.
 .cache/
-
-# Internal generated runtime settings
-internal/
-
