@@ -7,6 +7,7 @@ use crate::core::act::mqtt_event::MqttEvent;
 
 use crate::core::act::audio::audio::AudioHandler;
 use crate::core::act::audio::ringtone_player;
+#[cfg(feature = "touch_device")]
 use crate::core::api::call_signals_service::CallSignalsService;
 use crate::core::state::ringtone::RingtoneManager;
 use crate::networking::mqtt::mqtt_handler::MqttHandler;
@@ -26,6 +27,7 @@ enum CallState {
 }
 
 pub struct CallHandler {
+    #[cfg(feature = "touch_device")]
     call_signals_service: CallSignalsService,
     mqtt_handler: Arc<Mutex<MqttHandler>>,
     audio_handler: AudioHandler,
@@ -40,12 +42,13 @@ pub struct CallHandler {
 
 impl CallHandler {
     pub fn new(
-        call_signals_service: CallSignalsService,
+        #[cfg(feature = "touch_device")] call_signals_service: CallSignalsService,
         mqtt_handler: Arc<Mutex<MqttHandler>>,
         audio_handler: AudioHandler,
         ringtone_manager: Arc<Mutex<RingtoneManager>>,
     ) -> Self {
         Self {
+            #[cfg(feature = "touch_device")]
             call_signals_service,
             mqtt_handler,
             audio_handler,
@@ -63,12 +66,14 @@ impl CallHandler {
     fn set_call_state(&mut self, state: CallState) {
         self.call_state = state;
 
+        #[cfg(feature = "touch_device")]
         self.call_signals_service
             .trigger_call_state_changed(self.decide_ui_call_state());
     }
 
     /// Decides from CallState enum the proper CallState for qml to display correct call view
     /// Frontend wants either IDLE, CALLING, RINGING, CONNECTED
+    #[cfg(feature = "touch_device")]
     fn decide_ui_call_state(&self) -> &'static str {
         match self.call_state {
             CallState::Idle => "IDLE",
@@ -86,6 +91,7 @@ impl CallHandler {
         }
     }
 }
+
 
 /// Methods that are called locally by this device
 impl CallHandler {
