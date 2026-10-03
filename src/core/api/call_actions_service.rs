@@ -2,6 +2,7 @@ use std::sync::{Arc, Mutex};
 use tonic::{Request, Response, Status};
 
 use crate::core::act::call::call_handler::CallHandler;
+use crate::core::act::mqtt_event::DeviceType;
 use crate::core::act::commands_handler::{self, CommandsHandler};
 use crate::core::api::proto;
 use crate::core::state::devices::DeviceManager;
@@ -79,6 +80,7 @@ impl CallActions for CallActionsService {
         Ok(Response::new(()))
     }
 
+    /// Initiates a group call as a normal device
     async fn all(&self, _: Request<()>) -> Result<Response<()>, Status> {
         let (location_id, ip_address) = self.get_call_context()?;
 
@@ -88,7 +90,7 @@ impl CallActions for CallActionsService {
             .map_err(|_| Status::internal("Failed to lock CallHandler"))?;
 
         handler
-            .initiate_call_all(location_id, &ip_address)
+            .initiate_call_all(location_id, &ip_address, DeviceType::Device)
             .map_err(|e| Status::internal(e.to_string()))?;
 
         println!("Call to everyone");

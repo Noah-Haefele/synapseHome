@@ -8,6 +8,7 @@ use synapsed::core::{
     act::{
         audio::{aec::AecHandler, audio::AudioHandler},
         call::{call_handler::CallHandler, doorstation_handler::DoorstationHandler},
+        mqtt_event::DeviceType,
     },
     state::{devices::DeviceManager, ringtone::RingtoneManager},
 };
@@ -29,7 +30,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let door_config_path = Path::new("internal/door_device.json");
     let door_config = DoorDeviceConfig::load_or_default(door_config_path);
 
-    println!("[Config] Doorstation Location ID: {}", door_config.location_id);
+    println!(
+        "[Config] Doorstation Location ID: {}",
+        door_config.location_id
+    );
     println!(
         "[Config] GPIO Pins -> Buzzer: {}, Ring: {}, Open: {}, Buzz Duration: {}ms",
         door_config.buzzer_pin,
@@ -55,7 +59,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let audio_handler = AudioHandler::new(audio_receiver, audio_sender, aec_handler)?;
 
     let net_iface = NetIface::new();
-    let local_ip = net_iface.get_ip_address().unwrap_or_else(|_| "127.0.0.1".to_string());
+    let local_ip = net_iface
+        .get_ip_address()
+        .unwrap_or_else(|_| "127.0.0.1".to_string());
 
     let mqtt_config = MqttConfig::new()?;
     let mqtt_handler = Arc::new(Mutex::new(MqttHandler::new(mqtt_config, event_sender)?));
@@ -67,7 +73,6 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         audio_handler,
         ringtone_manager,
     )));
-
 
     // --- 4. Initialize Hardware GPIO ---
     let gpio_controller = Arc::new(GpioController::new(&door_config));
@@ -83,7 +88,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         move || {
             println!("[Hardware] Ring button pressed! Initiating ALL CALL...");
             if let Ok(mut ch) = ch_for_ring.lock() {
-                if let Err(e) = ch.initiate_call_all(loc_id_ring, &ip_for_ring) {
+                // Initiate a group call as a doordevice
+                if let Err(e) = ch.initiate_call_all(loc_id_ring, &ip_for_ring, DeviceType::DoorDevice) {
                     eprintln!("[Doorstation] Failed to initiate ALL CALL: {}", e);
                 }
             }

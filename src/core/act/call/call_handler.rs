@@ -131,6 +131,7 @@ impl CallHandler {
         &mut self,
         caller_id: i32,
         caller_ip: &str,
+        caller_device_type: DeviceType,
     ) -> Result<(), Box<dyn std::error::Error>> {
         self.call_device_id = -1;
         self.is_caller = true;
@@ -148,7 +149,7 @@ impl CallHandler {
             caller_id,
             caller_ip: caller_ip.to_string(),
             call_type: CallType::Group,
-            caller_device_type: DeviceType::Device,
+            caller_device_type,
         };
         let payload_str = serde_json::to_string(&payload)?;
 
