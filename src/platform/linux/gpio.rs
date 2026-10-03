@@ -173,35 +173,56 @@ impl GpioController {
         let open_pin = self.open_pin;
 
         thread::spawn(move || {
-            let mut last_ring_state = 0u8;
-            let mut last_open_state = 0u8;
+            let ring_path = format!("/sys/class/gpio/gpio{}/value", ring_pin);
+            let open_path = format!("/sys/class/gpio/gpio{}/value", open_pin);
+
+            let mut last_ring_state = fs::read_to_string(&ring_path)
+                .ok()
+                .and_then(|s| s.trim().parse::<u8>().ok())
+                .unwrap_or(0);
+
+            let mut last_open_state = fs::read_to_string(&open_path)
+                .ok()
+                .and_then(|s| s.trim().parse::<u8>().ok())
+                .unwrap_or(0);
+
+            println!(
+                "[GPIO] Input listener started. Initial states -> Ring(pin {}): {}, Open(pin {}): {}",
+                ring_pin, last_ring_state, open_pin, last_open_state
+            );
 
             loop {
                 thread::sleep(Duration::from_millis(50));
 
-                let ring_path = format!("/sys/class/gpio/gpio{}/value", ring_pin);
-                let open_path = format!("/sys/class/gpio/gpio{}/value", open_pin);
-
                 if let Ok(content) = fs::read_to_string(&ring_path) {
-                    let current_state = content.trim().parse::<u8>().unwrap_or(0);
-                    // Edge trigger: 0 -> 1 (button pressed)
-                    if current_state == 1 && last_ring_state == 0 {
-                        println!("[GPIO] Ring button pressed on pin {}", ring_pin);
-                        on_ring();
+                    if let Ok(current_state) = content.trim().parse::<u8>() {
+                        if current_state != last_ring_state {
+                            println!(
+                                "[GPIO] Ring pin {} state changed: {} -> {}",
+                                ring_pin, last_ring_state, current_state
+                            );
+                            // Trigger action on any active button press (either 0->1 or 1->0)
+                            on_ring();
+                            last_ring_state = current_state;
+                        }
                     }
-                    last_ring_state = current_state;
                 }
 
                 if let Ok(content) = fs::read_to_string(&open_path) {
-                    let current_state = content.trim().parse::<u8>().unwrap_or(0);
-                    // Edge trigger: 0 -> 1 (button pressed)
-                    if current_state == 1 && last_open_state == 0 {
-                        println!("[GPIO] Door open button pressed on pin {}", open_pin);
-                        on_open();
+                    if let Ok(current_state) = content.trim().parse::<u8>() {
+                        if current_state != last_open_state {
+                            println!(
+                                "[GPIO] Open pin {} state changed: {} -> {}",
+                                open_pin, last_open_state, current_state
+                            );
+                            // Trigger action on any active button press (either 0->1 or 1->0)
+                            on_open();
+                            last_open_state = current_state;
+                        }
                     }
-                    last_open_state = current_state;
                 }
             }
         });
+
     }
 }
