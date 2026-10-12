@@ -6,9 +6,11 @@
 
 # synapseHome
 
-**synapsed** is the daemon at the core of synapseHome — a self-hosted, MQTT-based intercom system built for residential and small commercial use. It runs on Linux-based intercom stations, coordinates peer-to-peer audio calls between devices over your local network, and exposes a gRPC API so that any client (touch UI, mobile app, etc.) can control it.
+**synapsed** is the daemon at the core of synapseHome — a fully self-hosted, open-source door intercom system built for residential and small commercial use.
 
-The idea is simple: every intercom station on your network runs `synapsed`. Stations discover each other through a shared MQTT broker. When one station initiates a call, the daemon handles signalling via MQTT, establishes a direct UDP audio stream between the two endpoints, and manages the full call lifecycle — from ring to hangup.
+The goal is a system that works entirely on your local network, no cloud, no internet dependency, no subscriptions. Communication runs over ethernet, audio is transmitted peer-to-peer at good quality with acoustic echo cancellation for clean full-duplex conversations, and the whole thing is designed from the ground up to be modular and extensible. Planned hardware support includes cameras with night vision for outdoor stations, door release control, and a flexible device model that can grow with your installation.
+
+Every intercom station runs `synapsed`. Stations discover each other through a shared MQTT broker on your LAN. When one station initiates a call, the daemon handles signalling, establishes a direct UDP audio stream between the two endpoints, and manages the full call lifecycle — from ring to hangup. The gRPC API it exposes means any client can integrate with it: touch UI, mobile app, web frontend, or your own tooling.
 
 ---
 
@@ -166,6 +168,7 @@ This project is in early development. The following areas are actively being wor
 
 - **Systemd service files** — `.service` unit files for `synapsed` to run as a proper system daemon with auto-restart and dependency ordering.
 - **Installation scripts** — a single script covering dependency installation, Mosquitto broker setup, config templating, and service registration.
+- **Video Camera** — each door device can have a camera connected to it which feeds its video stream to the touch devices inside the building.
 - **Utility scripts** — helpers for managing the device list, testing MQTT connectivity, and diagnosing audio routing issues.
 - **Video guides** — walkthrough videos covering hardware setup, network configuration, and getting the system running end-to-end.
 - **Documentation** — network topology guide, full API documentation generated from the proto files, and more.
