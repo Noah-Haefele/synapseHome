@@ -22,19 +22,19 @@ log() {
 }
 
 info() {
-    printf '%s%s%s\n' "$COLOR_BLUE" "$*" "$COLOR_RESET"
+    printf '%s[ INFO ]%s %s\n' "$COLOR_BLUE" "$COLOR_RESET" "$*"
 }
 
 success() {
-    printf '%s%s%s\n' "$COLOR_GREEN" "$*" "$COLOR_RESET"
+    printf '%s[ OK   ]%s %s\n' "$COLOR_GREEN" "$COLOR_RESET" "$*"
 }
 
 warn() {
-    printf '%s%s%s\n' "$COLOR_YELLOW" "$*" "$COLOR_RESET" >&2
+    printf '%s[ WARN ] %s%s\n' "$COLOR_YELLOW" "$*" "$COLOR_RESET" >&2
 }
 
 error() {
-    printf '%s%s%s\n' "$COLOR_RED" "$*" "$COLOR_RESET" >&2
+    printf '%s[ FAIL ] %s%s\n' "$COLOR_RED" "$*" "$COLOR_RESET" >&2
 }
 
 step() {
