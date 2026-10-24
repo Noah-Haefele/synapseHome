@@ -2,8 +2,8 @@
 set -euo pipefail
 
 SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
-source "$SCRIPT_DIR/common.sh"
-source "$SCRIPT_DIR/package_install.sh"
+source "$SCRIPT_DIR/../../../scripts/logging.sh"
+source "$SCRIPT_DIR/../helpers/package_install.sh"
 
 if [[ -r /etc/os-release ]]; then
     source /etc/os-release
@@ -17,6 +17,7 @@ DISTRO_LIKE="${ID_LIKE:-}"
 
 if [[ "$DISTRO_ID" =~ ^(ubuntu|debian|linuxmint|pop|elementary)$ ]] ||
     [[ "$DISTRO_LIKE" =~ (ubuntu|debian) ]]; then
+    info "Installing C++ dependencies ..."
 
     install_packages \
         cmake \
@@ -29,6 +30,7 @@ if [[ "$DISTRO_ID" =~ ^(ubuntu|debian|linuxmint|pop|elementary)$ ]] ||
 
 elif [[ "$DISTRO_ID" =~ ^(fedora|rhel|centos)$ ]] ||
     [[ "$DISTRO_LIKE" =~ (fedora|rhel) ]]; then
+    info "Installing C++ dependencies ..."
 
     install_packages \
         cmake \
@@ -42,6 +44,7 @@ elif [[ "$DISTRO_ID" =~ ^(fedora|rhel|centos)$ ]] ||
 
 elif [[ "$DISTRO_ID" =~ ^(arch|manjaro|endeavouros)$ ]] ||
     [[ "$DISTRO_LIKE" =~ arch ]]; then
+    info "Installing C++ dependencies ..."
 
     install_packages \
         cmake \

@@ -2,7 +2,7 @@
 set -euo pipefail
 
 SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
-source "$SCRIPT_DIR/common.sh"
+source "$SCRIPT_DIR/../../../scripts/logging.sh"
 
 # Check if rust is already installed
 if command -v rustc >/dev/null 2>&1 &&
@@ -24,5 +24,5 @@ else
         source "$HOME/.cargo/env"
     fi
 
-    success "Rust is now installed."
+    success "Rust is installed."
 fi
