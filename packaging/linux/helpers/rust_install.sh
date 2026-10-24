@@ -6,8 +6,8 @@ source "$SCRIPT_DIR/common.sh"
 
 # Check if rust is already installed
 if command -v rustc >/dev/null 2>&1 &&
-   command -v cargo >/dev/null 2>&1 &&
-   command -v rustup >/dev/null 2>&1; then
+    command -v cargo >/dev/null 2>&1 &&
+    command -v rustup >/dev/null 2>&1; then
 
     log "Rust is already installed."
     info "Updating Rust ..."
@@ -23,6 +23,6 @@ else
     if [ -f "$HOME/.cargo/env" ]; then
         source "$HOME/.cargo/env"
     fi
-	
+
     success "Rust is now installed."
 fi

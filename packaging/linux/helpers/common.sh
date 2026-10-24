@@ -40,4 +40,3 @@ error() {
 step() {
     printf '\n%s==> %s%s\n' "$COLOR_CYAN" "$*" "$COLOR_RESET"
 }
-
