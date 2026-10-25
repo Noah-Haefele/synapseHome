@@ -8,7 +8,7 @@
 
 **synapsed** is the daemon at the core of synapseHome — a fully self-hosted, open-source door intercom system built for residential and small commercial use.
 
-The goal is a system that works entirely on your local network, no cloud, no internet dependency, no subscriptions. Communication runs over ethernet, audio is transmitted peer-to-peer at good quality with acoustic echo cancellation for clean full-duplex conversations, and the whole thing is designed from the ground up to be modular and extensible. Planned hardware support includes cameras with night vision for outdoor stations, door release control, and a flexible device model that can grow with your installation.
+The goal is a fully self-hosted system that operates entirely on your local network, without cloud services, subscriptions, or an internet connection during normal operation. Communication runs over ethernet, audio is transmitted peer-to-peer in high quality with acoustic echo cancellation for clean full-duplex conversations, and the whole thing is designed from the ground up to be modular and extensible. Planned hardware support includes cameras with night vision for outdoor stations, door release control, and a flexible device model that can grow with your installation.
 
 Every intercom station runs `synapsed`. Stations discover each other through a shared MQTT broker on your LAN. When one station initiates a call, the daemon handles signalling, establishes a direct UDP audio stream between the two endpoints, and manages the full call lifecycle — from ring to hangup. The gRPC API it exposes means any client can integrate with it: touch UI, mobile app, web frontend, or your own tooling.
 
@@ -17,26 +17,18 @@ Every intercom station runs `synapsed`. Stations discover each other through a s
 ## Getting Started
 
 > [!NOTE]
-> The first build compiles the Rust daemon and the C++-based UI from source. Depending on your hardware this can take **up to an hour** — on a Raspberry Pi noticeably longer than on a desktop machine. All of this will be automated with a single install script before the first stable release.
+> The first build compiles the Rust daemon and the C++-based UI from source. Depending on your hardware this can take **up to two hours** — on a Raspberry Pi noticeably longer than on a desktop machine.
 
-### Step 1 — Install system dependencies
+### Step 1 — Run the installation script (supports most Linux distributions)
+> [!WARNING]
+> Running this can take **up to two hours** depending on your hardware and network connection (Ethernet vs. Wi-Fi). On a typical desktop PC, installation should take around 30 minutes.
 
+From the repo root:
 ```bash
-sudo apt-get install cmake
-sudo apt-get install protobuf-compiler
-sudo apt-get install qt6-base-dev qt6-declarative-dev
-sudo apt-get install libasound2-dev
-sudo apt-get install libclang-dev
-
-# Required to build webrtc-audio-processing with the bundled flag
-sudo apt-get install meson ninja-build build-essential pkg-config
+chmod +x install.sh
+./install.sh
 ```
-
-Also make sure you have the Rust toolchain installed. If not:
-
-```bash
-curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
-```
+This will install all required dependencies and compilers and build the application.
 
 ### Step 2 — Set up an MQTT broker
 
@@ -48,7 +40,9 @@ synapseHome requires an MQTT broker that every station on the network can reach.
 sudo apt-get install mosquitto mosquitto-clients
 ```
 
-**Option B — Public test broker:** `test.mosquitto.org:1883` (provided by the Eclipse Foundation) works out of the box for testing without any local setup. Don't use this for a permanent installation.
+**Option B — Public test broker:** `test.mosquitto.org:1883` (provided by the Eclipse Foundation)
+> [!CAUTION]
+> The public test broker is shared with other users and is not suitable for private or production deployments. Use a dedicated broker for real installations.
 
 > A setup script that installs and pre-configures a local Mosquitto instance is coming with the first stable release.
 
@@ -80,7 +74,7 @@ Use a unique `clientId` per station. The broker IP must be reachable from all st
 
 Every station in the network must carry the same `devices.json`. The daemon reads this at startup to build the call routing table.
 
-### Step 4 — Build and start the daemon
+### Step 4 — Start the daemon
 
 ```bash
 cargo run --release --bin touch_device
@@ -88,18 +82,7 @@ cargo run --release --bin touch_device
 
 This compiles and starts `synapsed`. The gRPC server comes up on port `50051` and the station begins listening for MQTT events.
 
-### Step 5 — Build the UI
-
-In a separate terminal from the repo root:
-
-```bash
-chmod +x ui_build.sh
-./ui_build.sh
-```
-
-This runs CMake to compile the touch UI into `build/sHUiBridge`.
-
-### Step 6 — Launch the UI
+### Step 5 — Launch the UI
 
 ```bash
 ./build/sHUiBridge
@@ -167,8 +150,8 @@ synapsed/
 This project is in early development. The following areas are actively being worked on and will land before a stable release:
 
 - **Systemd service files** — `.service` unit files for `synapsed` to run as a proper system daemon with auto-restart and dependency ordering.
-- **Installation scripts** — a single script covering dependency installation, Mosquitto broker setup, config templating, and service registration.
-- **Video Camera** — each door device can have a camera connected to it which feeds its video stream to the touch devices inside the building.
+- **Encryption** — Add encryption for audio streams and MQTT communication to protect communications between stations.
+- **Video cameras** — each door device can have a camera connected to it which feeds its video stream to the touch devices inside the building.
 - **Utility scripts** — helpers for managing the device list, testing MQTT connectivity, and diagnosing audio routing issues.
 - **Video guides** — walkthrough videos covering hardware setup, network configuration, and getting the system running end-to-end.
 - **Documentation** — network topology guide, full API documentation generated from the proto files, and more.
