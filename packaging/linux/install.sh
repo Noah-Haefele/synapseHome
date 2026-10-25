@@ -78,7 +78,8 @@ bash "$SCRIPT_DIR/compile/ui_build.sh"
 # Compiling the backend
 log
 step "Building the daemon ..."
-cargo build --features "$DEVICE" --bin "$DEVICE" --release
+#cargo build --features "$DEVICE" --bin "$DEVICE" --release
+cargo build --release
 success "Daemon built successfully."
 
 log
