@@ -30,7 +30,7 @@ info "When encountering problems, feel free to visit waveshare's page"
 info "https://www.waveshare.com/wiki/WM8960_Audio_HAT"
 
 log
-warning "A system reboot is required for the audio driver uninstallation to take effect."
+warn "A system reboot is required for the audio driver uninstallation to take effect."
 read -rp "Do you want to reboot now? [y/N] " -n 1 -r
 log
 
