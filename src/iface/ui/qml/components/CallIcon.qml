@@ -1,4 +1,5 @@
 import QtQuick
+import QtQuick.VectorImage
 
 Item {
     id: root
@@ -15,7 +16,7 @@ Item {
         width: Math.min(parent.width, parent.height)
         height: width
 
-        Image {
+        VectorImage {
             id: image
             anchors.fill: parent
             fillMode: Image.PreserveAspectFit
