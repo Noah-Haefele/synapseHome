@@ -5,8 +5,7 @@ SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPT_DIR/../../scripts/logging.sh"
 source "$SCRIPT_DIR/helpers/package_install.sh"
 
-TOUCH_DEVICE=false
-DOOR_DEVICE=false
+DEVICE=""
 
 usage() {
     info "Usage: $0 [OPTIONS]"
@@ -19,11 +18,16 @@ usage() {
 
 while getopts ":tdh" opt; do
     case "$opt" in
-    t)
-        TOUCH_DEVICE=true
-        ;;
-    d)
-        DOOR_DEVICE=true
+    t | d)
+        if [[ -n "$DEVICE" ]]; then
+            error "Select exactly one device: -t or -d."
+            usage >&2
+            exit 1
+        fi
+        case "$opt" in
+        t) DEVICE=touch_device ;;
+        d) DEVICE=door_device ;;
+        esac
         ;;
     h)
         usage
@@ -36,16 +40,15 @@ while getopts ":tdh" opt; do
         ;;
     :)
         error "Option -$OPTARG requires a value."
-        usage
+        usage >&2
         exit 1
         ;;
     esac
 done
 
-# Check if no device was selected
-if [[ "$TOUCH_DEVICE" == false && "$DOOR_DEVICE" == false ]]; then
-    error "No option provided."
-    usage
+if [[ -z "$DEVICE" ]]; then
+    error "Select exactly one device: -t or -d."
+    usage >&2
     exit 1
 fi
 
@@ -59,7 +62,7 @@ info "Installing curl ..."
 install_packages curl
 success "Curl is installed."
 
-# Installing dependencys and compilers
+# Installing dependencies and compilers
 log
 bash "$SCRIPT_DIR/install/cpp_install.sh"
 log
@@ -71,3 +74,14 @@ success "Dependencies are installed."
 # Compiling the frontend
 log
 bash "$SCRIPT_DIR/compile/ui_build.sh"
+
+# Compiling the backend
+log
+step "Building the daemon ..."
+cargo build --features "$DEVICE" --bin "$DEVICE" --release
+success "Daemon built successfully."
+
+log
+log
+success "Application successfully installed."
+success "Enjoy"
