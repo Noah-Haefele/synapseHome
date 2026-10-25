@@ -24,5 +24,15 @@ else
         source "$HOME/.cargo/env"
     fi
 
+    command -v rustc >/dev/null 2>&1 || {
+        error "Rustc not found after installation" >&2
+        exit 1
+    }
+
+    command -v cargo >/dev/null 2>&1 || {
+        error "Cargo not found after installation" >&2
+        exit 1
+    }
+
     success "Rust is installed."
 fi
