@@ -115,6 +115,7 @@ set(QML_FILES
 
     qml/views/Home.qml
     qml/views/Settings.qml
+    qml/views/Reconnect.qml
     qml/views/call/ConnectedDevice.qml
     qml/views/call/ConnectedDoorDevice.qml
     qml/views/call/Incoming.qml
@@ -134,6 +135,7 @@ set(QML_FILES
     qml/components/NavBar.qml
     qml/components/SimpleButton.qml
     qml/components/Slider.qml
+    qml/components/LoadingCircle.qml
 )
 
 set(SRC_FILES
@@ -143,12 +145,12 @@ set(SRC_FILES
     src/control_grid_bridge.cpp
     src/call_bridge.hpp
     src/call_bridge.cpp
+    src/grpc_connection_monitor.hpp
+    src/grpc_connection_monitor.cpp
     api/grpc_client.hpp
     api/grpc_client.cpp
     api/grpc_call_client.hpp
     api/grpc_call_client.cpp
-    api/grpc_connection_monitor.hpp
-    api/grpc_connection_monitor.cpp
 )
 
 set(ICON_FILES

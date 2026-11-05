@@ -1,6 +1,7 @@
 import QtQuick 2.15
 import QtQuick.Controls 2.15
 import CallBridge
+import ConnectionMonitor
 
 ApplicationWindow {
     id: mainWindow
@@ -39,6 +40,28 @@ ApplicationWindow {
         }
     }
 
+    // This layer is for displaying critical information about the status of the software
+    Item {
+        id: criticalLayer
+
+        anchors.fill: parent
+
+        z: 2000
+        visible: false
+
+        MouseArea {
+            anchors.fill: parent
+
+            enabled: criticalLayer.visible
+        }
+
+        Loader {
+            id: criticalOverlayLoader
+
+            anchors.fill: parent
+        }
+    }
+
     Connections {
         target: CallBridge
 
@@ -56,6 +79,20 @@ ApplicationWindow {
             }
             else if (state === "CONNECTED:DOOR_DEVICE") {
                 callOverlayLoader.source = "views/call/ConnectedDoorDevice.qml"
+            }
+        }
+    }
+
+    Connections {
+        target: ConnectionMonitor
+
+        function onSoftwareStateChanged(state) {
+            criticalLayer.visible = state !== "GRPC:CONNECTED"
+
+            if (state === "GRPC:DISCONNECTED") {
+                criticalOverlayLoader.source = "views/Reconnect.qml"
+            } else if (state === "GRPC:CONNECTED") {
+                criticalOverlayLoader.source = ""
             }
         }
     }

@@ -7,10 +7,10 @@
 
 #include "api/grpc_client.hpp"
 #include "api/grpc_call_client.hpp"
-#include "api/grpc_connection_monitor.hpp"
 #include "src/control_grid_bridge.hpp"
 #include "src/settings_bridge.hpp"
 #include "src/call_bridge.hpp"
+#include "src/grpc_connection_monitor.hpp"
 
 int main(int argc, char *argv[])
 {
@@ -34,9 +34,7 @@ int main(int argc, char *argv[])
     }).detach();
 
     // Start the gRPC connection monitor
-    auto connectionMonitor = std::make_unique<GrpcConnectionMonitor>(channel);
-
-    connectionMonitor->start();
+    auto connectionMonitor = new GrpcConnectionMonitor(channel, &app);
 
     // create instance and bound to app
     auto settingsBridge = new SettingsBridge(grpcClient, &app);
@@ -66,9 +64,12 @@ int main(int argc, char *argv[])
     qmlRegisterSingletonInstance("SettingsBridge", 1, 0, "SettingsBridge", settingsBridge);
     qmlRegisterSingletonInstance("ControlGridBridge", 1, 0, "ControlGridBridge", controlGridBridge);
     qmlRegisterSingletonInstance("CallBridge", 1, 0, "CallBridge", callBridge);
+    qmlRegisterSingletonInstance("ConnectionMonitor", 1, 0, "ConnectionMonitor", connectionMonitor);
 
     QQmlApplicationEngine engine;
     engine.loadFromModule("UiBridge", "Main");
+
+    connectionMonitor->start();
 
     return app.exec();
 }
