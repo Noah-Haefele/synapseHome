@@ -147,6 +147,8 @@ set(SRC_FILES
     api/grpc_client.cpp
     api/grpc_call_client.hpp
     api/grpc_call_client.cpp
+    api/grpc_connection_monitor.hpp
+    api/grpc_connection_monitor.cpp
 )
 
 set(ICON_FILES

@@ -7,22 +7,36 @@
 
 #include "api/grpc_client.hpp"
 #include "api/grpc_call_client.hpp"
+#include "api/grpc_connection_monitor.hpp"
 #include "src/control_grid_bridge.hpp"
 #include "src/settings_bridge.hpp"
 #include "src/call_bridge.hpp"
-
 
 int main(int argc, char *argv[])
 {
     QGuiApplication app(argc, argv);
 
-    auto channel = grpc::CreateChannel("localhost:50051", grpc::InsecureChannelCredentials());
+    grpc::ChannelArguments args;
+    args.SetInt(GRPC_ARG_INITIAL_RECONNECT_BACKOFF_MS, 1000);
+    args.SetInt(GRPC_ARG_MAX_RECONNECT_BACKOFF_MS, 1000);
+    args.SetInt(GRPC_ARG_MIN_RECONNECT_BACKOFF_MS, 1000);
+
+    auto channel = grpc::CreateCustomChannel(
+        "localhost:50051",
+        grpc::InsecureChannelCredentials(),
+        args
+    );
     auto grpcClient = std::make_shared<Client>(channel, "settings_db");
     auto grpcCallClient = new GrpcCallClient(channel, &app);
     // Start blocking subscribe method
     std::thread([grpcCallClient]() {
         grpcCallClient->subscribe();
     }).detach();
+
+    // Start the gRPC connection monitor
+    auto connectionMonitor = std::make_unique<GrpcConnectionMonitor>(channel);
+
+    connectionMonitor->start();
 
     // create instance and bound to app
     auto settingsBridge = new SettingsBridge(grpcClient, &app);
