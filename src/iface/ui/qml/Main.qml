@@ -87,11 +87,11 @@ ApplicationWindow {
         target: ConnectionMonitor
 
         function onSoftwareStateChanged(state) {
-            criticalLayer.visible = state !== "GRPC:CONNECTED"
-
             if (state === "GRPC:DISCONNECTED") {
                 criticalOverlayLoader.source = "views/Reconnect.qml"
+                criticalLayer.visible = true
             } else if (state === "GRPC:CONNECTED") {
+                criticalLayer.visible = false
                 criticalOverlayLoader.source = ""
             }
         }
