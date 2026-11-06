@@ -158,6 +158,9 @@ public:
     QVariantList ringtone_model() const;
     int ringtone_id() const;
 
+    // Is executed when the gRPC client connects to the server
+    void handleReconnect();
+
 private:
     std::shared_ptr<Client> client_;
 

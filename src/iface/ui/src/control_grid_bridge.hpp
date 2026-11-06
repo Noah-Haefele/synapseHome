@@ -64,6 +64,9 @@ public:
 
     Q_INVOKABLE int getPrefCallId(int num) const;
 
+    // Is executed when the gRPC client connects to the server
+    void handleReconnect();
+
 private:
     std::shared_ptr<Client> client_;
 

@@ -78,3 +78,8 @@ int ControlGridBridge::getPrefCallId(int num) const
 
     return *device_id;
 }
+
+void ControlGridBridge::handleReconnect()
+{
+    emit pref_call_icon_changed();
+}

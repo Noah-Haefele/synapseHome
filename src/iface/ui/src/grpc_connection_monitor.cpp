@@ -44,6 +44,7 @@ void GrpcConnectionMonitor::transmitState(grpc_connectivity_state state)
         case GRPC_CHANNEL_READY:
             std::cout << "gRPC: CONNECTED\n";
             emit softwareStateChanged("GRPC:CONNECTED");
+            emit reconnected(); // Notify the fronend bridges to fetch data from the server
             break;
 
         case GRPC_CHANNEL_TRANSIENT_FAILURE:

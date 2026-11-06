@@ -34,13 +34,14 @@ int main(int argc, char *argv[])
     }).detach();
 
     // Start the gRPC connection monitor
-    auto connectionMonitor = new GrpcConnectionMonitor(channel, &app);
+    auto grpcConnectionMonitor = new GrpcConnectionMonitor(channel, &app);
 
     // create instance and bound to app
     auto settingsBridge = new SettingsBridge(grpcClient, &app);
     auto controlGridBridge = new ControlGridBridge(grpcClient, &app);
     auto callBridge = new CallBridge(grpcCallClient, &app);
-
+    
+    // Connect signals
     // Connect pref_call_icon_changed signals between settings_bridge and control_grid_bridge
     QObject::connect(
         settingsBridge,
@@ -56,6 +57,20 @@ int main(int argc, char *argv[])
         &CallBridge::callStateChanged
     );
 
+    QObject::connect(
+        grpcConnectionMonitor,
+        &GrpcConnectionMonitor::reconnected,
+        settingsBridge,
+        &SettingsBridge::handleReconnect
+    );
+
+    QObject::connect(
+        grpcConnectionMonitor,
+        &GrpcConnectionMonitor::reconnected,
+        controlGridBridge,
+        &ControlGridBridge::handleReconnect
+    );
+
     // c++ keeps memory contorl
     QQmlEngine::setObjectOwnership(settingsBridge, QQmlEngine::CppOwnership);
     QQmlEngine::setObjectOwnership(controlGridBridge, QQmlEngine::CppOwnership);
@@ -64,12 +79,12 @@ int main(int argc, char *argv[])
     qmlRegisterSingletonInstance("SettingsBridge", 1, 0, "SettingsBridge", settingsBridge);
     qmlRegisterSingletonInstance("ControlGridBridge", 1, 0, "ControlGridBridge", controlGridBridge);
     qmlRegisterSingletonInstance("CallBridge", 1, 0, "CallBridge", callBridge);
-    qmlRegisterSingletonInstance("ConnectionMonitor", 1, 0, "ConnectionMonitor", connectionMonitor);
+    qmlRegisterSingletonInstance("ConnectionMonitor", 1, 0, "ConnectionMonitor", grpcConnectionMonitor);
 
     QQmlApplicationEngine engine;
     engine.loadFromModule("UiBridge", "Main");
 
-    connectionMonitor->start();
+    grpcConnectionMonitor->start();
 
     return app.exec();
 }

@@ -306,3 +306,17 @@ void SettingsBridge::set_ringtone_id(int id)
     }
     emit ringtone_settings_changed();
 }
+
+void SettingsBridge::handleReconnect()
+{
+    emit location_id_changed();
+    emit pref_call_id_changed();
+    emit brightness_changed();
+    emit display_time_changed();
+    emit audio_devices_changed();
+    emit pref_call_icon_changed();
+    emit input_device_changed();
+    emit output_device_changed();
+    emit ip_address_changed();
+    emit ringtone_settings_changed();
+}

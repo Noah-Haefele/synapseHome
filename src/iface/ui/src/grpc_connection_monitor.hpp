@@ -24,6 +24,7 @@ public:
 
 signals:
     void softwareStateChanged(const QString &state);
+    void reconnected();
 
 private:
     void run();
