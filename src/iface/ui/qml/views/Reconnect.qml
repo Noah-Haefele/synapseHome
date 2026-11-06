@@ -2,9 +2,13 @@ import QtQuick
 import QtQuick.Layouts
 import "../components"
 
-Item {
+Rectangle {
     id: root
-    
+
+    anchors.fill: parent
+
+    color: "white"
+
     RowLayout {
         anchors.fill: parent
         spacing: 0
