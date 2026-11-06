@@ -28,20 +28,63 @@ GrpcCallClient::GrpcCallClient(
 {
 }
 
+GrpcCallClient::~GrpcCallClient()
+{
+    stopSubscribe();
+}
+
+void GrpcCallClient::startSubscribe()
+{
+    if (running_)
+        return;
+
+    // Eventuell noch vorhandenen Thread aufräumen
+    if (subscribeThread_.joinable())
+        subscribeThread_.join();
+
+    running_ = true;
+
+    subscribeThread_ = std::thread([this]() {
+        subscribe();
+    });
+}
+
+void GrpcCallClient::stopSubscribe()
+{
+    running_ = false;
+
+    {
+        std::lock_guard<std::mutex> lock(contextMutex_);
+
+        if (activeContext_) {
+            activeContext_->TryCancel();
+        }
+    }
+
+    if (subscribeThread_.joinable()) {
+        subscribeThread_.join();
+    }
+}
+
 void GrpcCallClient::subscribe()
 {
     SubscribeRequest request;
     request.set_topic("on_call_state_changed");
 
-    context_ = std::make_unique<grpc::ClientContext>();
+    grpc::ClientContext context;
+
+    {
+        std::lock_guard<std::mutex> lock(contextMutex_);
+        activeContext_ = &context;
+    }
 
     std::unique_ptr<grpc::ClientReader<Event>> reader(
-        call_signals_stub_->Subscribe(context_.get(), request)
+        call_signals_stub_->Subscribe(&context, request)
     );
 
     Event event;
 
-    while (reader->Read(&event)) {
+    while (running_ && reader->Read(&event)) {
         if (event.event_type() == "on_call_state_changed") {
             onCallStateChanged(event.state());
         }
@@ -49,20 +92,18 @@ void GrpcCallClient::subscribe()
 
     grpc::Status status = reader->Finish();
 
+    {
+        std::lock_guard<std::mutex> lock(contextMutex_);
+        activeContext_ = nullptr;
+    }
+
     if (!status.ok()) {
         std::cerr << "Subscribe ended: "
                   << status.error_message()
                   << std::endl;
     }
 
-    context_.reset();
-}
-
-void GrpcCallClient::stop()
-{
-    if (context_) {
-        context_->TryCancel();
-    }
+    running_ = false;
 }
 
 void GrpcCallClient::onCallStateChanged(const std::string& state)

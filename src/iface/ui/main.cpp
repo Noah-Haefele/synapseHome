@@ -28,10 +28,6 @@ int main(int argc, char *argv[])
     );
     auto grpcClient = std::make_shared<Client>(channel, "settings_db");
     auto grpcCallClient = new GrpcCallClient(channel, &app);
-    // Start blocking subscribe method
-    std::thread([grpcCallClient]() {
-        grpcCallClient->subscribe();
-    }).detach();
 
     // Start the gRPC connection monitor
     auto grpcConnectionMonitor = new GrpcConnectionMonitor(channel, &app);
@@ -42,6 +38,23 @@ int main(int argc, char *argv[])
     auto callBridge = new CallBridge(grpcCallClient, &app);
     
     // Connect signals
+    // Handles subscribing and unsubscribing from the serverstream
+    QObject::connect(
+        grpcConnectionMonitor,
+        &GrpcConnectionMonitor::softwareStateChanged,
+        grpcCallClient,
+        [grpcCallClient](const QString &state) {
+            if (state == "GRPC:CONNECTED") {
+                grpcCallClient->startSubscribe();
+            }
+            else {
+                grpcCallClient->stopSubscribe();
+            }
+
+        },
+        Qt::QueuedConnection
+    );
+
     // Connect pref_call_icon_changed signals between settings_bridge and control_grid_bridge
     QObject::connect(
         settingsBridge,

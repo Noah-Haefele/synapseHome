@@ -2,6 +2,9 @@
 
 #include <QObject>
 #include <grpcpp/grpcpp.h>
+#include <thread>
+#include <atomic>
+#include <mutex>
 
 #include "call_api.grpc.pb.h"
 
@@ -15,8 +18,12 @@ public:
         QObject *parent = nullptr
     );
 
+    ~GrpcCallClient();
+
+    void startSubscribe();
+    void stopSubscribe();
+
     void subscribe();
-    void stop();
 
     void initiateCall(int device_id);
     void initiateCallAll();
@@ -31,6 +38,12 @@ signals:
 
 private:
     void onCallStateChanged(const std::string& state);
+
+    std::thread subscribeThread_;
+    std::atomic<bool> running_{false};
+
+    std::mutex contextMutex_;
+    grpc::ClientContext *activeContext_ = nullptr;
 
     std::unique_ptr<grpc::ClientContext> context_;
     std::unique_ptr<synapsed::api::call::CallSignals::Stub> call_signals_stub_;
