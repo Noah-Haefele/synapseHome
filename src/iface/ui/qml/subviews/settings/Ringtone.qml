@@ -1,6 +1,7 @@
 import QtQuick 2.15
 import QtQuick.Controls 2.15
 import SettingsBridge
+import UiBridge
 import "../../components"
 
 /**
@@ -11,7 +12,7 @@ import "../../components"
 Rectangle {
     id: root
 
-    color: "#f8f9fa"
+    color: Theme.colors.primaryBackground
 
     Component.onCompleted: {
         SettingsBridge.refresh_ringtones()
@@ -32,7 +33,7 @@ Rectangle {
         width: height
 
         backgroundColor: root.color
-        textColor: "black"
+        textColor: Theme.colors.text
         radius: 8
 
         text: "\u21bb" // Reload / refresh unicode symbol
@@ -41,6 +42,7 @@ Rectangle {
         // Reload ringtones
         // Required when user uploads ringtones and dont wants to restart the entire application
         onClicked: SettingsBridge.refresh_ringtones()
+
     }
 
     // Main content
@@ -70,6 +72,12 @@ Rectangle {
             selectedValue: SettingsBridge.ringtone_id
 
             onUserSelected: (val) => SettingsBridge.set_ringtone_id(val)
+
+
+            labelColor: Theme.colors.text
+            textColor: Theme.colors.text
+            accentColor: Theme.colors.secondaryAccent
+            backgroundColor: Theme.colors.primaryBackground
         }
     }
 }

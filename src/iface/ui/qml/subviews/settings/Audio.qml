@@ -1,6 +1,7 @@
 import QtQuick 2.15
 import QtQuick.Controls 2.15
 import SettingsBridge
+import UiBridge
 import "../../components"
 
 /**
@@ -12,7 +13,7 @@ import "../../components"
 Rectangle {
     id: root
 
-    color: "#f8f9fa"
+    color: Theme.colors.primaryBackground
 
     // Main content
     Column {
@@ -48,6 +49,11 @@ Rectangle {
                     SettingsBridge.onAudioDropdownOpened()
                 }
             }
+
+            labelColor: Theme.colors.text
+            textColor: Theme.colors.text
+            accentColor: Theme.colors.secondaryAccent
+            backgroundColor: Theme.colors.primaryBackground
         }
 
         // Source (audio input)
@@ -72,6 +78,11 @@ Rectangle {
                     SettingsBridge.onAudioDropdownOpened()
                 }
             }
+
+            labelColor: Theme.colors.text
+            textColor: Theme.colors.text
+            accentColor: Theme.colors.secondaryAccent
+            backgroundColor: Theme.colors.primaryBackground
         }
     }
 }

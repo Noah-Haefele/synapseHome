@@ -1,6 +1,7 @@
 import QtQuick 2.15
 import QtQuick.Controls 2.15
 import CallBridge
+import UiBridge
 import "../../components"
 
 Rectangle {
@@ -8,7 +9,7 @@ Rectangle {
 
     anchors.fill: parent
 
-    color: "white"
+    color: Theme.colors.primaryBackground
 
     Label {
         anchors {
@@ -18,6 +19,7 @@ Rectangle {
         }
 
         font.pixelSize: 30
+        color: Theme.colors.text
 
         text: CallBridge.destinationLabel
     }

@@ -1,6 +1,7 @@
 import QtQuick 2.15
 import QtQuick.Controls 2.15
 import SettingsBridge
+import UiBridge
 import "../../components"
 import "../../models"
 
@@ -13,7 +14,7 @@ import "../../models"
 Rectangle {
     id: configRoot
 
-    color: "#f8f9fa"
+    color: Theme.colors.primaryBackground
 
     // Main content
     Column {
@@ -53,6 +54,11 @@ Rectangle {
                 selectedValue: SettingsBridge.location_id
 
                 onUserSelected: (val) => SettingsBridge.set_location_id(val)
+                
+                labelColor: Theme.colors.text
+                textColor: Theme.colors.text
+                accentColor: Theme.colors.secondaryAccent
+                backgroundColor: Theme.colors.primaryBackground
             }
 
             // Pref 1
@@ -71,6 +77,11 @@ Rectangle {
                 selectedValue: SettingsBridge.pref1_call_id
 
                 onUserSelected: (val) => SettingsBridge.set_pref_call_id(1, val)
+
+                labelColor: Theme.colors.text
+                textColor: Theme.colors.text
+                accentColor: Theme.colors.secondaryAccent
+                backgroundColor: Theme.colors.primaryBackground
             }
 
             // Pref 2
@@ -89,6 +100,11 @@ Rectangle {
                 selectedValue: SettingsBridge.pref2_call_id
 
                 onUserSelected: (val) => SettingsBridge.set_pref_call_id(2, val)
+
+                labelColor: Theme.colors.text
+                textColor: Theme.colors.text
+                accentColor: Theme.colors.secondaryAccent
+                backgroundColor: Theme.colors.primaryBackground
             }
 
             // Pref 3
@@ -107,6 +123,11 @@ Rectangle {
                 selectedValue: SettingsBridge.pref3_call_id
 
                 onUserSelected: (val) => SettingsBridge.set_pref_call_id(3, val)
+
+                labelColor: Theme.colors.text
+                textColor: Theme.colors.text
+                accentColor: Theme.colors.secondaryAccent
+                backgroundColor: Theme.colors.primaryBackground
             }
         }
 
@@ -128,7 +149,7 @@ Rectangle {
                     family: "Inter"
                 }
 
-                color: "#6b7280"
+                color: Theme.colors.text
             }
 
             Text {
@@ -142,7 +163,7 @@ Rectangle {
                     family: "Inter"
                 }
 
-                color: "#1f2937"
+                color: Theme.colors.text
             }
         }
     }

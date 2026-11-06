@@ -11,6 +11,12 @@ Item {
     property int max: 100
     signal moved(int value)
 
+    property color textColor: "black"
+    property color valueColor: "black"
+    property color primaryAccentColor: "#79baff"
+    property color secondaryAccentColor: "lightgray"
+    property color knobColor: "white"
+
     height: 80
     width: parent.width
 
@@ -30,7 +36,7 @@ Item {
 
                 font.pixelSize: 22
                 font.bold: true
-                color: "#2c3e50"
+                color: root.textColor
             }
             Text {
                 anchors.right: parent.right
@@ -39,7 +45,7 @@ Item {
 
                 font.pixelSize: 22
                 font.bold: true
-                color: "black"
+                color: root.valueColor
             }
         }
 
@@ -64,13 +70,13 @@ Item {
                 height: implicitHeight
 
                 radius: 6
-                color: "#dee2e6"
+                color: root.secondaryAccentColor
 
                 Rectangle {
                     width: control.visualPosition * parent.width
                     height: parent.height
 
-                    color: '#79baff'
+                    color: root.primaryAccentColor
                     radius: 6
                 }
             }
@@ -83,8 +89,8 @@ Item {
                 implicitHeight: 50
 
                 radius: 25
-                color: "white"
-                border.color: '#79baff'
+                color: root.knobColor
+                border.color: root.primaryAccentColor
                 border.width: 3
             }
         }

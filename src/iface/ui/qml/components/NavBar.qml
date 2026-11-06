@@ -1,13 +1,18 @@
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
+import UiBridge
 import "../models"
 
 Item {
     id: root
 
     property real preferredWidth: 280
-    property color backgroundColor: "#f2f2f4"
+
+    property color backgroundColor: "white"
+    property color textColor: "black"
+    property color primaryAccentColor: "#79baff"
+    property color secondaryAccentColor: "lightgrey"
 
     signal backClicked()
     signal optionClicked(int index, string name)
@@ -44,7 +49,7 @@ Item {
                     width: height
 
                     backgroundColor: root.backgroundColor
-                    textColor: "black"
+                    textColor: root.textColor
                     radius: 8
 
                     text: "\u2190"
@@ -58,6 +63,7 @@ Item {
                     anchors.centerIn: parent
 
                     text: "Settings"
+                    color: root.textColor
 
                     font {
                         pixelSize: parent.height * 0.3
@@ -74,7 +80,7 @@ Item {
                     width: height
 
                     backgroundColor: root.backgroundColor
-                    textColor: "black"
+                    textColor: root.textColor
                     radius: 8
 
                     text: "\u23FB"
@@ -104,6 +110,8 @@ Item {
                     width: ListView.view.width
                     height: ListView.view.height * 0.11
 
+                    color: root.backgroundColor
+
                     readonly property bool isCurrent: ListView.isCurrentItem
 
                     Rectangle {
@@ -113,8 +121,8 @@ Item {
 
                         radius: 6
                         color: wrapper.isCurrent
-                            ? (hoverArea.containsMouse ? Qt.darker("#79baff", 1.2) : "#79baff")
-                            : (hoverArea.containsMouse ? Qt.darker(root.backgroundColor, 1.2) : root.backgroundColor)
+                            ? root.primaryAccentColor
+                            : root.secondaryAccentColor
                         border.color: Qt.darker(background.color, 1.4)
                         // display border only if the option is highlighted
                         border.width: wrapper.isCurrent ? 1 : 0
@@ -125,7 +133,7 @@ Item {
 
                         text: name
 
-                        color: "black"
+                        color: root.textColor
 
                         font.pixelSize: parent.height * 0.38
                     }

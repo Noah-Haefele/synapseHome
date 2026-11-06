@@ -1,5 +1,6 @@
 import QtQuick
 import QtQuick.Layouts
+import UiBridge
 import "../components"
 
 Rectangle {
@@ -7,7 +8,7 @@ Rectangle {
 
     anchors.fill: parent
 
-    color: "white"
+    color: Theme.colors.primaryBackground
 
     ColumnLayout {
         anchors.fill: parent
@@ -20,7 +21,7 @@ Rectangle {
 
             text: "The backend seems to be offline"
 
-            color: "black"
+            color: Theme.colors.text
             font.pixelSize: 23
         }
 
@@ -31,7 +32,7 @@ Rectangle {
             LoadingCircle {
                 id: spinner
                 running: true
-                color: "#79baff"
+                color: Theme.colors.primaryAccent
                 lineWidth: 14
                 width: 100
                 height: 100
@@ -40,7 +41,7 @@ Rectangle {
             Text {
                 anchors.horizontalCenter: parent.horizontalCenter
                 text: "Reconnecting ..."
-                color: "black"
+                color: Theme.colors.text
                 font.pixelSize: 12
             }
         }
