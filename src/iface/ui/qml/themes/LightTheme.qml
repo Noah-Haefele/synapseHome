@@ -5,6 +5,7 @@ QtObject {
         readonly property color primaryBackground: "white"
         readonly property color secondaryBackground: "whitesmoke"
         readonly property color tertiaryBackground: "#e8e8e8" // Darker light-grey
+        readonly property color gridBackground: "white"
         readonly property color text: "black"
         readonly property color primaryAccent: "lightseagreen"
         readonly property color secondaryAccent: "lightgrey"
