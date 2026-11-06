@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
+import UiBridge
 import "../components"
 import "../subviews/settings"
 
@@ -24,6 +25,11 @@ Item {
         NavBar {
             preferredWidth: parent.width * 0.25
 
+            backgroundColor: Theme.colors.primaryBackground
+            textColor: Theme.colors.text
+            primaryAccentColor: Theme.colors.primaryAccent
+            secondaryAccentColor: Theme.colors.secondaryBackground
+
             onBackClicked: stackView.pop()
             onOptionClicked: (index, name) => {
                 root.leftViewState = index
@@ -35,7 +41,7 @@ Item {
             height: parent.height
             width: 1
 
-            color: '#dbdbdd'
+            color: Theme.colors.greySeperator
         }
 
         // Content area
@@ -72,11 +78,12 @@ Item {
                 visible: leftViewState !== 3 && leftViewState !== 0 && leftViewState !== 1 && leftViewState !== 2
                 Layout.fillHeight: true
                 Layout.fillWidth: true
-                color: "white"
+                color: Theme.colors.primaryBackground
 
                 Label {
                     anchors.centerIn: parent
                     text: "Settings Content"
+                    color: Theme.colors.text
                 }
             }
         }

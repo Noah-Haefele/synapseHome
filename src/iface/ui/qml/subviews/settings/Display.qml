@@ -1,6 +1,7 @@
 import QtQuick 2.15
 import QtQuick.Controls 2.15
 import SettingsBridge
+import UiBridge
 import "../../components"
 
 /**
@@ -11,7 +12,7 @@ import "../../components"
 Rectangle {
     id: root
 
-    color: "#f8f9fa"
+    color: Theme.colors.primaryBackground
 
     // Main content
     Column {
@@ -33,6 +34,12 @@ Rectangle {
             min: 10
             max: 100
             onMoved: (v) => SettingsBridge.brightness = v
+
+            textColor: Theme.colors.text
+            valueColor: Theme.colors.text
+            primaryAccentColor: Theme.colors.primaryAccent
+            secondaryAccentColor: Theme.colors.secondaryAccent
+            knobColor: Theme.colors.primaryBackground
         }
 
         // Display-Standby Slider
@@ -43,6 +50,12 @@ Rectangle {
             min: 10
             max: 300
             onMoved: (v) => SettingsBridge.display_time = v
+
+            textColor: Theme.colors.text
+            valueColor: Theme.colors.text
+            primaryAccentColor: Theme.colors.primaryAccent
+            secondaryAccentColor: Theme.colors.secondaryAccent
+            knobColor: Theme.colors.primaryBackground
         }
     }
 }

@@ -23,6 +23,11 @@ Column {
     // Active selection provided by backend state
     property var selectedValue: -1
 
+    property color labelColor: "black"
+    property color textColor: "black"
+    property color backgroundColor: "white"
+    property color accentColor: "lightgrey"
+
     readonly property alias popupVisible: popup.visible
 
     // Emitted only on explicit user interaction
@@ -61,7 +66,7 @@ Column {
 
         font.pixelSize: root.pixelsize
 
-        color: "#6b7280"
+        color: root.labelColor
     }
 
     ComboBox {
@@ -100,14 +105,14 @@ Column {
 
             contentItem: Text {
                 text: parent.text
-                color: highlighted ? "#2F4C6B" : "#333333"
+                color: root.textColor
                 font.pixelSize: 22
                 verticalAlignment: Text.AlignVCenter
                 leftPadding: 20
             }
 
             background: Rectangle {
-                color: highlighted ? "#f0f0f0" : "#ffffff"
+                color: root.backgroundColor
             }
         }
 
@@ -116,14 +121,14 @@ Column {
             x: combo.width - width - 20
             anchors.verticalCenter: parent.verticalCenter
             text: combo.popup.visible ? "▲" : "▼"
-            color: "#999999"
+            color: root.accentColor
             font.pixelSize: 18
             horizontalAlignment: Text.AlignHCenter
             verticalAlignment: Text.AlignVCenter
         }
 
         background: Rectangle {
-            color: "#ffffff"
+            color: root.backgroundColor
             radius: 12
             border.color: "#e0e0e0"
             border.width: 1
@@ -133,7 +138,7 @@ Column {
         contentItem: Text {
             text: combo.displayText
 
-            color: "#333333"
+            color: root.textColor
             font: combo.font
 
             verticalAlignment: Text.AlignVCenter
@@ -181,7 +186,7 @@ Column {
             transformOrigin: opensUpwards ? Popup.Bottom : Popup.Top
 
             background: Rectangle {
-                color: "#ffffff"
+                color: root.backgroundColor
                 radius: 12
 
                 border.color: "#e0e0e0"

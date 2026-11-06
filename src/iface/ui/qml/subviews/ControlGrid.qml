@@ -2,6 +2,7 @@ import QtQuick 2.15
 import QtQuick.Controls 2.15
 import QtQuick.Layouts 1.15
 import ControlGridBridge
+import UiBridge
 import "../components"
 import "../models"
 
@@ -97,7 +98,7 @@ Rectangle {
                     return model.iconPath
                 }
 
-                clr: "white"
+                clr: Theme.colors.gridBackground
 
                 label: {
                     if (model.type === "floor") {

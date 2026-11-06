@@ -1,6 +1,7 @@
 import QtQuick 2.15
 import QtQuick.Controls 2.15
 import QtQuick.Layouts 1.15
+import UiBridge
 import ControlGridBridge
 import CallBridge
 import "../subviews"
@@ -16,14 +17,14 @@ Item {
         Rectangle {
             Layout.fillHeight: true
             Layout.preferredWidth: parent.width * 0.5
-            color: "white"
+            color: Theme.colors.primaryBackground
         }
 
         // center
         Rectangle {
             Layout.fillHeight: true
             width: 2
-            color: "black"
+            color: Theme.colors.blackSeperator
         }
 
         // right panel
