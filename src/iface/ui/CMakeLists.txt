@@ -113,6 +113,9 @@ qt_add_executable(sHUiBridge
 set(QML_FILES
     qml/Main.qml
 
+    qml/themes/Theme.qml
+    qml/themes/LightTheme.qml
+
     qml/views/Home.qml
     qml/views/Settings.qml
     qml/views/Reconnect.qml
@@ -180,6 +183,11 @@ foreach(ICON ${ICON_FILES})
         QT_RESOURCE_ALIAS "${ICON_RELATIVE}"
     )
 endforeach()
+
+set_source_files_properties(
+    qml/themes/Theme.qml
+    PROPERTIES QT_QML_SINGLETON_TYPE TRUE
+)
 
 qt_add_qml_module(sHUiBridge
     URI UiBridge
