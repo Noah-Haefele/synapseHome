@@ -7,9 +7,13 @@ QtObject {
         readonly property color tertiaryBackground: "#e8e8e8" // Darker light-grey
         readonly property color gridBackground: "white"
         readonly property color text: "black"
+        readonly property color opositeText: "white"
         readonly property color primaryAccent: "lightseagreen"
         readonly property color secondaryAccent: "lightgrey"
         readonly property color blackSeperator: "#515151" // Lighter black
         readonly property color greySeperator: "#dbdbdd" // Lighter grey
+        readonly property color red: "red";
+        readonly property color green: "lightseagreen";
+        readonly property color blue: "#2563EB"; // = blue
     }
 }
