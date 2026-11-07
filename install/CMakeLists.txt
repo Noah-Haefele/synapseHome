@@ -8,7 +8,7 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 get_filename_component(PROJECT_ROOT
-    "${CMAKE_CURRENT_SOURCE_DIR}/../../../"
+    "${CMAKE_CURRENT_SOURCE_DIR}/../"
     ABSOLUTE
 )
 
@@ -24,9 +24,39 @@ qt_add_executable(synapseHomeInstaller
     main.cpp
 )
 
+set(THEME_FILES
+    "${PROJECT_ROOT}/assets/themes/Theme.qml"
+    "${PROJECT_ROOT}/assets/themes/LightTheme.qml"
+)
+
 set(QML_FILES
     qml/Main.qml
-    qml/Start.qml
+
+    ${THEME_FILES}
+
+    qml/components/WizardStep.qml
+    qml/components/ModernButton.qml
+
+    qml/subviews/Welcome.qml
+)
+
+foreach(THEME ${THEME_FILES})
+    file(RELATIVE_PATH THEME_RELATIVE
+        "${PROJECT_ROOT}"
+        "${THEME}"
+    )
+
+    set_source_files_properties(
+        "${THEME}"
+        PROPERTIES
+        QT_RESOURCE_ALIAS "${THEME_RELATIVE}"
+    )
+endforeach()
+
+set_source_files_properties(
+    "${PROJECT_ROOT}/assets/themes/Theme.qml"
+    PROPERTIES
+    QT_QML_SINGLETON_TYPE TRUE
 )
 
 qt_add_qml_module(synapseHomeInstaller
