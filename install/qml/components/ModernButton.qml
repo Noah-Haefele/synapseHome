@@ -4,6 +4,7 @@ Item {
     id: root
 
     property string text: "Next"
+    property string symbol: ""
     property color textColor: "#FFFFFF"
     property color backgroundColor: "#4F46E5"
 
@@ -47,7 +48,7 @@ Item {
             }
 
             Text {
-                text: "→"
+                text: root.symbol
                 color: root.textColor
                 font.pixelSize: 21
                 anchors.verticalCenter: parent.verticalCenter

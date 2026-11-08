@@ -71,6 +71,7 @@ Rectangle {
 
         ModernButton {
             text: "Launch"
+            symbol: "\u{1F5F8}"
             textColor: Theme.colors.oppositeText
 
             backgroundColor: Theme.colors.green
@@ -82,6 +83,7 @@ Rectangle {
 
         ModernButton {
             text: "Finish"
+            symbol: "\u{1F5F8}"
             textColor: Theme.colors.oppositeText
 
             backgroundColor: Theme.colors.primaryAccent

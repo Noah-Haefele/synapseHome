@@ -59,6 +59,7 @@ Rectangle {
         anchors.bottomMargin: 30
 
         text: "Start"
+        symbol: "\u2192"
         textColor: "white"
 
         backgroundColor: Theme.colors.primaryAccent

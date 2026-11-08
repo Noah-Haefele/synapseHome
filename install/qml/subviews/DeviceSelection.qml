@@ -80,6 +80,7 @@ Rectangle {
         anchors.bottomMargin: 30
 
         text: "Install"
+        symbol: "\u2192"
         textColor: Theme.colors.oppositeText
 
         backgroundColor: Theme.colors.primaryAccent
