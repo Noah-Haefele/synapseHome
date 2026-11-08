@@ -87,4 +87,3 @@ Rectangle {
         height: 48
     }
 }
-
