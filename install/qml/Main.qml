@@ -26,7 +26,7 @@ ApplicationWindow {
 
         spacing: 30
 
-        property int currentStep: 3
+        property int currentStep: 4
 
         // Sidebar
         Column {
@@ -82,6 +82,13 @@ ApplicationWindow {
             Layout.fillWidth: true
 
             visible: root.currentStep === 3
+        }
+
+        Finish {
+            Layout.fillHeight: true
+            Layout.fillWidth: true
+
+            visible: root.currentStep === 4
         }
     }
 }

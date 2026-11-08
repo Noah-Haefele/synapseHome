@@ -41,6 +41,7 @@ set(QML_FILES
     qml/subviews/Welcome.qml
     qml/subviews/DeviceSelection.qml
     qml/subviews/SystemServices.qml
+    qml/subviews/Finish.qml
 )
 
 foreach(THEME ${THEME_FILES})
