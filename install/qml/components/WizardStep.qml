@@ -41,7 +41,7 @@ Row {
         Rectangle {
             width: 2
             height: 35
-            color: Theme.colors.secondaryBackground
+            color: Theme.colors.primaryBackground
             anchors.horizontalCenter: parent.horizontalCenter
             visible: root.stepNumber < 5
         }
@@ -54,6 +54,6 @@ Row {
 
         color: root.stepNumber === root.currentStep
                ? Theme.colors.text
-               : Theme.colors.secondaryAccent
+               : Theme.colors.blackSeperator
     }
 }
