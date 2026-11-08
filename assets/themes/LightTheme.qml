@@ -16,7 +16,7 @@ QtObject {
         readonly property color blackSeperator: "#515151" // Lighter black
         readonly property color greySeperator: "#dbdbdd" // Lighter grey
         readonly property color red: "red";
-        readonly property color green: "green";
+        readonly property color green: "#00a800"; // = green
         readonly property color blue: "#2563EB"; // = blue
     }
 }
