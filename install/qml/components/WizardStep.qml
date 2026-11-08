@@ -34,7 +34,7 @@ Row {
                       ? "\u{1F5F8}" // Unicode for check mark
                       : root.stepNumber
 
-                color: Theme.colors.opositeText
+                color: Theme.colors.oppositeText
             }
         }
 
