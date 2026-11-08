@@ -110,11 +110,15 @@ qt_add_executable(sHUiBridge
     ${GRPC_HDR_FILES}
 )
 
+set(THEME_FILES
+    "${PROJECT_ROOT}/assets/themes/Theme.qml"
+    "${PROJECT_ROOT}/assets/themes/LightTheme.qml"
+)
+
 set(QML_FILES
     qml/Main.qml
 
-    qml/themes/Theme.qml
-    qml/themes/LightTheme.qml
+    ${THEME_FILES}
 
     qml/views/Home.qml
     qml/views/Settings.qml
@@ -184,9 +188,23 @@ foreach(ICON ${ICON_FILES})
     )
 endforeach()
 
+foreach(THEME ${THEME_FILES})
+    file(RELATIVE_PATH THEME_RELATIVE
+        "${PROJECT_ROOT}"
+        "${THEME}"
+    )
+
+    set_source_files_properties(
+        "${THEME}"
+        PROPERTIES
+        QT_RESOURCE_ALIAS "${THEME_RELATIVE}"
+    )
+endforeach()
+
 set_source_files_properties(
-    qml/themes/Theme.qml
-    PROPERTIES QT_QML_SINGLETON_TYPE TRUE
+    "${PROJECT_ROOT}/assets/themes/Theme.qml"
+    PROPERTIES
+    QT_QML_SINGLETON_TYPE TRUE
 )
 
 qt_add_qml_module(sHUiBridge
