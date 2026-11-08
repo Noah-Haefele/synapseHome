@@ -1,5 +1,6 @@
 import QtQuick
 import sHInstaller
+import GuiInstaller
 import "../components"
 
 Rectangle {
@@ -65,5 +66,7 @@ Rectangle {
         backgroundColor: Theme.colors.primaryAccent
         width: 140
         height: 48
+
+        onClicked: GuiInstaller.nextInstallationPage()
     }
 }

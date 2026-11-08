@@ -1,11 +1,20 @@
 import QtQuick
 import sHInstaller
+import GuiInstaller
 import "../components"
 
 Rectangle {
     color: Theme.colors.primaryBackground
 
     property string selectedDevice: ""
+
+    function validatePageSwitch() {
+        if (selectedDevice === "") {
+            return false
+        }
+
+        return true
+    }
 
     Column {
         anchors.horizontalCenter: parent.horizontalCenter
@@ -86,5 +95,11 @@ Rectangle {
         backgroundColor: Theme.colors.primaryAccent
         width: 140
         height: 48
+
+        onClicked: {
+            if (validatePageSwitch()) {
+                GuiInstaller.nextInstallationPage()
+            }
+        }
     }
 }

@@ -2,6 +2,7 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 import sHInstaller
+import GuiInstaller
 import "components"
 import "subviews"
 
@@ -26,7 +27,7 @@ ApplicationWindow {
 
         spacing: 30
 
-        property int currentStep: 4
+        property int currentStep: GuiInstaller.currentInstallationPage
 
         // Sidebar
         Column {
