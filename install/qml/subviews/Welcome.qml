@@ -3,7 +3,7 @@ import sHInstaller
 import "../components"
 
 Rectangle {
-    color: "#FFFFFF"
+    color: Theme.colors.primaryBackground
 
     Column {
         anchors.horizontalCenter: parent.horizontalCenter
@@ -17,13 +17,13 @@ Rectangle {
             text: "Welcome to synapseHome"
             font.pixelSize: 30
             font.weight: Font.DemiBold
-            color: "#202020"
+            color: Theme.colors.text
         }
 
         Rectangle {
             width: 55
             height: 4
-            color: "#3B82F6"
+            color: Theme.colors.blue
             radius: 2
         }
 
@@ -31,7 +31,7 @@ Rectangle {
             width: parent.width
             text: "This wizard will guide you through the installation of synapseHome."
             font.pixelSize: 16
-            color: "#444444"
+            color: Theme.colors.secondaryText
             wrapMode: Text.WordWrap
         }
 
@@ -39,7 +39,7 @@ Rectangle {
             width: parent.width
             text: "You will be able to select your device type, configure the required services and complete the installation."
             font.pixelSize: 15
-            color: "#666666"
+            color: Theme.colors.tertiaryText
             wrapMode: Text.WordWrap
             lineHeight: 1.3
         }
@@ -48,7 +48,7 @@ Rectangle {
             text: "Click Next to continue."
             font.pixelSize: 14
             font.weight: Font.Medium
-            color: "#202020"
+            color: Theme.colors.text
         }
     }
         
@@ -58,9 +58,9 @@ Rectangle {
         anchors.rightMargin: 35
         anchors.bottomMargin: 30
 
-        text: "Start"
+        text: "Next"
         symbol: "\u2192"
-        textColor: "white"
+        textColor: Theme.colors.oppositeText
 
         backgroundColor: Theme.colors.primaryAccent
         width: 140
