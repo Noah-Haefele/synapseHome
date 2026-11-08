@@ -36,8 +36,10 @@ set(QML_FILES
 
     qml/components/WizardStep.qml
     qml/components/ModernButton.qml
+    qml/components/RadioButton.qml
 
     qml/subviews/Welcome.qml
+    qml/subviews/DeviceSelection.qml
 )
 
 foreach(THEME ${THEME_FILES})
