@@ -8,8 +8,8 @@ import "subviews"
 ApplicationWindow {
     id: mainWindow
 
-    width: 900
-    height: 600
+    width: 1000
+    height: 630
 
     minimumWidth: 800
     minimumHeight: 550
@@ -26,7 +26,7 @@ ApplicationWindow {
 
         spacing: 30
 
-        property int currentStep: 2
+        property int currentStep: 3
 
         // Sidebar
         Column {
@@ -75,6 +75,13 @@ ApplicationWindow {
             Layout.fillWidth: true
 
             visible: root.currentStep === 2
+        }
+
+        SystemServices {
+            Layout.fillHeight: true
+            Layout.fillWidth: true
+
+            visible: root.currentStep === 3
         }
     }
 }
