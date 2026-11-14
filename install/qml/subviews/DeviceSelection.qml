@@ -14,8 +14,7 @@ Rectangle {
     function validatePageSwitch() {
         if (root.selectedDevice === "") {
             root.error = true
-            errorTimer.restart()
-            errorRectangle.border.color = Theme.colors.error
+            errorAnimation.restart()
             return false
         }
 
@@ -25,18 +24,33 @@ Rectangle {
     function selectDevice(device) {
         root.selectedDevice = device
         root.error = false
-        errorTimer.stop()
+        errorAnimation.stop()
         errorRectangle.border.color = "transparent"
     }
 
-    Timer {
-        id: errorTimer
-        interval: 1000
-        repeat: false
-        running: false
+    SequentialAnimation {
+        id: errorAnimation
 
-        onTriggered: {
-            errorRectangle.border.color = "transparent"
+        ColorAnimation {
+            target: errorRectangle.border
+            property: "color"
+            from: "transparent"
+            to: Theme.colors.error
+            duration: 300
+            easing.type: Easing.OutCubic
+        }
+
+        PauseAnimation {
+            duration: 400
+        }
+
+        ColorAnimation {
+            target: errorRectangle.border
+            property: "color"
+            from: Theme.colors.error
+            to: "transparent"
+            duration: 500
+            easing.type: Easing.InOutQuad
         }
     }
 
