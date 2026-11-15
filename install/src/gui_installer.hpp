@@ -41,11 +41,15 @@ public:
     Q_INVOKABLE void nextInstallationPage();
     Q_INVOKABLE void installDevice(DeviceType deviceType);
     Q_INVOKABLE void service(Service service);
+    Q_INVOKABLE void finishGuiInstaller();
+    Q_INVOKABLE void launchApplication();
 
     int currentInstallationPage() const;
     bool isGuiDevice() const;
 
 private:
+    void quitGuiInstaller();
+
     int m_currentInstallationPage = 1;
     DeviceType m_deviceType;
     Service m_service;

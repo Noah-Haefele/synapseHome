@@ -1,5 +1,6 @@
 #include "gui_installer.hpp"
 #include <iostream>
+#include <QCoreApplication>
 
 GuiInstaller::GuiInstaller(QObject *parent)
     : QObject(parent)
@@ -51,6 +52,16 @@ void GuiInstaller::service(GuiInstaller::Service service)
     }
 }
 
+void GuiInstaller::finishGuiInstaller()
+{
+    GuiInstaller::quitGuiInstaller();
+}
+
+void GuiInstaller::launchApplication()
+{
+    GuiInstaller::quitGuiInstaller();
+}
+
 int GuiInstaller::currentInstallationPage() const
 {
     return m_currentInstallationPage;
@@ -62,4 +73,9 @@ bool GuiInstaller::isGuiDevice() const
         return true;
     }
     return false;
+}
+
+void GuiInstaller::quitGuiInstaller()
+{
+    QCoreApplication::quit();
 }
