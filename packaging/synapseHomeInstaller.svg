@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <title>synapseHome Installer Icon</title>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0F172A"/>
+      <stop offset="1" stop-color="#1E293B"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#22D3EE"/>
+      <stop offset="1" stop-color="#6366F1"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="512" height="512" rx="112" fill="url(#bg)"/>
+
+  <!-- Bubble -->
+  <path d="M160 141 H352 Q416 141 416 205 V307 Q416 371 352 371 H196 L150 427 L164 371 H160 Q96 371 96 307 V205 Q96 141 160 141 Z"
+        fill="url(#accent)"/>
+
+  <!-- House -->
+  <path d="M186 261 L256 201 L326 261 V331 H186 Z"
+      fill="none" stroke="#0F172A" stroke-width="16" stroke-linejoin="round"/>
+
+  <!-- Lines to every corner -->
+  <g stroke="#0F172A" stroke-width="6" stroke-linecap="butt">
+    <line x1="256" y1="281" x2="256" y2="201"/>
+    <line x1="256" y1="281" x2="186" y2="261"/>
+    <line x1="256" y1="281" x2="326" y2="261"/>
+    <line x1="256" y1="281" x2="186" y2="331"/>
+    <line x1="256" y1="281" x2="326" y2="331"/>
+  </g>
+
+  <!-- Center dot -->
+  <circle cx="256" cy="281" r="22" fill="#E2E8F0"/>
+
+  <!-- Installer badge with arrow -->
+  <circle cx="388" cy="388" r="64" fill="url(#accent)" stroke="#0F172A" stroke-width="12"/>
+  <path d="M388 352 V414 M364 390 L388 414 L412 390"
+        fill="none" stroke="#0F172A" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
+
