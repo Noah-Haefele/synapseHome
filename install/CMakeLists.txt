@@ -44,6 +44,11 @@ set(QML_FILES
     qml/subviews/Finish.qml
 )
 
+set(SRC_FILES
+    src/gui_installer.hpp
+    src/gui_installer.cpp
+)
+
 foreach(THEME ${THEME_FILES})
     file(RELATIVE_PATH THEME_RELATIVE
         "${PROJECT_ROOT}"
@@ -68,6 +73,7 @@ qt_add_qml_module(synapseHomeInstaller
     VERSION 1.0.0
 
     QML_FILES ${QML_FILES}
+    SOURCES ${SRC_FILES}
 )
 
 target_include_directories(synapseHomeInstaller PRIVATE

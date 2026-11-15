@@ -1,99 +1,182 @@
 import QtQuick
 import sHInstaller
+import GuiInstaller
 import "../components"
 
 Rectangle {
+    id: root
+
     color: Theme.colors.primaryBackground
 
     property string selectedService: ""
-    property bool guiDevice: true
+    property bool guiDevice: GuiInstaller.isGuiDevice
+    property bool error: false
+
+    function validatePageSwitch() {
+        if (root.selectedService === "") {
+            root.error = true
+            errorAnimation.restart()
+            return false
+        }
+
+        return true
+    }
+
+    function selectServices(service) {
+        root.selectedService = service
+        root.error = false
+        errorAnimation.stop()
+        errorRectangle.border.color = "transparent"
+    }
+
+    SequentialAnimation {
+        id: errorAnimation
+
+        ColorAnimation {
+            target: errorRectangle.border
+            property: "color"
+            from: "transparent"
+            to: Theme.colors.error
+            duration: 300
+            easing.type: Easing.OutCubic
+        }
+
+        PauseAnimation {
+            duration: 400
+        }
+
+        ColorAnimation {
+            target: errorRectangle.border
+            property: "color"
+            from: Theme.colors.error
+            to: "transparent"
+            duration: 500
+            easing.type: Easing.InOutQuad
+        }
+    }
 
     Column {
-        anchors.horizontalCenter: parent.horizontalCenter
-        anchors.top: parent.top
+        anchors.fill: parent
         anchors.topMargin: 30
-        width: parent.width * 0.75
-
-        spacing: 18
-
-        Text {
-            text: "Configure system services"
-            font.pixelSize: 30
-            font.weight: Font.DemiBold
-            color: Theme.colors.text
-        }
-
-        Rectangle {
-            width: 55
-            height: 4
-            color: Theme.colors.blue
-            radius: 2
-        }
-
-        Text {
-            width: parent.width
-            text: "Choose how synapseHome should run on your device."
-            font.pixelSize: 16
-            color: Theme.colors.secondaryText
-            wrapMode: Text.WordWrap
-        }
-
-        // Installation without GUI
-        Text {
-            visible: !guiDevice
-
-            width: parent.width
-            text: "Choose whether the backend daemon (synapsed) should run automatically as a system service. This determines how synapseHome operates in the background. For more information, visit the synapseHome GitHub page."
-            font.pixelSize: 15
-            color: Theme.colors.tertiaryText
-            wrapMode: Text.WordWrap
-            lineHeight: 1.3
-        }
-
-        // Installation with GUI
-        Text {
-            visible: guiDevice
-
-            width: parent.width
-            text: "Choose whether the backend daemon (synapsed) should run automatically as a system service, either alone or together with the graphical interface (synapse UI). The selected components will be configured accordingly. For more information, visit the synapseHome GitHub page."
-            font.pixelSize: 15
-            color: Theme.colors.tertiaryText
-            wrapMode: Text.WordWrap
-            lineHeight: 1.3
-        }
-
-        Text {
-            text: "System services"
-            font.pixelSize: 16
-            font.weight: Font.Medium
-            color: Theme.colors.text
-        }
-
+        spacing: 10
+        
         Column {
-            width: parent.width
-            spacing: 12
+            id: textColumn
 
-            RadioButton {
-                text: "No system services"
-                checked: selectedService === "none"
+            width: parent.width * 0.75
 
-                onClicked: selectedService = "none"
+            anchors.horizontalCenter: parent.horizontalCenter
+
+            spacing: 18
+
+            Text {
+                text: "Configure system services"
+                font.pixelSize: 30
+                font.weight: Font.DemiBold
+                color: Theme.colors.text
             }
 
-            RadioButton {
-                text: "Backend daemon (synapsed)"
-                checked: selectedService === "backend"
-
-                onClicked: selectedService = "backend"
+            Rectangle {
+                width: 55
+                height: 4
+                color: Theme.colors.blue
+                radius: 2
             }
 
-            // Only available for GUI installations
-            RadioButton {
-                visible: guiDevice
-                text: "Backend daemon (synapsed) + GUI (synapse UI)"
-                checked: selectedService === "backendgui"
+            Text {
+                width: parent.width
+                text: "Choose how synapseHome should run on your device."
+                font.pixelSize: 16
+                color: Theme.colors.secondaryText
+                wrapMode: Text.WordWrap
+            }
 
-                onClicked: selectedService = "backendgui"
+            // Installation without GUI
+            Text {
+                visible: !root.guiDevice
+
+                width: parent.width
+                text: "Choose whether the backend daemon (synapsed) should run automatically as a system service. This determines how synapseHome operates in the background. For more information, visit the synapseHome GitHub page."
+                font.pixelSize: 15
+                color: Theme.colors.tertiaryText
+                wrapMode: Text.WordWrap
+                lineHeight: 1.3
+            }
+
+            // Installation with GUI
+            Text {
+                visible: root.guiDevice
+
+                width: parent.width
+                text: "Choose whether the backend daemon (synapsed) should run automatically as a system service, either alone or together with the graphical interface (synapse UI). The selected components will be configured accordingly. For more information, visit the synapseHome GitHub page."
+                font.pixelSize: 15
+                color: Theme.colors.tertiaryText
+                wrapMode: Text.WordWrap
+                lineHeight: 1.3
+            }
+
+            Row {
+                spacing: 20
+
+                Text {
+                    text: "System services"
+                    font.pixelSize: 16
+                    font.weight: Font.Medium
+                    color: Theme.colors.text
+                }
+
+                Text {
+                    text: "Input Required!"
+                    font.pixelSize: 16
+                    font.bold: true
+                    color: Theme.colors.error
+
+                    visible: error
+                }
+            }
+        }
+        
+        Rectangle {
+            id: errorRectangle
+
+            anchors.horizontalCenter: parent.horizontalCenter
+
+            width: textColumn.width + 20
+            height: buttonColumn.implicitHeight + 20
+
+            radius: 8
+            border.width: 2
+            border.color: "transparent"
+
+            Column {
+                id: buttonColumn
+
+                width: parent.width - 20
+                anchors.centerIn: parent
+                spacing: 12
+
+                RadioButton {
+                    text: "No system services"
+                    checked: root.selectedService === "none"
+
+                    onClicked: root.selectServices("none")
+                }
+
+                RadioButton {
+                    text: "Backend daemon (synapsed)"
+                    checked: root.selectedService === "backend"
+
+                    onClicked: root.selectServices("backend")
+                }
+
+                // Only available for GUI installations
+                RadioButton {
+                    visible: root.guiDevice
+                    text: "Backend daemon (synapsed) + GUI (synapse UI)"
+                    checked: root.selectedService === "backendGui"
+
+                    onClicked: root.selectServices("backendGui")
+                }
             }
         }
     }
@@ -111,5 +194,22 @@ Rectangle {
         backgroundColor: Theme.colors.primaryAccent
         width: 140
         height: 48
+
+        onClicked: {
+            if (validatePageSwitch()) {
+                switch (root.selectedService) {
+                    case "none":
+                        GuiInstaller.service(GuiInstaller.None)
+                        break
+                    case "backend":
+                        GuiInstaller.service(GuiInstaller.Backend)
+                        break
+                    case "backendGui":
+                        GuiInstaller.service(GuiInstaller.BackendGui)
+                        break
+                }
+                GuiInstaller.nextInstallationPage()
+            }
+        }
     }
 }

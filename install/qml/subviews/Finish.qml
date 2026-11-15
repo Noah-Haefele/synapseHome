@@ -1,5 +1,6 @@
 import QtQuick
 import sHInstaller
+import GuiInstaller
 import "../components"
 
 Rectangle {
@@ -79,6 +80,7 @@ Rectangle {
             height: 48
 
             // Launch synapseHome and close installer
+            onClicked: GuiInstaller.launchApplication()
         }
 
         ModernButton {
@@ -91,6 +93,7 @@ Rectangle {
             height: 48
 
             // Close installer
+            onClicked: GuiInstaller.finishGuiInstaller()
         }
     }
 }
